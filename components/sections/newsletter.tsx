@@ -23,7 +23,7 @@ export function Newsletter() {
   }
 
   return (
-    <section className="py-16 lg:py-24 bg-gradient-to-r from-primary to-shopify-purple text-primary-foreground">
+    <section className="py-16 lg:py-24 bg-linear-to-r from-primary to-shopify-purple text-primary-foreground">
       <div className="container px-4">
         <div className="max-w-3xl mx-auto text-center">
           <div className="w-16 h-16 bg-primary-foreground/20 rounded-full flex items-center justify-center mx-auto mb-6">

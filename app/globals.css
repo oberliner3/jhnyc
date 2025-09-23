@@ -1,7 +1,5 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'); */
-
-@variant dark (&:is(.dark *));
 
 @theme {
   /* Border radius values */
@@ -64,6 +62,8 @@
   --animate-fade-in: fade-in 0.6s ease-out;
   --animate-slide-up: fade-in 0.6s ease-out;
 }
+
+@variant dark (&:is(.dark *));
 
 /* Keyframe definitions */
 @keyframes fade-in {
@@ -239,6 +239,6 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-primary to-shopify-purple bg-clip-text text-transparent;
+    @apply bg-linear-to-r from-primary to-shopify-purple bg-clip-text text-transparent;
   }
 }

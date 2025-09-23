@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/20">
+    <section className="relative overflow-hidden bg-linear-to-br from-primary/5 via-background to-secondary/20">
       <div className="container px-4 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Content */}
@@ -58,7 +58,7 @@ export function Hero() {
 
           {/* Hero Image */}
           <div className="relative">
-            <div className="relative aspect-square lg:aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20">
+            <div className="relative aspect-square lg:aspect-4/5 overflow-hidden rounded-2xl bg-linear-to-br from-primary/20 to-secondary/20">
               <Image
                 src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=800&fit=crop"
                 alt="Hero product showcase"
