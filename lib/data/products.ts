@@ -17,6 +17,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     rating: 4.8,
     reviewCount: 124,
     tags: ['wireless', 'headphones', 'premium'],
+    vendor: 'AudioTech',
   },
   {
     id: '2',
@@ -32,6 +33,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     rating: 4.6,
     reviewCount: 89,
     tags: ['organic', 'cotton', 'sustainable'],
+    vendor: 'EcoWear',
   },
   {
     id: '3',
@@ -48,6 +50,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     rating: 4.7,
     reviewCount: 203,
     tags: ['fitness', 'smartwatch', 'health'],
+    vendor: 'FitGear',
   },
   {
     id: '4',
@@ -63,6 +66,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     rating: 4.5,
     reviewCount: 67,
     tags: ['minimalist', 'backpack', 'travel'],
+    vendor: 'UrbanCarry',
   },
   {
     id: '5',
@@ -78,6 +82,7 @@ export const FEATURED_PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 145,
     tags: ['coffee', 'artisan', 'premium'],
+    vendor: 'BeanCraft',
   },
 ]
 

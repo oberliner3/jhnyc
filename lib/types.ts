@@ -1,4 +1,5 @@
 export interface Product {
+    [key: string]: unknown; // Add index signature
     id: string
     name: string
     slug: string
@@ -11,6 +12,7 @@ export interface Product {
     rating: number
     reviewCount: number
     tags: string[]
+    vendor: string
     variants?: ProductVariant[]
   }
 
