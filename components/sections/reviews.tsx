@@ -11,7 +11,7 @@ export function Reviews() {
             What Our Customers Say
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Don't just take our word for it. Here's what real customers have to say about their experience.
+            Don&apos;t just take our word for it. Here&apos;s what real customers have to say about their experience.
           </p>
         </div>
 
@@ -33,7 +33,7 @@ export function Reviews() {
                   />
                 ))}
               </div>
-              <p className="text-muted-foreground mb-6">"{review.comment}"</p>
+              <p className="text-muted-foreground mb-6">&quot;{review.comment}&quot;</p>
               <div className="flex items-center gap-3">
                 {review.avatar && (
                   <Image

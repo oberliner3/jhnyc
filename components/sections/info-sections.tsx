@@ -32,7 +32,7 @@ export function InfoSections() {
             Why Shop With Us?
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            We're committed to providing the best shopping experience with premium quality products and exceptional service.
+            We&apos;re committed to providing the best shopping experience with premium quality products and exceptional service.
           </p>
         </div>
 

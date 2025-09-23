@@ -39,7 +39,7 @@ export default function TermsOfServicePage() {
           <section>
             <h2 className="text-2xl font-bold mb-4">Disclaimer</h2>
             <p className="text-muted-foreground">
-              The materials on our website are provided on an 'as is' basis. We make no warranties, 
+              The materials on our website are provided on an &apos;as is&apos; basis. We make no warranties, 
               expressed or implied, and hereby disclaim and negate all other warranties including, 
               without limitation, implied warranties or conditions of merchantability.
             </p>

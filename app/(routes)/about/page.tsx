@@ -17,7 +17,7 @@ export default function AboutPage() {
         
         <div className="prose prose-lg max-w-none">
           <p className="text-xl text-muted-foreground mb-8">
-            We're passionate about bringing you the finest products with exceptional quality and unmatched service.
+            We&apos;re passionate about bringing you the finest products with exceptional quality and unmatched service.
           </p>
           
           <div className="grid md:grid-cols-2 gap-8 mb-12">
@@ -43,7 +43,7 @@ export default function AboutPage() {
           <p className="text-muted-foreground mb-6">
             With over a decade of experience in e-commerce, we understand what matters most to our customers. 
             From carefully selected products to lightning-fast shipping and hassle-free returns, 
-            we're committed to exceeding your expectations at every step.
+            we&apos;re committed to exceeding your expectations at every step.
           </p>
         </div>
       </div>

@@ -10,7 +10,7 @@ export function Partners() {
             Trusted by Leading Brands
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            We partner with the world's most innovative companies to bring you the best products.
+            We partner with the world&apos;s most innovative companies to bring you the best products.
           </p>
         </div>
 

@@ -6,7 +6,6 @@ export function generateSEO({
   description,
   image,
   path = '',
-  type = 'website',
 }: {
   title?: string
   description?: string

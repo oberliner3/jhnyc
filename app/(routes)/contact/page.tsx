@@ -3,7 +3,7 @@ import { generateSEO } from '@/lib/seo'
 import { Mail, Phone, MapPin, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
+
 
 export const metadata: Metadata = generateSEO({
   title: 'Contact Us',
@@ -75,7 +75,7 @@ export default function ContactPage() {
           <div>
             <h2 className="text-2xl font-semibold mb-4">Get in touch</h2>
             <p className="text-muted-foreground mb-8">
-              We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+              We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
             </p>
             
             <div className="space-y-6">

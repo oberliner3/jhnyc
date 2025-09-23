@@ -11,7 +11,6 @@ const ANNOUNCEMENTS = [
 
 export function AnnouncementBar() {
   const [isVisible, setIsVisible] = useState(true)
-  const [currentIndex, setCurrentIndex] = useState(0)
 
   if (!isVisible) return null
 

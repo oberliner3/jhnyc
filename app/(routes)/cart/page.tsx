@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { formatPrice } from '@/lib/utils'
+import Link from 'next/link'
+import Image from 'next/image'
 
 export const metadata: Metadata = generateSEO({
   title: 'Shopping Cart',
@@ -50,7 +52,7 @@ export default function CartPage() {
           <h2 className="text-2xl font-semibold mb-2">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">Add some items to your cart to get started.</p>
           <Button asChild>
-            <a href="/products">Continue Shopping</a>
+            <Link href="/products">Continue Shopping</Link>
           </Button>
         </div>
       ) : (
@@ -59,9 +61,11 @@ export default function CartPage() {
           <div className="lg:col-span-2 space-y-4">
             {CART_ITEMS.map((item) => (
               <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg">
-                <img
+              <Image
                   src={item.image}
                   alt={item.name}
+                  width={80}
+                  height={80}
                   className="w-20 h-20 object-cover rounded-md"
                 />
                 <div className="flex-1">

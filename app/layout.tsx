@@ -1,7 +1,7 @@
-import type { Metadata, Viewport } from 'next'
+import type { Metadata, Viewport } from 'next' // eslint-disable-line @typescript-eslint/no-unused-vars
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { generateSEO } from '@/lib/seo'
+
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { AnnouncementBar } from '@/components/layout/announcement-bar'
@@ -9,7 +9,7 @@ import { SchemaMarkup } from '@/components/common/schema-markup'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = generateSEO({})
+
 
 export const viewport: Viewport = {
   width: 'device-width',
