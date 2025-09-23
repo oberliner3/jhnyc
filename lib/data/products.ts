@@ -1,0 +1,83 @@
+import { Product } from '@/lib/types'
+
+export const FEATURED_PRODUCTS: Product[] = [
+  {
+    id: '1',
+    name: 'Premium Wireless Headphones',
+    slug: 'premium-wireless-headphones',
+    description: 'High-quality wireless headphones with noise cancellation',
+    price: 299.99,
+    compareAtPrice: 399.99,
+    images: [
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&h=500&fit=crop',
+    ],
+    category: 'Electronics',
+    inStock: true,
+    rating: 4.8,
+    reviewCount: 124,
+    tags: ['wireless', 'headphones', 'premium'],
+  },
+  {
+    id: '2',
+    name: 'Organic Cotton T-Shirt',
+    slug: 'organic-cotton-tshirt',
+    description: 'Soft, comfortable organic cotton t-shirt',
+    price: 29.99,
+    images: [
+      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
+    ],
+    category: 'Clothing',
+    inStock: true,
+    rating: 4.6,
+    reviewCount: 89,
+    tags: ['organic', 'cotton', 'sustainable'],
+  },
+  {
+    id: '3',
+    name: 'Smart Fitness Watch',
+    slug: 'smart-fitness-watch',
+    description: 'Track your fitness goals with this advanced smartwatch',
+    price: 199.99,
+    compareAtPrice: 249.99,
+    images: [
+      'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&h=500&fit=crop',
+    ],
+    category: 'Electronics',
+    inStock: true,
+    rating: 4.7,
+    reviewCount: 203,
+    tags: ['fitness', 'smartwatch', 'health'],
+  },
+  {
+    id: '4',
+    name: 'Minimalist Backpack',
+    slug: 'minimalist-backpack',
+    description: 'Sleek and functional backpack for everyday use',
+    price: 79.99,
+    images: [
+      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=500&fit=crop',
+    ],
+    category: 'Accessories',
+    inStock: true,
+    rating: 4.5,
+    reviewCount: 67,
+    tags: ['minimalist', 'backpack', 'travel'],
+  },
+  {
+    id: '5',
+    name: 'Artisan Coffee Beans',
+    slug: 'artisan-coffee-beans',
+    description: 'Premium single-origin coffee beans',
+    price: 24.99,
+    images: [
+      'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop',
+    ],
+    category: 'Food & Beverage',
+    inStock: true,
+    rating: 4.9,
+    reviewCount: 145,
+    tags: ['coffee', 'artisan', 'premium'],
+  },
+]
+
