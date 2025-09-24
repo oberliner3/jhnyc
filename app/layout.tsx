@@ -10,8 +10,8 @@ import { SchemaMarkup } from "@/components/common/schema-markup";
 import { Providers } from "./providers";
 import { CookieBanner } from "@/components/common/cookie-banner";
 
-import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,6 +34,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>
+				<meta name="apple-mobile-web-app-title" content="OriGinz" />
 				<SchemaMarkup />
 			</head>
 			<body className={inter.className}>
@@ -46,8 +47,8 @@ export default function RootLayout({
 					</div>
 					<CookieBanner />
 				</Providers>
-         <Analytics />
-         <SpeedInsights />
+				<Analytics />
+				<SpeedInsights />
 			</body>
 		</html>
 	);
