@@ -239,6 +239,6 @@
   }
 
   .gradient-text {
-    @apply bg-linear-to-r from-primary to-shopify-purple bg-clip-text text-transparent;
+    @apply bg-linear-to-r from-shopify-purple via-shopify-purple to-cyan-700 bg-clip-text text-transparent;
   }
 }

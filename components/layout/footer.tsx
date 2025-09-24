@@ -4,18 +4,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Logo } from '@/components/common/logo'
-import { FOOTER_LINKS, SITE_CONFIG } from '@/lib/constants'
+import { APP_CONTACTS, FOOTER_LINKS, SITE_CONFIG } from "@/lib/constants";
 
 export function Footer() {
   return (
     <footer className="bg-muted/50 border-t">
       {/* Newsletter Section */}
-      <div className="bg-primary text-primary-foreground">
+      <div className=" text-primary-foreground bg-primary shadow">
         <div className="container px-4 py-12">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-bold mb-2">Get Exclusive Offers</h2>
             <p className="mb-6 opacity-90">
-              Subscribe to our newsletter and get 10% off your first order plus access to exclusive deals.
+              Subscribe to our newsletter and get 10% off your first order plus
+              access to exclusive deals.
             </p>
             <form className="flex gap-2 max-w-md mx-auto">
               <Input
@@ -29,7 +30,8 @@ export function Footer() {
               </Button>
             </form>
             <p className="text-xs mt-3 opacity-75">
-              By subscribing, you agree to receive promotional emails. You can unsubscribe at any time.
+              By subscribing, you agree to receive promotional emails. You can
+              unsubscribe at any time.
             </p>
           </div>
         </div>
@@ -42,20 +44,21 @@ export function Footer() {
           <div className="space-y-4">
             <Logo />
             <p className="text-sm text-muted-foreground">
-              Premium e-commerce storefront delivering quality products with exceptional service.
+              Premium e-commerce storefront delivering quality products with
+              exceptional service.
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4" />
-                <span>123 Commerce St, City, State 12345</span>
+                <span>{APP_CONTACTS.address.office}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Phone className="h-4 w-4" />
-                <span>+1 (555) 123-4567</span>
+                <span>{APP_CONTACTS.phone.main}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Mail className="h-4 w-4" />
-                <span>hello@storecraft.com</span>
+                <span>{APP_CONTACTS.email.getInTouch}</span>
               </div>
             </div>
           </div>
@@ -160,5 +163,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

@@ -25,15 +25,17 @@ export function Header() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80">
-            <div className="flex flex-col space-y-4 pt-6">
-              <Logo />
-              <nav className="flex flex-col space-y-2">
+          <SheetContent side="left" className="w-80  bg-zinc-50 ">
+            <div className="flex flex-col space-y-4 py-2">
+              <div className="px-2">
+                <Logo />
+              </div>
+              <nav className="flex flex-col space-y-2 gap-2 border-t ">
                 {NAVIGATION_ITEMS.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="text-lg font-medium hover:text-primary transition-colors hover:shadow-sm hover:border-b p-2 hover:text-xl"
                   >
                     {item.name}
                   </Link>
@@ -110,5 +112,5 @@ export function Header() {
         </div>
       )}
     </header>
-  )
+  );
 }

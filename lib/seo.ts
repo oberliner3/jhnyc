@@ -1,22 +1,23 @@
-import { Metadata } from 'next'
-import { SITE_CONFIG } from './constants'
+import type { Metadata } from "next";
+import { SITE_CONFIG } from "./constants";
+export type OgType = "website" | "article" | "product";
 
 export function generateSEO({
   title,
   description,
   image,
-  path = '',
+  path = "",
 }: {
-  title?: string
-  description?: string
-  image?: string
-  path?: string
-  type?: 'website' | 'article' | 'product'
+  title?: string;
+  description?: string;
+  image?: string;
+  path?: string;
+  type?: OgType;
 }): Metadata {
-  const seoTitle = title ? `${title} | ${SITE_CONFIG.name}` : SITE_CONFIG.name
-  const seoDescription = description || SITE_CONFIG.description
-  const seoImage = image || SITE_CONFIG.ogImage
-  const seoUrl = `${SITE_CONFIG.url}${path}`
+  const seoTitle = title ? `${title} | ${SITE_CONFIG.name}` : SITE_CONFIG.name;
+  const seoDescription = description || SITE_CONFIG.description;
+  const seoImage = image || SITE_CONFIG.ogImage;
+  const seoUrl = `${SITE_CONFIG.url}${path}`;
 
   return {
     title: seoTitle,
@@ -31,14 +32,14 @@ export function generateSEO({
       googleBot: {
         index: true,
         follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
       },
     },
     openGraph: {
-      type: "article",
-      locale: 'en_US',
+      type: "website",
+      locale: "en_US",
       url: seoUrl,
       title: seoTitle,
       description: seoDescription,
@@ -53,21 +54,20 @@ export function generateSEO({
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: seoTitle,
       description: seoDescription,
       images: [seoImage],
-      creator: '@storecraft',
+      creator: "@OriGinz",
     },
     icons: {
-      icon: '/favicon.ico',
-      shortcut: '/favicon-16x16.png',
-      apple: '/apple-touch-icon.png',
+      icon: "/favicon.ico",
+      shortcut: "/favicon-16x16.png",
+      apple: "/apple-touch-icon.png",
     },
-    manifest: '/site.webmanifest',
+    manifest: "/site.webmanifest",
     alternates: {
       canonical: seoUrl,
     },
-  }
+  };
 }
-

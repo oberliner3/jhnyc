@@ -5,8 +5,8 @@ import { useState } from 'react'
 
 const ANNOUNCEMENTS = [
   "🎉 Free shipping on orders over $50 - Limited time offer!",
+  "💰 Save 20% with code SAVE2025 - Valid until midnight",
   "✨ New arrivals now available - Shop the latest trends",
-  "💰 Save 20% with code SAVE20 - Valid until midnight",
 ]
 
 export function AnnouncementBar() {
@@ -15,9 +15,9 @@ export function AnnouncementBar() {
   if (!isVisible) return null
 
   return (
-    <div className="relative bg-primary text-primary-foreground">
+    <div className="relative bg-primary text-primary-foreground border-b">
       <div className="overflow-hidden">
-        <div className="animate-slide-left flex">
+        <div className="animate-slide-up duration-1000 flex">
           {ANNOUNCEMENTS.map((announcement, index) => (
             <div
               key={index}

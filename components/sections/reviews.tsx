@@ -11,7 +11,8 @@ export function Reviews() {
             What Our Customers Say
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Don&apos;t just take our word for it. Here&apos;s what real customers have to say about their experience.
+            Don&apos;t just take our word for it. Here&apos;s what real
+            customers have to say about their experience.
           </p>
         </div>
 
@@ -22,18 +23,20 @@ export function Reviews() {
               className="bg-background rounded-lg p-6 border shadow-sm"
             >
               <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
+                {[...Array(4)].map((_, i) => (
                   <Star
                     key={i}
                     className={`h-4 w-4 ${
                       i < review.rating
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-muted-foreground/30'
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-muted-foreground/30"
                     }`}
                   />
                 ))}
               </div>
-              <p className="text-muted-foreground mb-6">&quot;{review.comment}&quot;</p>
+              <p className="text-muted-foreground mb-6">
+                &quot;{review.comment}&quot;
+              </p>
               <div className="flex items-center gap-3">
                 {review.avatar && (
                   <Image
@@ -48,7 +51,9 @@ export function Reviews() {
                   <div className="font-medium">{review.name}</div>
                   <div className="text-sm text-muted-foreground flex items-center gap-1">
                     {review.verified && (
-                      <span className="text-green-600">✓ Verified Purchase</span>
+                      <span className="text-green-600">
+                        ✓ Verified Purchase
+                      </span>
                     )}
                   </div>
                 </div>
@@ -58,6 +63,6 @@ export function Reviews() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 

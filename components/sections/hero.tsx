@@ -1,11 +1,11 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight, Play } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-linear-to-br from-primary/5 via-background to-secondary/20">
+    <section className="relative overflow-hidden bg-linear-to-br from-red-500/50 via-purple-500 to-blue-500/50">
       <div className="container px-4 py-16 lg:py-24">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Content */}
@@ -19,11 +19,11 @@ export function Hero() {
                 <span className="gradient-text block">Perfect Style</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-lg">
-                Shop our curated collection of premium products designed for the modern lifestyle. 
-                Quality meets style in every piece.
+                Shop our curated collection of premium products designed for the
+                modern lifestyle. Quality meets style in every piece.
               </p>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="text-lg px-8" asChild>
                 <Link href="/products">
@@ -32,6 +32,9 @@ export function Hero() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="text-lg px-8">
+                {/**
+                 * TODO: PopUp VideoPlayer
+                 */}
                 <Play className="mr-2 h-5 w-5" />
                 Watch Story
               </Button>
@@ -41,17 +44,23 @@ export function Hero() {
             <div className="flex items-center gap-6 pt-8">
               <div className="text-center">
                 <div className="text-2xl font-bold">10K+</div>
-                <div className="text-sm text-muted-foreground">Happy Customers</div>
+                <div className="text-sm text-muted-foreground">
+                  Happy Customers
+                </div>
               </div>
               <div className="h-8 w-px bg-border"></div>
               <div className="text-center">
-                <div className="text-2xl font-bold">4.9</div>
-                <div className="text-sm text-muted-foreground">Average Rating</div>
+                <div className="text-2xl font-bold">4.7</div>
+                <div className="text-sm text-muted-foreground">
+                  Average Rating
+                </div>
               </div>
               <div className="h-8 w-px bg-border"></div>
               <div className="text-center">
                 <div className="text-2xl font-bold">50+</div>
-                <div className="text-sm text-muted-foreground">Premium Brands</div>
+                <div className="text-sm text-muted-foreground">
+                  Premium Brands
+                </div>
               </div>
             </div>
           </div>
@@ -84,5 +93,5 @@ export function Hero() {
         </div>
       </div>
     </section>
-  )
+  );
 }
