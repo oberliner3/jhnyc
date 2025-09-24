@@ -26,6 +26,66 @@ export interface ApiProduct {
   updated_at: string;
 }
 
+// Map ApiProduct -> internal Product types
+import type { Product, ProductImage, ProductOption, ProductVariant } from "@/lib/types";
+
+export function mapApiVariant(variant: ApiProductVariant): ProductVariant {
+  return {
+    id: variant.id,
+    name:
+      variant.title ||
+      [variant.option1, variant.option2, variant.option3].filter(Boolean).join(" / ") ||
+      String(variant.id),
+    price: Number(variant.price),
+    inStock: Boolean(variant.available),
+    image: variant.featured_image,
+  };
+}
+
+export function mapApiOption(option: ApiProductOption): ProductOption {
+  return {
+    id: option.id,
+    name: option.name,
+    position: option.position,
+    values: option.values,
+  };
+}
+
+export function mapApiImage(image: ApiProductImage): ProductImage {
+  return {
+    id: image.id,
+    product_id: image.product_id,
+    position: image.position,
+    alt: image.alt,
+    src: image.src,
+    width: image.width,
+    height: image.height,
+    created_at: image.created_at,
+    updated_at: image.updated_at,
+    variant_ids: image.variant_ids,
+  };
+}
+
+export function mapApiToProduct(apiProduct: ApiProduct): Product {
+  return {
+    id: apiProduct.id,
+    name: apiProduct.name,
+    handle: apiProduct.handle,
+    body_html: apiProduct.body_html,
+    price: apiProduct.price,
+    compareAtPrice: apiProduct.compare_at_price,
+    images: apiProduct.images?.map(mapApiImage) || [],
+    category: apiProduct.category,
+    inStock: apiProduct.in_stock,
+    rating: apiProduct.rating,
+    reviewCount: apiProduct.review_count,
+    tags: apiProduct.tags,
+    vendor: apiProduct.vendor,
+    variants: apiProduct.variants?.map(mapApiVariant) || [],
+    options: apiProduct.options?.map(mapApiOption) || [],
+  } as Product;
+}
+
 export interface ApiProductImage {
   id: number;
   product_id: number;
@@ -133,7 +193,13 @@ export async function getProductById(id: number): Promise<ApiProduct> {
  * Get a specific product by handle
  */
 export async function getProductByHandle(handle: string): Promise<ApiProduct> {
-  return apiRequest<ApiProduct>(`/cosmos/products/handle/${handle}`);
+  // Backend doesn't expose handle endpoint; use search and exact-match by handle
+  const candidates = await searchProducts(handle);
+  const matched = candidates.find((p) => p.handle === handle);
+  if (!matched) {
+    throw new Error(`Product with handle '${handle}' not found`);
+  }
+  return matched;
 }
 
 /**

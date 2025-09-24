@@ -1,16 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { FEATURED_PRODUCTS } from "@/lib/data/products";
+import { getProductByHandle, mapApiToProduct } from "@/lib/api";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   context: { params: Promise<{ handle: string }> }
 ) {
   const { handle } = await context.params;
-  const product = FEATURED_PRODUCTS.find((p) => p.handle === handle);
-
-  if (!product) {
-    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  try {
+    const apiProduct = await getProductByHandle(handle);
+    const product = mapApiToProduct(apiProduct);
+    return NextResponse.json(product);
+  } catch (error) {
+    return NextResponse.json(
+      { error: `Product not found${error}` },
+      { status: 404 }
+    );
   }
-
-  return NextResponse.json(product);
 }

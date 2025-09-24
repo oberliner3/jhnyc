@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/utils";
 import { Product } from "@/lib/types";
 import { useCart } from "@/contexts/cart-context";
+import { getImageProxyUrl } from "@/lib/api";
 
 interface ProductCardProps {
 	product: Product;
@@ -39,7 +40,7 @@ export function ProductCard({ product }: ProductCardProps) {
 			<Link href={`/products/${product.handle}`} className="block">
 				<div className="relative aspect-square overflow-hidden">
 					<Image
-						src={product.images[0].src}
+						src={getImageProxyUrl(product.images[0].src)}
 						alt={product.name}
 						fill
 						className="object-cover group-hover:scale-105 transition-transform"
@@ -74,7 +75,7 @@ export function ProductCard({ product }: ProductCardProps) {
 					<div className="flex">
 						{[...Array(5)].map((_, i) => (
 							<Star
-								key={i}
+								key={`star-${product.id}-${i}`}
 								className={`h-4 w-4 ${
 									i < Math.floor(product.rating)
 										? "fill-yellow-400 text-yellow-400"

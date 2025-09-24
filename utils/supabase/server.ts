@@ -19,17 +19,28 @@ export async function createClient() {
       set(name: string, value: string, options: CookieOptions) {
         try {
           cookieStore.set({ name, value, ...options });
-        } catch (_error) {
+        } catch (error) {
           // The `cookies().set()` method can only be called in a Server Action or Route Handler.
-          // This error is typically not an issue if you're only reading cookies on the server.
+          // Log for visibility in development; ignore in production to avoid noisy logs.
+          if (process.env.NODE_ENV !== "production") {
+            console.error("[Supabase] Failed to set cookie", {
+              name,
+              message: (error as Error)?.message,
+            });
+          }
         }
       },
       remove(name: string, options: CookieOptions) {
         try {
           cookieStore.set({ name, value: "", ...options });
-        } catch (_error) {
+        } catch (error) {
           // The `cookies().set()` method can only be called in a Server Action or Route Handler.
-          // This error is typically not an issue if you're only reading cookies on the server.
+          if (process.env.NODE_ENV !== "production") {
+            console.error("[Supabase] Failed to remove cookie", {
+              name,
+              message: (error as Error)?.message,
+            });
+          }
         }
       },
     },

@@ -13,6 +13,7 @@ import { useCart } from "@/contexts/cart-context";
 import type { Product, ProductVariant } from "@/lib/types";
 import { ProductReviews } from '@/components/product/product-reviews';
 import { AddReviewForm } from '@/components/product/add-review-form';
+import { getImageProxyUrl } from "@/lib/api";
 
 interface ProductDetailsProps {
   slug: string;
@@ -87,7 +88,7 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
       <div className="space-y-4">
         <div className="relative bg-muted rounded-lg aspect-square overflow-hidden">
           <Image
-            src={selectedVariant?.image || product.images[0].src}
+            src={getImageProxyUrl(selectedVariant?.image || product.images[0].src)}
             alt={product.name}
             fill
             className="object-cover"
@@ -103,11 +104,11 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
           <div className="gap-2 grid grid-cols-4">
             {product.images.slice(1, 5).map((image, index) => (
               <div
-                key={index}
+                key={`thumb-${product.id}-${image.id ?? index}`}
                 className="relative bg-muted rounded-md aspect-square overflow-hidden"
               >
                 <Image
-                  src={image.src}
+                  src={getImageProxyUrl(image.src)}
                   alt={`${product.name} ${index + 2}`}
                   fill
                   className="object-cover"
@@ -133,7 +134,7 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <Star
-                  key={i}
+                  key={`star-${product.id}-${i}`}
                   className={`h-5 w-5 ${
                     i < Math.floor(product.rating)
                       ? "fill-yellow-400 text-yellow-400"

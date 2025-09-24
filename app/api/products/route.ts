@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { FEATURED_PRODUCTS } from "@/lib/data/products";
-import { Product } from "@/lib/types";
-
-type ProductKey = keyof Product;
+import { getAllProducts, getProductsByVendor, searchProducts } from "@/lib/api";
+import type { ApiProduct } from "@/lib/api";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -10,52 +8,36 @@ export async function GET(request: Request) {
   const vendor = searchParams.get("vendor");
   const limit = Number(searchParams.get("limit")) || 10;
   const page = Number(searchParams.get("page")) || 1;
-  const fields = searchParams.get("fields");
+  const fields = searchParams.get("fields") ?? undefined;
 
-  let products: Product[] = FEATURED_PRODUCTS;
+  try {
+    let products: ApiProduct[] = [];
 
-  if (search) {
-    products = products.filter(
-      (product) =>
-        product.name.toLowerCase().includes(search.toLowerCase()) ||
-        product.body_html.toLowerCase().includes(search.toLowerCase())
-    );
-  }
+    if (search && search.length > 0) {
+      products = await searchProducts(search);
+    } else if (vendor && vendor.length > 0) {
+      products = await getProductsByVendor(vendor);
+    } else {
+      products = await getAllProducts({ limit, page, fields });
+    }
 
-  if (vendor) {
-    products = products.filter(
-      (product) => product.vendor.toLowerCase() === vendor.toLowerCase()
-    );
-  }
+    // When using search/vendor endpoints, we may not have server-side pagination.
+    // Keep the response shape stable for clients.
+    const totalProducts = products.length;
+    const totalPages = Math.ceil(totalProducts / limit);
 
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  const paginatedProducts = products.slice(startIndex, endIndex);
-
-  const totalPages = Math.ceil(products.length / limit);
-
-  let formattedProducts: Record<string, unknown>[] = paginatedProducts;
-  if (fields) {
-    const selectedFields = fields
-      .split(",")
-      .map((field) => field.trim()) as ProductKey[];
-    formattedProducts = paginatedProducts.map((product) => {
-      const newProduct: Record<string, unknown> = {};
-      selectedFields.forEach((field) => {
-        const value = product[field as ProductKey];
-        if (value !== undefined) {
-          newProduct[field] = value;
-        }
-      });
-      return newProduct;
+    return NextResponse.json({
+      data: products,
+      page,
+      limit,
+      totalPages,
+      totalProducts,
     });
+  } catch (error) {
+    console.error("[API] Failed to fetch products:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch products" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({
-    data: formattedProducts as Partial<Product>[],
-    page,
-    limit,
-    totalPages,
-    totalProducts: products.length,
-  });
 }

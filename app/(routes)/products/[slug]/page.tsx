@@ -1,47 +1,53 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { generateSEO } from "@/lib/seo";
-import { FEATURED_PRODUCTS } from "@/lib/data/products";
+import { getAllProducts, getProductByHandle } from "@/lib/api";
 import { ProductDetails } from "./product-details";
+
+export const revalidate = 60; // ISR: revalidate product detail pages every 60 seconds
 
 interface ProductPageProps {
   params: { slug: string };
 }
 
 export async function generateStaticParams() {
-  return FEATURED_PRODUCTS.map((product) => ({
-    slug: product.handle,
-  }));
+  // Prebuild a set of product pages using Cosmos API
+  // Limit to a reasonable number to keep build fast
+  try {
+    const products = await getAllProducts({ limit: 100, fields: "handle" });
+    return products.map((p) => ({ slug: p.handle }));
+  } catch {
+    // On failure, return empty list; pages will be generated on-demand
+    return [] as { slug: string }[];
+  }
 }
 
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
-  const product = FEATURED_PRODUCTS.find((p) => p.handle === params.slug);
-
-  if (!product) {
+  try {
+    const product = await getProductByHandle(params.slug);
+    return generateSEO({
+      title: product.name,
+      description: product.body_html,
+      path: `/products/${product.handle}`,
+      type: "product",
+      image: product.images?.[0]?.src,
+    });
+  } catch {
     return generateSEO({ title: "Product Not Found" });
   }
-
-  return generateSEO({
-    title: product.name,
-    description: product.body_html,
-    path: `/products/${product.handle}`,
-    type: "product",
-    image: product.images[0].src,
-  });
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = params;
-
   // The product data will be fetched on the client in ProductDetails
-  // We can still check for the existence of the slug for a quick 404
-  const productExists = FEATURED_PRODUCTS.some((p) => p.handle === slug);
+  // Optionally, we could pre-check existence here by querying the API
+  // and calling notFound() if it doesn't exist, but to avoid extra
+  // server roundtrip we rely on client fetch + metadata fetch above.
 
-  if (!productExists) {
-    notFound();
-  }
+  // If you want strict 404 before rendering, uncomment:
+  try { await getProductByHandle(slug) } catch { notFound() }
 
   return (
     <div className="px-4 py-8 container">
