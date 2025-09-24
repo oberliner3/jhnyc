@@ -11,6 +11,7 @@ import { Providers } from "./providers";
 import { CookieBanner } from "@/components/common/cookie-banner";
 
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -46,6 +47,7 @@ export default function RootLayout({
 					<CookieBanner />
 				</Providers>
          <Analytics />
+         <SpeedInsights />
 			</body>
 		</html>
 	);
