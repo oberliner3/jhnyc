@@ -1,11 +1,12 @@
 export const SITE_CONFIG = {
-  name: "OriGinz",
+  name: "Two Meskinz",
   description: "Premium e-commerce storefront built with Next.js",
-  domain: "originz.vercel.app",
-  url: "https://originz.vercel.app",
+  domain: "vohovintage.shop",
+  url: "https://vohovintage.shop",
+  ogTitle: "Two Meskinz - Your One-Stop Shop for Quality Products",
   ogImage: "https://originz.vercel.app/og.jpg",
-  author: "OriGinz Team",
-  lastUpdate: "June 30, 2025",
+  author: "Two Meskinz",
+  lastUpdate: "June 30, 2015",
   keywords: [
     "e-commerce",
     "online store",
