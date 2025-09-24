@@ -36,7 +36,7 @@ export default function CartDrawer() {
 			/>
 
 			{/* Sidebar */}
-			<div className="top-0 right-0 z-[100] fixed flex flex-col bg-neutral-50 shadow-xl w-full max-w-md h-full">
+			<div className="top-0 right-0 z-[100] fixed flex flex-col bg-neutral-50 shadow-xl w-full max-w-md h-screen">
 				{/* Header */}
 				<div className="flex justify-between items-center p-4 border-b">
 					<h2 className="font-semibold text-lg">Shopping Cart</h2>

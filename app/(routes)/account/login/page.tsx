@@ -1,55 +1,42 @@
-'use client'
+"use client";
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import Link from 'next/link'
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-})
-
-type LoginFormValues = z.infer<typeof loginSchema>
+import Link from "next/link";
+import { useId } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { signin } from "./actions";
 
 export default function LoginPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-  })
+	const emailId = useId();
+	const passwordId = useId();
 
-  const onSubmit = (data: LoginFormValues) => {
-    console.log(data)
-  }
-
-  return (
-    <div className="container px-4 py-8 flex justify-center items-center">
-      <div className="w-full max-w-md">
-        <h1 className="text-3xl font-bold tracking-tight lg:text-4xl mb-8 text-center">
-          Login
-        </h1>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" {...register('email')} />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" {...register('password')} />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
-          </div>
-          <Button type="submit" className="w-full">Login</Button>
-        </form>
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Don&apos;t have an account? {' '}
-          <Link href="/account/register" className="underline">
-            Register
-          </Link>
-        </p>
-      </div>
-    </div>
-  )
+	return (
+		<div className="flex justify-center items-center px-4 py-8 container">
+			<div className="w-full max-w-md">
+				<h1 className="mb-8 font-bold text-3xl lg:text-4xl text-center tracking-tight">
+					Login
+				</h1>
+				<form action={signin} className="space-y-4">
+					<div>
+						<Label htmlFor={emailId}>Email</Label>
+						<Input id={emailId} name="email" type="email" />
+					</div>
+					<div>
+						<Label htmlFor={passwordId}>Password</Label>
+						<Input id={passwordId} name="password" type="password" />
+					</div>
+					<Button type="submit" className="w-full">
+						Login
+					</Button>
+				</form>
+				<p className="mt-4 text-muted-foreground text-sm text-center">
+					Don&apos;t have an account?{" "}
+					<Link href="/account/register" className="underline">
+						Register
+					</Link>
+				</p>
+			</div>
+		</div>
+	);
 }

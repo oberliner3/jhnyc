@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Logo } from '@/components/common/logo'
 import { APP_CONTACTS, FOOTER_LINKS, SITE_CONFIG } from "@/lib/constants";
-
 import { PaymentMethods } from '@/components/icons/payment-methods';
+import { subscribeToNewsletter } from '@/app/api/newsletter/actions';
 
 export function Footer() {
   return (
@@ -20,9 +20,10 @@ export function Footer() {
               Subscribe to our newsletter and get 10% off your first order plus
               access to exclusive deals.
             </p>
-            <form className="flex gap-2 max-w-md mx-auto">
+            <form action={subscribeToNewsletter} className="flex gap-2 max-w-md mx-auto">
               <Input
                 type="email"
+                name="email"
                 placeholder="Enter your email"
                 className="bg-primary-foreground text-foreground"
                 required

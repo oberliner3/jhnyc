@@ -26,7 +26,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const hasVariants = product.variants && product.variants.length > 0;
 
   const handleAddToCart = () => {
-    if (!hasVariants && product.variants[0]) {
+    if (!product.inStock) return;
+
+    if (!hasVariants && product.variants && product.variants.length > 0) {
       addItem(product, product.variants[0], 1);
     }
   };

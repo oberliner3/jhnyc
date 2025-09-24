@@ -12,6 +12,7 @@ import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/contexts/cart-context";
 import type { Product, ProductVariant } from "@/lib/types";
 import { ProductReviews } from '@/components/product/product-reviews';
+import { AddReviewForm } from '@/components/product/add-review-form';
 
 interface ProductDetailsProps {
   slug: string;
@@ -239,6 +240,10 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
         <Separator />
 
         <ProductReviews />
+
+        <Separator />
+
+        <AddReviewForm productId={product.id} />
       </div>
     </div>
   );

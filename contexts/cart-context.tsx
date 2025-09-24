@@ -87,24 +87,67 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
   }
 }
 
+import { createClient } from '@/utils/supabase/client';
+
+// ... (rest of the component)
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false })
+  const supabase = createClient();
 
   useEffect(() => {
-    const savedCart = localStorage.getItem('originz-cart')
-    if (savedCart) {
-      try {
-        const cartItems = JSON.parse(savedCart)
-        dispatch({ type: 'LOAD_CART', payload: cartItems })
-      } catch (error) {
-        console.error('Error loading cart from localStorage:', error)
+    const getCart = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('carts')
+          .select('items')
+          .eq('user_id', user.id)
+          .single();
+
+        if (data) {
+          dispatch({ type: 'LOAD_CART', payload: data.items });
+        } else {
+          const savedCart = localStorage.getItem('originz-cart');
+          if (savedCart) {
+            try {
+              const cartItems = JSON.parse(savedCart);
+              dispatch({ type: 'LOAD_CART', payload: cartItems });
+            } catch (error) {
+              console.error('Error loading cart from localStorage:', error);
+            }
+          }
+        }
+      } else {
+        const savedCart = localStorage.getItem('originz-cart');
+        if (savedCart) {
+          try {
+            const cartItems = JSON.parse(savedCart);
+            dispatch({ type: 'LOAD_CART', payload: cartItems });
+          } catch (error) {
+            console.error('Error loading cart from localStorage:', error);
+          }
+        }
       }
     }
-  }, [])
+    getCart();
+  }, [supabase]);
 
   useEffect(() => {
-    localStorage.setItem('originz-cart', JSON.stringify(state.items))
-  }, [state.items])
+    const saveCart = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('carts').upsert({ user_id: user.id, items: state.items });
+      } else {
+        localStorage.setItem('originz-cart', JSON.stringify(state.items));
+      }
+    }
+    saveCart();
+  }, [state.items, supabase]);
+
+  // ... (rest of the component)
+
+
 
   const addItem = (product: Product, variant: ProductVariant, quantity: number = 1) => {
     dispatch({ type: 'ADD_ITEM', payload: { product, variant, quantity } })
