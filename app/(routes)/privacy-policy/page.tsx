@@ -31,7 +31,7 @@ export default function PrivacyPolicyPage() {
       title='Information We Collect'
       first='We collect information you provide directly to us, such as when you create an account, make a purchase, or contact us for support.'
       >
-      <UnorderdList list={weCollect} />
+      <UnorderdList items={weCollect} />
       </ArticleSection>
       <section>
         <h2 className="text-2xl font-bold mb-4">How We Use Your Information</h2>

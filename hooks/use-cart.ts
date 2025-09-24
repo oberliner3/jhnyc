@@ -32,7 +32,7 @@ export function useCart() {
   };
 
   const removeItem = (id: string) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    setItems((prevItems) => prevItems.filter((item) => item.id !== parseInt(id)));
   };
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -41,7 +41,7 @@ export function useCart() {
       return;
     }
     setItems((prevItems) =>
-      prevItems.map((item) => (item.id === id ? { ...item, quantity } : item))
+      prevItems.map((item) => (item.id === parseInt(id) ? { ...item, quantity } : item))
     );
   };
 

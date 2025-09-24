@@ -24,7 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
 			<Link href={`/products/${product.handle}`} className="block">
 				<div className="relative aspect-square overflow-hidden">
 					<Image
-						src={product.images[0]}
+						src={product.images[0].src}
 						alt={product.name}
 						fill
 						className="object-cover group-hover:scale-105 transition-transform"

@@ -27,7 +27,7 @@ export async function generateMetadata({
 		description: product.body_html,
 		path: `/products/${product.handle}`,
 		type: "product",
-		image: product.images[0],
+		image: product.images[0].src,
 	});
 }
 
@@ -80,7 +80,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 					<div className="space-y-4">
 						<div className="relative bg-muted rounded-lg aspect-square overflow-hidden">
 							<Image
-								src={product.images[0]}
+								src={product.images[0].src}
 								alt={product.name}
 								fill
 								className="object-cover"
@@ -100,7 +100,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 										className="relative bg-muted rounded-md aspect-square overflow-hidden"
 									>
 										<Image
-											src={image}
+											src={image.src}
 											alt={`${product.name} ${index + 2}`}
 											fill
 											className="object-cover"

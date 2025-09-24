@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 
 /**
  * Generates a client-side script to customize the checkout page.

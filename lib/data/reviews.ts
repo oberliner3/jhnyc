@@ -2,7 +2,7 @@ import type { Review } from "@/lib/types";
 
 export const CUSTOMER_REVIEWS: Review[] = [
   {
-    id: "1",
+    id: 1,
     name: "Sarah Johnson",
     rating: 5,
     comment:
@@ -13,7 +13,7 @@ export const CUSTOMER_REVIEWS: Review[] = [
       "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
   },
   {
-    id: "2",
+    id: 2,
     name: "Mike Chen",
     rating: 5,
     comment:
@@ -24,7 +24,7 @@ export const CUSTOMER_REVIEWS: Review[] = [
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
   },
   {
-    id: "3",
+    id: 3,
     name: "Emma Davis",
     rating: 4,
     comment:
