@@ -171,7 +171,16 @@ export async function getAllProducts(
 
   const queryString = params.toString();
   const endpoint = queryString ? `/cosmos/products?${queryString}` : "/cosmos/products";
-  return apiRequest<ApiProduct[]>(endpoint);
+
+  try {
+    const data = await apiRequest<ApiProduct[]>(endpoint);
+    // Ensure data is an array; if not, return empty array to prevent build failures
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    // During build or if API is unavailable, return empty array to avoid build failure
+    console.warn(`[API] Failed to fetch products from ${endpoint}:`, error);
+    return [];
+  }
 }
 
 /**
@@ -179,7 +188,13 @@ export async function getAllProducts(
  */
 export async function searchProducts(query: string): Promise<ApiProduct[]> {
   const encodedQuery = encodeURIComponent(query);
-  return apiRequest<ApiProduct[]>(`/cosmos/products/search?q=${encodedQuery}`);
+  try {
+    const data = await apiRequest<ApiProduct[]>(`/cosmos/products/search?q=${encodedQuery}`);
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.warn(`[API] Failed to search products for "${query}":`, error);
+    return [];
+  }
 }
 
 /**
@@ -207,7 +222,13 @@ export async function getProductByHandle(handle: string): Promise<ApiProduct> {
  */
 export async function getProductsByVendor(vendor: string): Promise<ApiProduct[]> {
   const encodedVendor = encodeURIComponent(vendor);
-  return apiRequest<ApiProduct[]>(`/cosmos/products?vendor=${encodedVendor}`);
+  try {
+    const data = await apiRequest<ApiProduct[]>(`/cosmos/products?vendor=${encodedVendor}`);
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.warn(`[API] Failed to fetch products for vendor "${vendor}":`, error);
+    return [];
+  }
 }
 
 /**
