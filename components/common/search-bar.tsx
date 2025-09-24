@@ -1,18 +1,19 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 export function SearchBar({ className = "" }: { className?: string }) {
   const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      // Implement search logic
-      console.log('Searching for:', searchQuery)
+      router.push(`/search?q=${searchQuery.trim()}`)
     }
   }
 

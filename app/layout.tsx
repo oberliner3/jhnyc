@@ -7,6 +7,8 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { SchemaMarkup } from "@/components/common/schema-markup";
+import { Providers } from "./providers";
+import { CookieBanner } from "@/components/common/cookie-banner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,12 +34,15 @@ export default function RootLayout({
 				<SchemaMarkup />
 			</head>
 			<body className={inter.className}>
-				<div className="flex flex-col min-h-screen">
-					<AnnouncementBar />
-					<Header />
-					<main className="flex-1">{children}</main>
-					<Footer />
-				</div>
+				<Providers>
+					<div className="flex flex-col min-h-screen">
+						<AnnouncementBar />
+						<Header />
+						<main className="flex-1">{children}</main>
+						<Footer />
+					</div>
+					<CookieBanner />
+				</Providers>
 			</body>
 		</html>
 	);

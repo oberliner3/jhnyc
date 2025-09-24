@@ -58,6 +58,34 @@ export default function PrivacyPolicyPage() {
       </section>
 
       <section>
+        <h2 className="text-2xl font-bold mb-4">Data Retention</h2>
+        <p className="text-muted-foreground">
+          We will retain your personal information for as long as necessary to provide you with our services and as described in this Privacy Policy. 
+        </p>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-bold mb-4">Data Security</h2>
+        <p className="text-muted-foreground">
+          We take reasonable measures to help protect your personal information from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-bold mb-4">Your Rights</h2>
+        <p className="text-muted-foreground">
+          You have the right to access, correct, or delete your personal information. You can also object to the processing of your personal information, and you have the right to data portability.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-bold mb-4">Changes to This Policy</h2>
+        <p className="text-muted-foreground">
+          We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.
+        </p>
+      </section>
+
+      <section>
         <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
         <p className="text-muted-foreground">
           If you have any questions about this Privacy Policy, please contact us

@@ -44,8 +44,7 @@ export interface ProductOption {
 }
 
 export interface CartItem {
-  id: number;
-  productId: number;
+  id: string; // e.g., `${productId}-${variantId}`
   name: string;
   price: number;
   image: string;

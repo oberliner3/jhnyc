@@ -6,6 +6,8 @@ import { Separator } from '@/components/ui/separator'
 import { Logo } from '@/components/common/logo'
 import { APP_CONTACTS, FOOTER_LINKS, SITE_CONFIG } from "@/lib/constants";
 
+import { PaymentMethods } from '@/components/icons/payment-methods';
+
 export function Footer() {
   return (
     <footer className="bg-muted/50 border-t">
@@ -143,6 +145,7 @@ export function Footer() {
           <p className="text-sm text-muted-foreground">
             © 2024 {SITE_CONFIG.name}. All rights reserved.
           </p>
+          <PaymentMethods />
           <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
             <Link href="/privacy-policy" className="hover:text-foreground">
               Privacy Policy

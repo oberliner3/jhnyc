@@ -9,10 +9,14 @@ import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/common/logo'
 import { SearchBar } from '@/components/common/search-bar'
 import { NAVIGATION_ITEMS } from '@/lib/constants'
+import { useCart } from '@/contexts/cart-context'
+import CartDrawer from '@/components/cart/cart-drawer'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const cartItemCount = 2 // This would come from cart context
+  const { getTotalItems, toggleCart } = useCart()
+  const cartItemCount = getTotalItems()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -88,29 +92,38 @@ export function Header() {
           </Button>
 
           {/* Cart */}
-          <Button variant="ghost" size="icon" className="relative" asChild>
-            <Link href="/cart">
-              <ShoppingCart className="h-5 w-5" />
-              {cartItemCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs"
-                >
-                  {cartItemCount}
-                </Badge>
-              )}
-              <span className="sr-only">Cart ({cartItemCount} items)</span>
-            </Link>
+          <Button variant="ghost" size="icon" className="relative" onClick={toggleCart}>
+            <ShoppingCart className="h-5 w-5" />
+            {cartItemCount > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs"
+              >
+                {cartItemCount}
+              </Badge>
+            )}
+            <span className="sr-only">Cart ({cartItemCount} items)</span>
           </Button>
         </div>
       </div>
 
       {/* Mobile search */}
-      {isSearchOpen && (
-        <div className="border-t bg-background p-4 md:hidden">
-          <SearchBar />
-        </div>
-      )}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="overflow-hidden md:hidden"
+          >
+            <div className="border-t bg-background p-4">
+              <SearchBar />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <CartDrawer />
     </header>
   );
 }

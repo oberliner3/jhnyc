@@ -30,13 +30,13 @@ export default function CartDrawer() {
 			{/* Backdrop */}
 			<button
 				type="button"
-				className="z-40 fixed inset-0 backdrop-blur-sm backdrop-brightness-50 cursor-pointer"
+				className="z-[99] fixed inset-0 backdrop-blur-sm backdrop-brightness-50 cursor-pointer"
 				aria-label="Close cart"
 				onClick={toggleCart}
 			/>
 
 			{/* Sidebar */}
-			<div className="top-0 right-0 z-50 fixed flex flex-col bg-neutral-50 shadow-xl w-full max-w-md h-full">
+			<div className="top-0 right-0 z-[100] fixed flex flex-col bg-neutral-50 shadow-xl w-full max-w-md h-full">
 				{/* Header */}
 				<div className="flex justify-between items-center p-4 border-b">
 					<h2 className="font-semibold text-lg">Shopping Cart</h2>

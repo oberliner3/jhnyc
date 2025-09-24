@@ -1,0 +1,16 @@
+/* TEAM */
+Designer:  Dr. Oberliner (https://dr.oberliner.com)
+Developer: Juan Kallas (https://kallas.io)
+Manager:   Jane Doe (https://janedoe.com)
+Tester:    John Smith (https://johnsmith.com)
+
+/* THANKS */
+Thanks: Open Source Community
+
+/* SITE */
+Last update: 2025-09-24
+Standards: HTML5, CSS3, ARIA, ECMAScript 6
+Components: React, Redux, Webpack
+Software: NeoVim, Git, Node.js
+Language: English
+Doctype: HTML5

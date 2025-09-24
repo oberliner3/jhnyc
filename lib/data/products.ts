@@ -57,8 +57,20 @@ export const FEATURED_PRODUCTS: Product[] = [
     reviewCount: 89,
     tags: ["organic", "cotton", "sustainable"],
     vendor: "EcoWear",
-    variants: [],
-    options: [],
+    options: [
+      { id: 1, name: "Color", position: 1, values: ["White", "Black"] },
+      { id: 2, name: "Size", position: 2, values: ["S", "M", "L", "XL"] },
+    ],
+    variants: [
+      { id: 1, name: "White / S", price: 29.99, inStock: true },
+      { id: 2, name: "White / M", price: 29.99, inStock: true },
+      { id: 3, name: "White / L", price: 29.99, inStock: false },
+      { id: 4, name: "White / XL", price: 29.99, inStock: true },
+      { id: 5, name: "Black / S", price: 29.99, inStock: true },
+      { id: 6, name: "Black / M", price: 29.99, inStock: true },
+      { id: 7, name: "Black / L", price: 29.99, inStock: true },
+      { id: 8, name: "Black / XL", price: 29.99, inStock: false },
+    ],
   },
   {
     id: 3,

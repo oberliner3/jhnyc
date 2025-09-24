@@ -1,3 +1,5 @@
+'use client'
+
 import Link from "next/link";
 import Image from "next/image";
 import { Star, ShoppingCart } from "lucide-react";
@@ -5,18 +7,29 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/utils";
 import { Product } from "@/lib/types";
+import { useCart } from "@/contexts/cart-context";
 
 interface ProductCardProps {
 	product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addItem } = useCart();
+
 	const discountPercentage = product.compareAtPrice
 		? Math.round(
 				((product.compareAtPrice - product.price) / product.compareAtPrice) *
 					100,
 			)
 		: 0;
+
+  const hasVariants = product.variants && product.variants.length > 0;
+
+  const handleAddToCart = () => {
+    if (!hasVariants && product.variants[0]) {
+      addItem(product, product.variants[0], 1);
+    }
+  };
 
 	return (
 		<div className="group relative bg-card hover:shadow-lg border rounded-lg overflow-hidden text-card-foreground transition-all">
@@ -85,14 +98,22 @@ export function ProductCard({ product }: ProductCardProps) {
 							</span>
 						)}
 					</div>
-					<Button
-						size="sm"
-						variant="outline"
-						className="opacity-0 group-hover:opacity-100 transition-opacity"
-						disabled={!product.inStock}
-					>
-						<ShoppingCart className="w-4 h-4" />
-					</Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            disabled={!product.inStock}
+            onClick={handleAddToCart}
+            asChild={hasVariants}
+          >
+            {hasVariants ? (
+              <Link href={`/products/${product.handle}`}>
+                <ShoppingCart className="w-4 h-4" />
+              </Link>
+            ) : (
+              <ShoppingCart className="w-4 h-4" />
+            )}
+          </Button>
 				</div>
 			</div>
 		</div>
