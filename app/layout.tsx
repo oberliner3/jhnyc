@@ -10,6 +10,8 @@ import { SchemaMarkup } from "@/components/common/schema-markup";
 import { Providers } from "./providers";
 import { CookieBanner } from "@/components/common/cookie-banner";
 
+import { Analytics } from "@vercel/analytics/next"
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const viewport: Viewport = {
@@ -43,6 +45,7 @@ export default function RootLayout({
 					</div>
 					<CookieBanner />
 				</Providers>
+         <Analytics />
 			</body>
 		</html>
 	);
