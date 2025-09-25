@@ -1,66 +1,67 @@
-import { MetadataRoute } from 'next'
- 
+import { SITE_CONFIG } from "@/lib/constants";
+import { MetadataRoute } from "next";
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: '*',
-        allow: '/',
-        disallow: '/private/',
+        userAgent: "*",
+        allow: "/",
+        disallow: "/private/",
       },
       {
-        userAgent: 'GPTBot',
-        disallow: '/',
+        userAgent: "GPTBot",
+        disallow: "/",
       },
       {
-        userAgent: 'Google-Extended',
-        disallow: '/',
+        userAgent: "Google-Extended",
+        disallow: "/",
       },
       {
-        userAgent: 'CCBot',
-        disallow: '/',
+        userAgent: "CCBot",
+        disallow: "/",
       },
       {
-        userAgent: 'anthropic-ai',
-        disallow: '/',
+        userAgent: "anthropic-ai",
+        disallow: "/",
       },
       {
-        userAgent: 'Claude-Web',
-        disallow: '/',
+        userAgent: "Claude-Web",
+        disallow: "/",
       },
       {
-        userAgent: 'Bytespider',
-        disallow: '/',
+        userAgent: "Bytespider",
+        disallow: "/",
       },
       {
-        userAgent: 'Omgili',
-        disallow: '/',
+        userAgent: "Omgili",
+        disallow: "/",
       },
       {
-        userAgent: 'FacebookBot',
-        disallow: '/',
+        userAgent: "FacebookBot",
+        disallow: "/",
       },
       {
-        userAgent: 'PerplexityBot',
-        disallow: '/',
+        userAgent: "PerplexityBot",
+        disallow: "/",
       },
       {
-        userAgent: 'IbouBot',
-        disallow: '/',
+        userAgent: "IbouBot",
+        disallow: "/",
       },
       {
-        userAgent: 'Meta-ExternalAgent',
-        disallow: '/',
+        userAgent: "Meta-ExternalAgent",
+        disallow: "/",
       },
       {
-        userAgent: 'YouBot',
-        disallow: '/',
+        userAgent: "YouBot",
+        disallow: "/",
       },
       {
-        userAgent: 'Applebot-Extended',
-        disallow: '/',
+        userAgent: "Applebot-Extended",
+        disallow: "/",
       },
     ],
-    sitemap: 'https://acme.com/sitemap.xml',
-  }
+    sitemap: SITE_CONFIG.url + "/sitemap.xml",
+  };
 }

@@ -56,3 +56,65 @@ function Button({
 }
 
 export { Button, buttonVariants }
+
+// Preset button wrappers for consistent sizing/spacing across primary flows
+// Usage examples:
+//   <PrimaryCTA asChild><Link href="/products">Shop Now</Link></PrimaryCTA>
+//   <SecondaryCTA onClick={...}>Learn More</SecondaryCTA>
+//   <DangerButton onClick={handleDelete}>Delete</DangerButton>
+//   <IconButton aria-label="Open cart"><ShoppingCart /></IconButton>
+
+type ButtonProps = React.ComponentProps<typeof Button>
+
+/**
+ * Large primary call-to-action button.
+ * Defaults: variant="default" (primary), size="lg".
+ */
+export function PrimaryCTA({
+  className,
+  variant = "default",
+  size = "lg",
+  ...props
+}: ButtonProps) {
+  return <Button variant={variant} size={size} className={cn(className)} {...props} />
+}
+
+/**
+ * Large secondary call-to-action button.
+ * Defaults: variant="secondary", size="lg".
+ */
+export function SecondaryCTA({
+  className,
+  variant = "secondary",
+  size = "lg",
+  ...props
+}: ButtonProps) {
+  return <Button variant={variant} size={size} className={cn(className)} {...props} />
+}
+
+/**
+ * Destructive action button (e.g., delete, sign out confirmations).
+ * Defaults: variant="destructive", size="default".
+ */
+export function DangerButton({
+  className,
+  variant = "destructive",
+  size = "default",
+  ...props
+}: ButtonProps) {
+  return <Button variant={variant} size={size} className={cn(className)} {...props} />
+}
+
+/**
+ * Icon-only button with accessible label.
+ * Defaults: variant="ghost", size="icon".
+ * Remember to include sr-only text inside when used without aria-label.
+ */
+export function IconButton({
+  className,
+  variant = "ghost",
+  size = "icon",
+  ...props
+}: ButtonProps) {
+  return <Button variant={variant} size={size} className={cn(className)} {...props} />
+}

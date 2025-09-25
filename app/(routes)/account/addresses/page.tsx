@@ -1,14 +1,25 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useFormState } from 'react-dom'
-import { addAddress } from './actions'
+import { addAddress, getAddresses } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function AddressesPage() {
   const [state, formAction] = useFormState(addAddress, null)
+  const [addresses, setAddresses] = useState<any[]>([])
+
+  useEffect(() => {
+    async function fetchAddresses() {
+      const userAddresses = await getAddresses();
+      setAddresses(userAddresses);
+    }
+    fetchAddresses();
+  }, [state]); // Refetch when a new address is added
 
   return (
     <div className="container px-4 py-8">
@@ -65,7 +76,25 @@ export default function AddressesPage() {
         </div>
         <div>
           <h2 className="text-xl font-semibold mb-4">Your Addresses</h2>
-          {/* TODO: List existing addresses */}
+          <div className="space-y-4">
+            {addresses.length > 0 ? (
+              addresses.map((addr) => (
+                <Card key={addr.id}>
+                  <CardHeader>
+                    <CardTitle className="capitalize">{addr.type} Address</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>{addr.first_name} {addr.last_name}</p>
+                    <p>{addr.address}</p>
+                    <p>{addr.city}, {addr.postal_code}</p>
+                    <p>{addr.country}</p>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <p>You have no saved addresses.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -3,6 +3,29 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 
+export async function getAddresses() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
+  const { data: addresses, error } = await supabase
+    .from('addresses')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error('Error fetching addresses:', error);
+    return [];
+  }
+
+  return addresses;
+}
+
 export async function addAddress(
   _prevState: { success: boolean; message: string } | null,
   formData: FormData

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { PrimaryCTA, SecondaryCTA } from "@/components/ui/button";
 
 export function Hero() {
 	return (
-		<section className="relative bg-linear-to-br via-black to-primary/5 overflow-hidden from-accent-forground/5">
+		<section className="relative bg-gradient-to-br from-background via-muted/50 to-primary/10 overflow-hidden">
 			<div className="px-4 py-16 lg:py-24 container">
 				<div className="items-center gap-8 lg:gap-12 grid lg:grid-cols-2">
 					<div className="space-y-6 animate-fade-in">
@@ -24,19 +24,19 @@ export function Hero() {
 						</div>
 
 						<div className="flex sm:flex-row flex-col gap-4">
-							<Button size="lg" className="px-8 text-lg" asChild>
+							<PrimaryCTA className="px-8 text-lg" asChild>
 								<Link href="/products">
 									Shop Now
 									<ArrowRight className="ml-2 w-5 h-5" />
 								</Link>
-							</Button>
-							<Button size="lg" variant="outline" className="px-8 text-lg">
+							</PrimaryCTA>
+							<SecondaryCTA className="px-8 text-lg">
 								{/**
 								 * TODO: PopUp VideoPlayer
 								 */}
 								<Play className="mr-2 w-5 h-5" />
 								Watch Story
-							</Button>
+							</SecondaryCTA>
 						</div>
 
 						{/* Social Proof */}
@@ -66,11 +66,12 @@ export function Hero() {
 
 					{/* Hero Image */}
 					<div className="relative">
-						<div className="relative bg-linear-to-br from-primary/20 to-secondary/20 rounded-2xl aspect-square lg:aspect-4/5 overflow-hidden">
+						<div className="relative bg-gradient-to-br from-primary/15 via-primary/5 to-secondary/20 rounded-2xl aspect-square lg:aspect-4/5 overflow-hidden">
 							<Image
 								src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=800&fit=crop"
 								alt="Hero product showcase"
 								fill
+								sizes="(min-width: 1024px) 50vw, 100vw"
 								className="object-cover"
 								priority
 							/>

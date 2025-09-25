@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, ShoppingCart, User, Search } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Menu, ShoppingCart, Search } from 'lucide-react'
+import { AccountDropdown } from './account-dropdown'
+import { Button, IconButton } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/common/logo'
@@ -24,10 +25,10 @@ export function Header() {
         {/* Mobile menu */}
         <Sheet>
           <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
+            <IconButton>
               <Menu className="h-5 w-5" />
               <span className="sr-only">Toggle menu</span>
-            </Button>
+            </IconButton>
           </SheetTrigger>
           <SheetContent side="left" className="w-80  bg-zinc-50 ">
             <div className="flex flex-col space-y-4 py-2">
@@ -39,7 +40,7 @@ export function Header() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="text-lg font-medium hover:text-primary transition-colors hover:shadow-sm hover:border-b p-2 hover:text-xl"
+                    className="text-lg font-medium hover:text-primary transition-colors hover:shadow-sm hover:border-b p-2"
                   >
                     {item.name}
                   </Link>
@@ -73,26 +74,19 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center space-x-2">
           {/* Mobile search */}
-          <Button
-            variant="ghost"
-            size="icon"
+          <IconButton
             className="md:hidden"
             onClick={() => setIsSearchOpen(!isSearchOpen)}
           >
             <Search className="h-5 w-5" />
             <span className="sr-only">Search</span>
-          </Button>
+          </IconButton>
 
           {/* Account */}
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/account">
-              <User className="h-5 w-5" />
-              <span className="sr-only">Account</span>
-            </Link>
-          </Button>
+          <AccountDropdown />
 
           {/* Cart */}
-          <Button variant="ghost" size="icon" className="relative" onClick={toggleCart}>
+          <IconButton className="relative" onClick={toggleCart}>
             <ShoppingCart className="h-5 w-5" />
             {cartItemCount > 0 && (
               <Badge
@@ -103,7 +97,7 @@ export function Header() {
               </Badge>
             )}
             <span className="sr-only">Cart ({cartItemCount} items)</span>
-          </Button>
+          </IconButton>
         </div>
       </div>
 

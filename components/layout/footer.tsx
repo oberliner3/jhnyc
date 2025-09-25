@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button, IconButton } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Logo } from '@/components/common/logo'
@@ -105,18 +105,18 @@ export function Footer() {
             <div>
               <h3 className="font-semibold mb-4">Follow Us</h3>
               <div className="flex gap-2">
-                <Button variant="ghost" size="icon">
+                <IconButton>
                   <Facebook className="h-4 w-4" />
                   <span className="sr-only">Facebook</span>
-                </Button>
-                <Button variant="ghost" size="icon">
+                </IconButton>
+                <IconButton>
                   <Twitter className="h-4 w-4" />
                   <span className="sr-only">Twitter</span>
-                </Button>
-                <Button variant="ghost" size="icon">
+                </IconButton>
+                <IconButton>
                   <Instagram className="h-4 w-4" />
                   <span className="sr-only">Instagram</span>
-                </Button>
+                </IconButton>
               </div>
             </div>
             <div>
