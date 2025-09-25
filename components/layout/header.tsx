@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, ShoppingCart, Search } from 'lucide-react'
 import { AccountDropdown } from './account-dropdown'
-import { Button, IconButton } from '@/components/ui/button'
+import { IconButton } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/common/logo'

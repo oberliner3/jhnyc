@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useFormState } from 'react-dom'
+import { Address } from '@/lib/types'
 import { addAddress, getAddresses } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function AddressesPage() {
   const [state, formAction] = useFormState(addAddress, null)
-  const [addresses, setAddresses] = useState<any[]>([])
+  const [addresses, setAddresses] = useState<Address[]>([])
 
   useEffect(() => {
     async function fetchAddresses() {

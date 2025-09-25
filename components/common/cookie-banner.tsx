@@ -2,6 +2,19 @@
 
 import CookieConsent from 'react-cookie-consent'
 
+declare global {
+  interface Window {
+    gtag: (
+      command: 'consent',
+      action: 'update',
+      params: {
+        ad_storage: 'granted' | 'denied';
+        analytics_storage: 'granted' | 'denied';
+      }
+    ) => void;
+  }
+}
+
 // Build a structured consent payload and persist as a cookie
 const buildConsent = (accepted: boolean) => ({
   necessary: true,
@@ -30,8 +43,8 @@ export function CookieBanner() {
       onAccept={() => {
         const consent = buildConsent(true)
         document.cookie = `originz-cookie-consent=${encodeURIComponent(JSON.stringify(consent))};path=/;max-age=${60 * 60 * 24 * 180};SameSite=Lax`;
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          (window as any).gtag('consent', 'update', {
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('consent', 'update', {
             ad_storage: 'granted',
             analytics_storage: 'granted',
           })
@@ -40,8 +53,8 @@ export function CookieBanner() {
       onDecline={() => {
         const consent = buildConsent(false)
         document.cookie = `originz-cookie-consent=${encodeURIComponent(JSON.stringify(consent))};path=/;max-age=${60 * 60 * 24 * 180};SameSite=Lax`;
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-          (window as any).gtag('consent', 'update', {
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('consent', 'update', {
             ad_storage: 'denied',
             analytics_storage: 'denied',
           })

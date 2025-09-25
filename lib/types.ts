@@ -73,3 +73,14 @@ export interface Partner {
   logo: string;
   website?: string;
 }
+
+export interface Address {
+  id: string;
+  type: string;
+  first_name: string;
+  last_name: string;
+  address: string;
+  city: string;
+  postal_code: string;
+  country: string;
+}
