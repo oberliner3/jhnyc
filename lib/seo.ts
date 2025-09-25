@@ -63,7 +63,7 @@ export function generateSEO({
     icons: {
       icon: "/favicon.ico",
       shortcut: "/favicon-16x16.png",
-      apple: "/apple-touch-icon.png",
+      apple: "/apple-icon.png",
     },
     manifest: "/site.webmanifest",
     alternates: {

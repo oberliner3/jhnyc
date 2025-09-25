@@ -15,9 +15,9 @@ export function AnnouncementBar() {
   if (!isVisible) return null
 
   return (
-    <div className="relative bg-primary text-primary-foreground border-b">
+    <div className="relative bg-primary text-primary-foreground border-b z-60">
       <div className="overflow-hidden">
-        <div className="animate-slide-up duration-1000 flex">
+        <div className="animate-slide-up flex">
           {ANNOUNCEMENTS.map((announcement, index) => (
             <div
               key={index}

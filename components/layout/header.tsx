@@ -30,7 +30,7 @@ export function Header() {
               <span className="sr-only">Toggle menu</span>
             </IconButton>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80  bg-zinc-50 ">
+          <SheetContent side="left" className="w-full bg-background">
             <div className="flex flex-col space-y-4 py-2">
               <div className="px-2">
                 <Logo />
