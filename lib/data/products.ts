@@ -15,4 +15,4 @@ export async function getFeaturedProducts(): Promise<Product[]> {
 // For backward compatibility, keep the constant but make it a Promise
 // This will be used in server components with await
 // In client components, use the useQuery hook with getFeaturedProducts
-export const FEATURED_PRODUCTS_PROMISE = getFeaturedProducts();
+export const FEATURED_PRODUCTS = getFeaturedProducts();

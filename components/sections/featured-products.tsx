@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product/product-card'
 import { FEATURED_PRODUCTS } from '@/lib/data/products'
 
-export function FeaturedProducts() {
+export async function FeaturedProducts() {
+  const products = await FEATURED_PRODUCTS
+
   return (
     <section className="py-16 lg:py-24">
       <div className="container px-4">
@@ -26,7 +28,7 @@ export function FeaturedProducts() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-          {FEATURED_PRODUCTS.map((product) => (
+          {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
