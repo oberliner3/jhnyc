@@ -26,7 +26,7 @@ export function AccountDropdown() {
         <Link href="/account">
           <User className="h-5 w-5" />
           <span className="sr-only">Sign In</span>
-          <span className="hidden md:inline ml-2 text-sm">Account</span>
+          
         </Link>
       </Button>
     )
@@ -38,7 +38,7 @@ export function AccountDropdown() {
         <Button variant="ghost" size="icon">
           <User className="h-5 w-5" />
           <span className="sr-only">Account</span>
-          <span className="hidden md:inline ml-2 text-sm">Account</span>
+          
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
