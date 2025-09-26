@@ -1,24 +1,35 @@
 import { MetadataRoute } from 'next'
+import { getAllProducts } from '@/lib/api'
+import { SITE_CONFIG } from '@/lib/constants'
  
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await getAllProducts();
+  const productEntries: MetadataRoute.Sitemap = products.map((product) => ({
+    url: `${SITE_CONFIG.url}/products/${product.handle}`,
+    lastModified: new Date(product.updated_at),
+    changeFrequency: 'daily',
+    priority: 0.7,
+  }));
+
   return [
     {
-      url: 'https://acme.com',
+      url: SITE_CONFIG.url,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 1,
     },
     {
-      url: 'https://acme.com/about',
+      url: `${SITE_CONFIG.url}/about`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: 'https://acme.com/products',
+      url: `${SITE_CONFIG.url}/products`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.5,
     },
+    ...productEntries,
   ]
 }
