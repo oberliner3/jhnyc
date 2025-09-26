@@ -1,6 +1,6 @@
 "use client";
 
-import { Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/cart-context";
 import type { CartItem } from "@/lib/types";
+
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 
 export default function CartDrawer() {
 	const {
@@ -23,27 +25,12 @@ export default function CartDrawer() {
 
 	const totalPrice = getTotalPrice();
 
-	if (!isOpen) return null;
-
 	return (
-		<>
-			{/* Backdrop */}
-			<button
-				type="button"
-				className="z-[99] fixed inset-0 backdrop-blur-sm backdrop-brightness-50 cursor-pointer"
-				aria-label="Close cart"
-				onClick={toggleCart}
-			/>
-
-			{/* Sidebar */}
-			<div className="top-0 right-0 z-[100] fixed flex flex-col bg-neutral-50 shadow-xl w-full max-w-md h-screen">
-				{/* Header */}
-				<div className="flex justify-between items-center p-4 border-b">
-					<h2 className="font-semibold text-lg">Shopping Cart</h2>
-					<Button variant="ghost" size="icon" onClick={toggleCart}>
-						<X className="w-5 h-5" />
-					</Button>
-				</div>
+    <Sheet open={isOpen} onOpenChange={toggleCart}>
+      <SheetContent className="flex flex-col">
+        <SheetHeader>
+          <SheetTitle>Shopping Cart</SheetTitle>
+        </SheetHeader>
 
 				{/* Cart Items */}
 				<div className="flex-1 p-4 overflow-y-auto">
@@ -152,43 +139,45 @@ export default function CartDrawer() {
 
 				{/* Footer */}
 				{items.length > 0 && (
-					<div className="space-y-4 p-4 border-t">
-						{/* Total */}
-						<div className="flex justify-between items-center font-semibold text-lg">
-							<span>Total:</span>
-							<span>${totalPrice.toFixed(2)}</span>
-						</div>
+          <SheetFooter>
+            <div className="space-y-4 p-4 border-t w-full">
+              {/* Total */}
+              <div className="flex justify-between items-center font-semibold text-lg">
+                <span>Total:</span>
+                <span>${totalPrice.toFixed(2)}</span>
+              </div>
 
-						{/* Actions */}
-						<div className="space-y-2">
-							<Button
-								className="w-full"
-								size="lg"
-								onClick={() => console.log(items)}
-							>
-								Checkout
-							</Button>
-							<Link href="/cart" className="block">
-								<Button
-									variant="outline"
-									className="w-full"
-									onClick={toggleCart}
-								>
-									<ShoppingCart className="mr-2 w-4 h-4" />
-									View Cart
-								</Button>
-							</Link>
-							<Button
-								variant="destructive"
-								className="opacity-50 hover:opacity-100 w-full text-neutral-200"
-								onClick={clearCart}
-							>
-								Clear Cart
-							</Button>
-						</div>
-					</div>
+              {/* Actions */}
+              <div className="space-y-2">
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={() => console.log(items)}
+                >
+                  Checkout
+                </Button>
+                <Link href="/cart" className="block">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={toggleCart}
+                  >
+                    <ShoppingCart className="mr-2 w-4 h-4" />
+                    View Cart
+                  </Button>
+                </Link>
+                <Button
+                  variant="destructive"
+                  className="opacity-50 hover:opacity-100 w-full text-neutral-200"
+                  onClick={clearCart}
+                >
+                  Clear Cart
+                </Button>
+              </div>
+            </div>
+          </SheetFooter>
 				)}
-			</div>
-		</>
+      </SheetContent>
+    </Sheet>
 	);
 }

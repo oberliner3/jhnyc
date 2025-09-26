@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, ShoppingCart, Search } from 'lucide-react'
+import { ShoppingCart, Search } from 'lucide-react'
 import { AccountDropdown } from './account-dropdown'
 import { IconButton } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+
 import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/common/logo'
 import { SearchBar } from '@/components/common/search-bar'
@@ -13,6 +13,7 @@ import { NAVIGATION_ITEMS } from '@/lib/constants'
 import { useCart } from '@/contexts/cart-context'
 import CartDrawer from '@/components/cart/cart-drawer'
 import { motion, AnimatePresence } from 'framer-motion'
+import { MobileNav } from './mobile-nav'
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -23,32 +24,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Mobile menu */}
-        <Sheet>
-          <SheetTrigger asChild className="md:hidden">
-            <IconButton>
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle menu</span>
-            </IconButton>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-full bg-background">
-            <div className="flex flex-col space-y-4 py-2">
-              <div className="px-2">
-                <Logo />
-              </div>
-              <nav className="flex flex-col space-y-2 gap-2 border-t ">
-                {NAVIGATION_ITEMS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="text-lg font-medium hover:text-primary transition-colors hover:shadow-sm hover:border-b p-2"
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          </SheetContent>
-        </Sheet>
+        <MobileNav />
 
         {/* Logo */}
         <Logo className="md:mr-8" />
