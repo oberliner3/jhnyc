@@ -8,7 +8,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://moritotabi
 // Types for API responses
 export interface ApiProduct {
   id: number;
-  name: string;
+  title: string;
   handle: string;
   body_html: string;
   price: number;
@@ -27,14 +27,21 @@ export interface ApiProduct {
 }
 
 // Map ApiProduct -> internal Product types
-import type { Product, ProductImage, ProductOption, ProductVariant } from "@/lib/types";
+import type {
+  Product,
+  ProductImage,
+  ProductOption,
+  ProductVariant,
+} from "@/lib/types";
 
 export function mapApiVariant(variant: ApiProductVariant): ProductVariant {
   return {
     id: variant.id,
     name:
       variant.title ||
-      [variant.option1, variant.option2, variant.option3].filter(Boolean).join(" / ") ||
+      [variant.option1, variant.option2, variant.option3]
+        .filter(Boolean)
+        .join(" / ") ||
       String(variant.id),
     price: Number(variant.price),
     inStock: Boolean(variant.available),
@@ -69,7 +76,7 @@ export function mapApiImage(image: ApiProductImage): ProductImage {
 export function mapApiToProduct(apiProduct: ApiProduct): Product {
   return {
     id: apiProduct.id,
-    name: apiProduct.name,
+    title: apiProduct.title,
     handle: apiProduct.handle,
     body_html: apiProduct.body_html,
     price: apiProduct.price,
@@ -151,7 +158,9 @@ async function apiRequest<T>(
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`API Response from ${endpoint}:`, data);
+    return data;
   } catch (error) {
     console.error(`API Request failed for ${endpoint}:`, error);
     throw error;
@@ -161,21 +170,25 @@ async function apiRequest<T>(
 /**
  * Get all products
  */
-export async function getAllProducts(
-  options?: { limit?: number; page?: number; fields?: string }
-): Promise<ApiProduct[]> {
+export async function getAllProducts(options?: {
+  limit?: number;
+  page?: number;
+  fields?: string;
+}): Promise<ApiProduct[]> {
   const params = new URLSearchParams();
   if (options?.limit) params.append("limit", options.limit.toString());
   if (options?.page) params.append("page", options.page.toString());
   if (options?.fields) params.append("fields", options.fields);
 
   const queryString = params.toString();
-  const endpoint = queryString ? `/cosmos/products?${queryString}` : "/cosmos/products";
+  const endpoint = queryString
+    ? `/cosmos/products?${queryString}`
+    : "/cosmos/products";
 
   try {
-    const data = await apiRequest<ApiProduct[]>(endpoint);
-    // Ensure data is an array; if not, return empty array to prevent build failures
-    return Array.isArray(data) ? data : [];
+    const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
+    // Ensure data.products is an array; if not, return empty array to prevent build failures
+    return Array.isArray(data.products) ? data.products : [];
   } catch (error) {
     // During build or if API is unavailable, return empty array to avoid build failure
     console.warn(`[API] Failed to fetch products from ${endpoint}:`, error);

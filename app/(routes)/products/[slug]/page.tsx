@@ -15,7 +15,7 @@ export async function generateStaticParams() {
   // Limit to a reasonable number to keep build fast
   try {
     const products = await getAllProducts({ limit: 100, fields: "handle" });
-    return products.map((p) => ({ slug: p.handle }));
+    return products.filter((p) => p.handle).map((p) => ({ slug: p.handle }));
   } catch {
     // On failure, return empty list; pages will be generated on-demand
     return [] as { slug: string }[];
@@ -28,7 +28,7 @@ export async function generateMetadata({
   try {
     const product = await getProductByHandle(params.slug);
     return generateSEO({
-      title: product.name,
+      title: product.title,
       description: product.body_html,
       path: `/products/${product.handle}`,
       type: "product",

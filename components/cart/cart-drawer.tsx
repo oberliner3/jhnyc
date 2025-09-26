@@ -60,91 +60,91 @@ export default function CartDrawer() {
 									item.product.images?.[0]?.src || "/placeholder.svg";
 
 								return (
-									<Card key={`${item.product.id}-${item.variant?.id}`}>
-										<CardContent className="p-4">
-											<div className="flex gap-3">
-												{/* Product Image */}
-												<div className="relative bg-gray-100 rounded w-16 h-16 overflow-hidden">
-													<Image
-														src={imageUrl}
-														alt={item.product.name || item.product.handle}
-														fill
-														className="object-cover"
-														sizes="64px"
-													/>
-												</div>
+                  <Card key={`${item.product.id}-${item.variant?.id}`}>
+                    <CardContent className="p-4">
+                      <div className="flex gap-3">
+                        {/* Product Image */}
+                        <div className="relative bg-gray-100 rounded w-16 h-16 overflow-hidden">
+                          <Image
+                            src={imageUrl}
+                            alt={item.product.title || item.product.handle}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        </div>
 
-												{/* Product Info */}
-												<div className="flex-1 min-w-0">
-													<h3 className="mb-1 font-medium text-sm line-clamp-2">
-														{item.product.name}
-													</h3>
-													{item.variant &&
-														item.variant.name !== "Default Title" && (
-															<p className="mb-1 text-gray-500 text-xs">
-																{item.variant.name}
-															</p>
-														)}
-													<p className="font-semibold text-sm">
-														${price.toFixed(2)}
-													</p>
-												</div>
+                        {/* Product Info */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="mb-1 font-medium text-sm line-clamp-2">
+                            {item.product.title}
+                          </h3>
+                          {item.variant &&
+                            item.variant.name !== "Default Title" && (
+                              <p className="mb-1 text-gray-500 text-xs">
+                                {item.variant.name}
+                              </p>
+                            )}
+                          <p className="font-semibold text-sm">
+                            ${price.toFixed(2)}
+                          </p>
+                        </div>
 
-												{/* Remove Button */}
-												<Button
-													variant="ghost"
-													size="icon"
-													className="w-8 h-8"
-													onClick={() =>
-														removeItem(item.product.id, item.variant?.id || 0)
-													}
-												>
-													<Trash2 className="w-4 h-4" />
-												</Button>
-											</div>
+                        {/* Remove Button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="w-8 h-8"
+                          onClick={() =>
+                            removeItem(item.product.id, item.variant?.id || 0)
+                          }
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
 
-											{/* Quantity Controls */}
-											<div className="flex justify-between items-center mt-3">
-												<div className="flex items-center gap-2">
-													<Button
-														variant="outline"
-														size="icon"
-														className="w-8 h-8"
-														onClick={() =>
-															updateQuantity(
-																item.product.id,
-																item.variant?.id || 0,
-																item.quantity - 1,
-															)
-														}
-													>
-														<Minus className="w-3 h-3" />
-													</Button>
-													<Badge variant="secondary" className="px-3">
-														{item.quantity}
-													</Badge>
-													<Button
-														variant="outline"
-														size="icon"
-														className="w-8 h-8"
-														onClick={() =>
-															updateQuantity(
-																item.product.id,
-																item.variant?.id || 0,
-																item.quantity + 1,
-															)
-														}
-													>
-														<Plus className="w-3 h-3" />
-													</Button>
-												</div>
-												<p className="font-semibold text-sm">
-													${(price * item.quantity).toFixed(2)}
-												</p>
-											</div>
-										</CardContent>
-									</Card>
-								);
+                      {/* Quantity Controls */}
+                      <div className="flex justify-between items-center mt-3">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="w-8 h-8"
+                            onClick={() =>
+                              updateQuantity(
+                                item.product.id,
+                                item.variant?.id || 0,
+                                item.quantity - 1
+                              )
+                            }
+                          >
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                          <Badge variant="secondary" className="px-3">
+                            {item.quantity}
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="w-8 h-8"
+                            onClick={() =>
+                              updateQuantity(
+                                item.product.id,
+                                item.variant?.id || 0,
+                                item.quantity + 1
+                              )
+                            }
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <p className="font-semibold text-sm">
+                          ${(price * item.quantity).toFixed(2)}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
 							})}
 						</div>
 					)}

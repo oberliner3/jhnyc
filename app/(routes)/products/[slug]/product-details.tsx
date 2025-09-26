@@ -40,14 +40,16 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
   useEffect(() => {
     if (product) {
       const initialOptions: Record<string, string> = {};
-      product.options?.forEach(option => {
+      product.options?.forEach((option) => {
         initialOptions[option.name] = option.values[0];
       });
       setSelectedOptions(initialOptions);
-      
+
       if (product.variants.length > 0) {
-        const variantName = product.options.map(opt => initialOptions[opt.name]).join(" / ");
-        const variant = product.variants.find(v => v.name === variantName);
+        const variantName = product.options
+          .map((opt) => initialOptions[opt.name])
+          .join(" / ");
+        const variant = product.variants.find((v) => v.name === variantName);
         setSelectedVariant(variant || product.variants[0]);
       }
     }
@@ -57,9 +59,11 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
     if (!product) return;
     const newOptions = { ...selectedOptions, [optionName]: value };
     setSelectedOptions(newOptions);
-    
-    const variantName = product.options.map(opt => newOptions[opt.name]).join(" / ");
-    const variant = product.variants.find(v => v.name === variantName);
+
+    const variantName = product.options
+      .map((opt) => newOptions[opt.name])
+      .join(" / ");
+    const variant = product.variants.find((v) => v.name === variantName);
     setSelectedVariant(variant);
   };
 
@@ -79,7 +83,7 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
             100
         )
       : 0;
-      
+
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;
 
   return (
@@ -88,8 +92,10 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
       <div className="space-y-4">
         <div className="relative bg-muted rounded-lg aspect-square overflow-hidden">
           <Image
-            src={getImageProxyUrl(selectedVariant?.image || product.images[0].src)}
-            alt={product.name}
+            src={getImageProxyUrl(
+              selectedVariant?.image || product.images[0].src
+            )}
+            alt={product.title}
             fill
             className="object-cover"
             priority
@@ -109,7 +115,7 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
               >
                 <Image
                   src={getImageProxyUrl(image.src)}
-                  alt={`${product.name} ${index + 2}`}
+                  alt={`${product.title} ${index + 2}`}
                   fill
                   className="object-cover"
                 />
@@ -126,7 +132,7 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
             {product.category}
           </Badge>
           <h1 className="font-bold text-3xl lg:text-4xl tracking-tight">
-            {product.name}
+            {product.title}
           </h1>
 
           {/* Rating */}
@@ -148,27 +154,36 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
             </span>
           </div>
         </div>
-        
+
         {/* Options */}
-        {product.options && product.options.length > 0 && product.options[0].name !== "Title" && (
-          <div className="space-y-4">
-            {product.options.map(option => (
-              <div key={option.id}>
-                <h3 className="text-sm font-medium mb-2">{option.name}</h3>
-                <Select onValueChange={(value) => handleOptionChange(option.name, value)} defaultValue={selectedOptions[option.name]}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={`Select ${option.name}`} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {option.values.map(value => (
-                      <SelectItem key={value} value={value}>{value}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            ))}
-          </div>
-        )}
+        {product.options &&
+          product.options.length > 0 &&
+          product.options[0].name !== "Title" && (
+            <div className="space-y-4">
+              {product.options.map((option) => (
+                <div key={option.id}>
+                  <h3 className="text-sm font-medium mb-2">{option.name}</h3>
+                  <Select
+                    onValueChange={(value) =>
+                      handleOptionChange(option.name, value)
+                    }
+                    defaultValue={selectedOptions[option.name]}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={`Select ${option.name}`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {option.values.map((value) => (
+                        <SelectItem key={value} value={value}>
+                          {value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ))}
+            </div>
+          )}
 
         {/* Price */}
         <div className="space-y-2">
@@ -184,8 +199,8 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
           </div>
           {product.compareAtPrice && discountPercentage > 0 && (
             <p className="text-green-600 text-sm">
-              You save {formatPrice(product.compareAtPrice - currentPrice)}{" "}
-              ({discountPercentage}%)
+              You save {formatPrice(product.compareAtPrice - currentPrice)} (
+              {discountPercentage}%)
             </p>
           )}
         </div>
@@ -224,9 +239,7 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <Truck className="w-5 h-5 text-muted-foreground" />
-            <span className="text-sm">
-              Free shipping on orders over $50
-            </span>
+            <span className="text-sm">Free shipping on orders over $50</span>
           </div>
           <div className="flex items-center gap-3">
             <RefreshCw className="w-5 h-5 text-muted-foreground" />

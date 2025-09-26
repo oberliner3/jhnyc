@@ -1,7 +1,7 @@
 export interface Product {
   [key: string]: unknown;
   id: number;
-  name: string;
+  title: string;
   handle: string;
   body_html: string;
   price: number;

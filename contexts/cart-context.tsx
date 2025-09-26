@@ -43,10 +43,10 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         product,
         variant,
         quantity,
-        name: product.name,
+        name: product.title,
         price: variant.price,
         image: variant.image || product.images[0]?.src,
-      }
+      };
 
       return { ...state, items: [...state.items, newItem] }
     }

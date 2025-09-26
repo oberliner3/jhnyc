@@ -16,7 +16,7 @@ export function useSearch(products: Product[]) {
     return products.filter((product) => {
       const matchesQuery =
         query === "" ||
-        product.name.toLowerCase().includes(query.toLowerCase()) ||
+        product.title.toLowerCase().includes(query.toLowerCase()) ||
         product.body_html.toLowerCase().includes(query.toLowerCase()) ||
         product.tags.some((tag) =>
           tag.toLowerCase().includes(query.toLowerCase())

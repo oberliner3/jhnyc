@@ -35,3 +35,7 @@ export function generateImage({
 }): string {
   return `https://via.placeholder.com/${dim.w}x${dim.h}/${bg}/${fg}?text=${text}`;
 }
+
+export function stripHtml(html: string): string {
+  return html.replace(/(<([^>]+)>)/gi, "");
+}
