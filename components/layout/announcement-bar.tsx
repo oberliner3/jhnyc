@@ -1,7 +1,8 @@
 'use client'
 
 import { X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const ANNOUNCEMENTS = [
   "🎉 Free shipping on orders over $50 - Limited time offer!",
@@ -11,22 +12,32 @@ const ANNOUNCEMENTS = [
 
 export function AnnouncementBar() {
   const [isVisible, setIsVisible] = useState(true)
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % ANNOUNCEMENTS.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
 
   if (!isVisible) return null
 
   return (
     <div className="relative bg-primary text-primary-foreground border-b z-60">
-      <div className="overflow-hidden">
-        <div className="animate-slide-up flex">
-          {ANNOUNCEMENTS.map((announcement, index) => (
-            <div
-              key={index}
-              className="flex min-w-full items-center justify-center px-4 py-2 text-sm font-medium"
-            >
-              {announcement}
-            </div>
-          ))}
-        </div>
+      <div className="overflow-hidden h-10 flex items-center justify-center">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '-100%' }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="min-w-full text-center text-sm font-medium"
+          >
+            {ANNOUNCEMENTS[currentIndex]}
+          </motion.div>
+        </AnimatePresence>
       </div>
       <button
         onClick={() => setIsVisible(false)}
