@@ -1,6 +1,6 @@
 export interface Product {
   [key: string]: unknown;
-  id: number;
+  id: string;
   title: string;
   handle: string;
   body_html: string;
@@ -20,17 +20,17 @@ export interface ProductImage {
   alt?: string;
   created_at: string;
   height?: number;
-  id: number;
+  id: string;
   position: number;
-  product_id: number;
+  product_id: string;
   src: string;
   updated_at: string;
-  variant_ids?: number[];
+  variant_ids?: string[];
   width?: number;
 }
 
 export interface ProductVariant {
-  id: number;
+  id: string;
   name: string;
   price: number;
   inStock: boolean;
@@ -60,12 +60,10 @@ export interface ProductOption {
 }
 
 export interface CartItem {
-  id: string; // e.g., `${productId}-${variantId}`
-  name: string;
-  price: number;
-  image: string;
-  product: Product;
-  variant: ProductVariant;
+  id: string;
+  cart_id: string;
+  product_id: string;
+  variant_id: string;
   quantity: number;
 }
 export interface CartState {

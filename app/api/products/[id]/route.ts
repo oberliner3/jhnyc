@@ -3,19 +3,19 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { handle: string } }
+  { params }: { params: { id: string } }
 ) {
   const supabase = await createClient();
-  const { handle } = params;
+  const { id } = params;
 
   const { data: product, error } = await supabase
     .from("products")
     .select("*")
-    .eq("handle", handle)
+    .eq("id", id)
     .single();
 
   if (error) {
-    console.error(`[API] Failed to fetch product with handle ${handle} from Supabase:`, error);
+    console.error(`[API] Failed to fetch product with id ${id} from Supabase:`, error);
     return NextResponse.json(
       { error: "Failed to fetch product" },
       { status: 500 }

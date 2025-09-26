@@ -5,10 +5,10 @@ import { createContext, useContext, useEffect, useReducer } from 'react'
 import type { CartItem, CartState, Product, ProductVariant } from '@/lib/types'
 
 interface CartContextType extends CartState {
-  addItem: (product: Product, variant: ProductVariant, quantity?: number) => void
-  removeItem: (productId: number, variantId: number) => void
-  updateQuantity: (productId: number, variantId: number, quantity: number) => void
-  clearCart: () => void
+  addItem: (product: Product, variant: ProductVariant, quantity?: number) => Promise<void>
+  removeItem: (productId: string, variantId: string) => Promise<void>
+  updateQuantity: (productId: string, variantId: string, quantity: number) => Promise<void>
+  clearCart: () => Promise<void>
   toggleCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
@@ -16,8 +16,8 @@ interface CartContextType extends CartState {
 
 type CartAction =
   | { type: 'ADD_ITEM'; payload: { product: Product; variant: ProductVariant; quantity: number } }
-  | { type: 'REMOVE_ITEM'; payload: { productId: number; variantId: number } }
-  | { type: 'UPDATE_QUANTITY'; payload: { productId: number; variantId: number; quantity: number } }
+  | { type: 'REMOVE_ITEM'; payload: { productId: string; variantId: string } }
+  | { type: 'UPDATE_QUANTITY'; payload: { productId: string; variantId: string; quantity: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
   | { type: 'LOAD_CART'; payload: CartItem[] }
@@ -88,37 +88,20 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 }
 
 import { createClient } from '@/utils/supabase/client';
-
-// ... (rest of the component)
+import { useAuth } from './auth-context';
+import { mapApiToProduct } from '@/lib/api';
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false })
+  const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false });
   const supabase = createClient();
+  const { user } = useAuth();
+  const [cartId, setCartId] = useState<string | null>(null);
 
+  // Load cart from API or create a new one
   useEffect(() => {
-    const getCart = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from('carts')
-          .select('items')
-          .eq('user_id', user.id)
-          .single();
-
-        if (data) {
-          dispatch({ type: 'LOAD_CART', payload: data.items });
-        } else {
-          const savedCart = localStorage.getItem('originz-cart');
-          if (savedCart) {
-            try {
-              const cartItems = JSON.parse(savedCart);
-              dispatch({ type: 'LOAD_CART', payload: cartItems });
-            } catch (error) {
-              console.error('Error loading cart from localStorage:', error);
-            }
-          }
-        }
-      } else {
+    async function loadCart() {
+      if (!user) {
+        // For unauthenticated users, load from localStorage
         const savedCart = localStorage.getItem('originz-cart');
         if (savedCart) {
           try {
@@ -128,46 +111,151 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.error('Error loading cart from localStorage:', error);
           }
         }
+        return;
+      }
+
+      // For authenticated users, load from DB
+      try {
+        const res = await fetch('/api/cart');
+        if (!res.ok) {
+          throw new Error("Failed to fetch cart");
+        }
+        let cartData = await res.json();
+
+        if (!cartData) {
+          // If no cart exists, create one
+          const createRes = await fetch('/api/cart', {
+            method: 'POST',
+          });
+          if (!createRes.ok) {
+            throw new Error("Failed to create cart");
+          }
+          cartData = await createRes.json();
+        }
+        setCartId(cartData.id);
+
+        // Fetch product details for each cart item
+        const itemsWithDetails = await Promise.all(cartData.cart_items.map(async (item: any) => {
+          const productRes = await fetch(`/api/products/${item.product_id}`);
+          const productData = await productRes.json();
+          const product = mapApiToProduct(productData);
+
+          const variant = product.variants.find((v) => v.id === item.variant_id);
+
+          return {
+            id: item.id,
+            product,
+            variant: variant || product.variants[0],
+            quantity: item.quantity,
+            name: product.title,
+            price: variant?.price || product.price,
+            image: variant?.image || product.images[0]?.src,
+          };
+        }));
+
+        dispatch({ type: 'LOAD_CART', payload: itemsWithDetails });
+      } catch (err) {
+        console.error('Error loading cart from API:', err);
+        setError((err as Error).message);
       }
     }
-    getCart();
-  }, [supabase]);
+    loadCart();
+  }, [user]);
 
+  // Save cart to localStorage for unauthenticated users
   useEffect(() => {
-    const saveCart = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from('carts').upsert({ user_id: user.id, items: state.items });
-      } else {
-        localStorage.setItem('originz-cart', JSON.stringify(state.items));
-      }
+    if (!user) {
+      localStorage.setItem('originz-cart', JSON.stringify(state.items));
     }
-    saveCart();
-  }, [state.items, supabase]);
+  }, [state.items, user]);
 
-  // ... (rest of the component)
+  const addItem = async (product: Product, variant: ProductVariant, quantity: number = 1) => {
+    if (!user || !cartId) {
+      // Fallback to local storage for unauthenticated users
+      dispatch({ type: 'ADD_ITEM', payload: { product, variant, quantity } });
+      return;
+    }
 
+    try {
+      const res = await fetch('/api/cart/items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart_id: cartId, product_id: product.id, variant_id: variant.id, quantity }),
+      });
+      if (!res.ok) throw new Error("Failed to add item to cart");
+      // After adding, refetch cart to update state
+      // This is a simplified approach; a more optimized solution would update local state directly
+      // and then sync with API in background.
+      loadCart(); // Re-load cart to get updated items with details
+    } catch (err) {
+      console.error('Error adding item to cart:', err);
+    }
+  };
 
+  const removeItem = async (productId: string, variantId: string) => {
+    if (!user || !cartId) {
+      dispatch({ type: 'REMOVE_ITEM', payload: { productId, variantId } });
+      return;
+    }
 
-  const addItem = (product: Product, variant: ProductVariant, quantity: number = 1) => {
-    dispatch({ type: 'ADD_ITEM', payload: { product, variant, quantity } })
-  }
+    try {
+      const res = await fetch('/api/cart/items', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart_id: cartId, product_id: productId, variant_id: variantId }),
+      });
+      if (!res.ok) throw new Error("Failed to remove item from cart");
+      loadCart(); // Re-load cart to get updated items
+    } catch (err) {
+      console.error('Error removing item from cart:', err);
+    }
+  };
 
-  const removeItem = (productId: number, variantId: number) => {
-    dispatch({ type: 'REMOVE_ITEM', payload: { productId, variantId } })
-  }
+  const updateQuantity = async (productId: string, variantId: string, quantity: number) => {
+    if (!user || !cartId) {
+      dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, variantId, quantity } });
+      return;
+    }
 
-  const updateQuantity = (productId: number, variantId: number, quantity: number) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, variantId, quantity } })
-  }
+    if (quantity <= 0) {
+      removeItem(productId, variantId);
+      return;
+    }
 
-  const clearCart = () => {
-    dispatch({ type: 'CLEAR_CART' })
-  }
+    try {
+      const res = await fetch('/api/cart/items', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart_id: cartId, product_id: productId, variant_id: variantId, quantity }),
+      });
+      if (!res.ok) throw new Error("Failed to update item quantity");
+      loadCart(); // Re-load cart to get updated items
+    } catch (err) {
+      console.error('Error updating item quantity:', err);
+    }
+  };
 
-  const toggleCart = () => {
-    dispatch({ type: 'TOGGLE_CART' })
-  }
+  const clearCart = async () => {
+    if (!user || !cartId) {
+      dispatch({ type: 'CLEAR_CART' });
+      return;
+    }
+
+    try {
+      // This would ideally be a dedicated API endpoint to clear all items for a cart_id
+      // For now, we'll iterate and delete, or implement a new API route.
+      // For simplicity, let's assume a new API route /api/cart/clear
+      const res = await fetch('/api/cart/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart_id: cartId }),
+      });
+      if (!res.ok) throw new Error("Failed to clear cart");
+      loadCart(); // Re-load cart to get updated items
+    } catch (err) {
+      console.error('Error clearing cart:', err);
+    }
+  };
 
   const getTotalItems = () => {
     return state.items.reduce((total, item) => total + item.quantity, 0)

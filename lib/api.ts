@@ -3,11 +3,8 @@
  * Base URL: http://localhost:8000
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://moritotabi.com";
-
-// Types for API responses
 export interface ApiProduct {
-  id: number;
+  id: string;
   title: string;
   handle: string;
   body_html: string;
@@ -26,76 +23,9 @@ export interface ApiProduct {
   updated_at: string;
 }
 
-// Map ApiProduct -> internal Product types
-import type {
-  Product,
-  ProductImage,
-  ProductOption,
-  ProductVariant,
-} from "@/lib/types";
-
-export function mapApiVariant(variant: ApiProductVariant): ProductVariant {
-  return {
-    id: variant.id,
-    name:
-      variant.title ||
-      [variant.option1, variant.option2, variant.option3]
-        .filter(Boolean)
-        .join(" / ") ||
-      String(variant.id),
-    price: Number(variant.price),
-    inStock: Boolean(variant.available),
-    image: variant.featured_image,
-  };
-}
-
-export function mapApiOption(option: ApiProductOption): ProductOption {
-  return {
-    id: option.id,
-    name: option.name,
-    position: option.position,
-    values: option.values,
-  };
-}
-
-export function mapApiImage(image: ApiProductImage): ProductImage {
-  return {
-    id: image.id,
-    product_id: image.product_id,
-    position: image.position,
-    alt: image.alt,
-    src: image.src,
-    width: image.width,
-    height: image.height,
-    created_at: image.created_at,
-    updated_at: image.updated_at,
-    variant_ids: image.variant_ids,
-  };
-}
-
-export function mapApiToProduct(apiProduct: ApiProduct): Product {
-  return {
-    id: apiProduct.id,
-    title: apiProduct.title,
-    handle: apiProduct.handle,
-    body_html: apiProduct.body_html,
-    price: Number(apiProduct.price),
-    compareAtPrice: apiProduct.compare_at_price,
-    images: apiProduct.images?.map(mapApiImage) || [],
-    category: apiProduct.category,
-    inStock: Boolean(apiProduct.in_stock),
-    rating: apiProduct.rating,
-    reviewCount: apiProduct.review_count,
-    tags: apiProduct.tags,
-    vendor: apiProduct.vendor,
-    variants: apiProduct.variants?.map(mapApiVariant) || [],
-    options: apiProduct.options?.map(mapApiOption) || [],
-  } as Product;
-}
-
 export interface ApiProductImage {
-  id: number;
-  product_id: number;
+  id: string;
+  product_id: string;
   position: number;
   alt?: string;
   src: string;
@@ -103,12 +33,12 @@ export interface ApiProductImage {
   height?: number;
   created_at: string;
   updated_at: string;
-  variant_ids?: number[];
+  variant_ids?: string[];
 }
 
 export interface ApiProductVariant {
-  id: number;
-  product_id: number;
+  id: string;
+  product_id: string;
   title: string;
   option1?: string;
   option2?: string;
@@ -127,43 +57,21 @@ export interface ApiProductVariant {
 }
 
 export interface ApiProductOption {
-  id: number;
-  product_id: number;
+  id: string;
+  product_id: string;
   name: string;
   position: number;
   values: string[];
 }
 
-/**
- * Generic API request function with error handling
- */
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  const config: RequestInit = {
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    ...options,
-  };
-
-  try {
-    const response = await fetch(url, config);
-
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`API Request failed for ${endpoint}:`, error);
-    throw error;
-  }
+  const url = endpoint;
+  return fetch(url, options).then(res => res.json());
+}
+  return fetch(url, options).then(res => res.json());
 }
 
 /**
@@ -173,7 +81,7 @@ export async function getAllProducts(options?: {
   limit?: number;
   page?: number;
   fields?: string;
-}): Promise<ApiProduct[]> {
+}): Promise<Product[]> {
   const params = new URLSearchParams();
   if (options?.limit) params.append("limit", options.limit.toString());
   if (options?.page) params.append("page", options.page.toString());
@@ -186,10 +94,8 @@ export async function getAllProducts(options?: {
 
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
-    // Ensure data.products is an array; if not, return empty array to prevent build failures
-    return Array.isArray(data.products) ? data.products : [];
+    return Array.isArray(data.products) ? data.products.map(mapApiToProduct) : [];
   } catch (error) {
-    // During build or if API is unavailable, return empty array to avoid build failure
     console.warn(`[API] Failed to fetch products from ${endpoint}:`, error);
     return [];
   }
@@ -198,11 +104,11 @@ export async function getAllProducts(options?: {
 /**
  * Search products by query
  */
-export async function searchProducts(query: string): Promise<ApiProduct[]> {
+export async function searchProducts(query: string): Promise<Product[]> {
   const encodedQuery = encodeURIComponent(query);
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(`/api/products?search=${encodedQuery}`);
-    return Array.isArray(data.products) ? data.products : [];
+    return Array.isArray(data.products) ? data.products.map(mapApiToProduct) : [];
   } catch (error) {
     console.warn(`[API] Failed to search products for "${query}":`, error);
     return [];
@@ -212,25 +118,27 @@ export async function searchProducts(query: string): Promise<ApiProduct[]> {
 /**
  * Get a specific product by ID
  */
-export async function getProductById(id: number): Promise<ApiProduct> {
-  return apiRequest<ApiProduct>(`/api/products/${id}`);
+export async function getProductById(id: string): Promise<Product> {
+  const data = await apiRequest<ApiProduct>(`/api/products/${id}`);
+  return mapApiToProduct(data);
 }
 
 /**
  * Get a specific product by handle
  */
-export async function getProductByHandle(handle: string): Promise<ApiProduct> {
-  return apiRequest<ApiProduct>(`/api/products/handle/${handle}`);
+export async function getProductByHandle(handle: string): Promise<Product> {
+  const data = await apiRequest<ApiProduct>(`/api/products/handle/${handle}`);
+  return mapApiToProduct(data);
 }
 
 /**
  * Get products filtered by vendor
  */
-export async function getProductsByVendor(vendor: string): Promise<ApiProduct[]> {
+export async function getProductsByVendor(vendor: string): Promise<Product[]> {
   const encodedVendor = encodeURIComponent(vendor);
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(`/api/products?vendor=${encodedVendor}`);
-    return Array.isArray(data.products) ? data.products : [];
+    return Array.isArray(data.products) ? data.products.map(mapApiToProduct) : [];
   } catch (error) {
     console.warn(`[API] Failed to fetch products for vendor "${vendor}":`, error);
     return [];
@@ -242,7 +150,7 @@ export async function getProductsByVendor(vendor: string): Promise<ApiProduct[]>
  */
 export function getImageProxyUrl(imageUrl: string): string {
   const encodedUrl = encodeURIComponent(imageUrl);
-  return `${API_BASE_URL}/cosmos/image-proxy?url=${encodedUrl}`;
+  return `https://moritotabi.com/cosmos/image-proxy?url=${encodedUrl}`;
 }
 
 /**
