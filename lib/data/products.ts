@@ -1,151 +1,18 @@
 import type { Product } from "@/lib/types";
+import { getAllProducts, mapApiToProduct } from "@/lib/api";
 
-export const FEATURED_PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: "Premium Wireless Headphones",
-    handle: "premium-wireless-headphones",
-    body_html: "High-quality wireless headphones with noise cancellation",
-    price: 299.99,
-    compareAtPrice: 399.99,
-    images: [
-      {
-        id: 101,
-        product_id: 1,
-        position: 1,
-        created_at: "2023-01-01T12:00:00Z",
-        updated_at: "2023-01-01T12:00:00Z",
-        src: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop",
-      },
-      {
-        id: 102,
-        product_id: 1,
-        position: 2,
-        created_at: "2023-01-01T12:00:00Z",
-        updated_at: "2023-01-01T12:00:00Z",
-        src: "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&h=500&fit=crop",
-      },
-    ],
-    category: "Electronics",
-    inStock: true,
-    rating: 4.8,
-    reviewCount: 124,
-    tags: ["wireless", "headphones", "premium"],
-    vendor: "AudioTech",
-    variants: [],
-    options: [],
-  },
-  {
-    id: 2,
-    name: "Organic Cotton T-Shirt",
-    handle: "organic-cotton-tshirt",
-    body_html: "Soft, comfortable organic cotton t-shirt",
-    price: 29.99,
-    images: [
-      {
-        id: 201,
-        product_id: 2,
-        position: 1,
-        created_at: "2023-01-01T12:00:00Z",
-        updated_at: "2023-01-01T12:00:00Z",
-        src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
-      },
-    ],
-    category: "Clothing",
-    inStock: true,
-    rating: 4.6,
-    reviewCount: 89,
-    tags: ["organic", "cotton", "sustainable"],
-    vendor: "EcoWear",
-    options: [
-      { id: 1, name: "Color", position: 1, values: ["White", "Black"] },
-      { id: 2, name: "Size", position: 2, values: ["S", "M", "L", "XL"] },
-    ],
-    variants: [
-      { id: 1, name: "White / S", price: 29.99, inStock: true },
-      { id: 2, name: "White / M", price: 29.99, inStock: true },
-      { id: 3, name: "White / L", price: 29.99, inStock: false },
-      { id: 4, name: "White / XL", price: 29.99, inStock: true },
-      { id: 5, name: "Black / S", price: 29.99, inStock: true },
-      { id: 6, name: "Black / M", price: 29.99, inStock: true },
-      { id: 7, name: "Black / L", price: 29.99, inStock: true },
-      { id: 8, name: "Black / XL", price: 29.99, inStock: false },
-    ],
-  },
-  {
-    id: 3,
-    name: "Smart Fitness Watch",
-    handle: "smart-fitness-watch",
-    body_html: "Track your fitness goals with this advanced smartwatch",
-    price: 199.99,
-    compareAtPrice: 249.99,
-    images: [
-      {
-        id: 301,
-        product_id: 3,
-        position: 1,
-        created_at: "2023-01-01T12:00:00Z",
-        updated_at: "2023-01-01T12:00:00Z",
-        src: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&h=500&fit=crop",
-      },
-    ],
-    category: "Electronics",
-    inStock: true,
-    rating: 4.7,
-    reviewCount: 203,
-    tags: ["fitness", "smartwatch", "health"],
-    vendor: "FitGear",
-    variants: [],
-    options: [],
-  },
-  {
-    id: 4,
-    name: "Minimalist Backpack",
-    handle: "minimalist-backpack",
-    body_html: "Sleek and functional backpack for everyday use",
-    price: 79.99,
-    images: [
-      {
-        id: 401,
-        product_id: 4,
-        position: 1,
-        created_at: "2023-01-01T12:00:00Z",
-        updated_at: "2023-01-01T12:00:00Z",
-        src: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=500&fit=crop",
-      },
-    ],
-    category: "Accessories",
-    inStock: true,
-    rating: 4.5,
-    reviewCount: 67,
-    tags: ["minimalist", "backpack", "travel"],
-    vendor: "UrbanCarry",
-    variants: [],
-    options: [],
-  },
-  {
-    id: 5,
-    name: "Artisan Coffee Beans",
-    handle: "artisan-coffee-beans",
-    body_html: "Premium single-origin coffee beans",
-    price: 24.99,
-    images: [
-      {
-        id: 501,
-        product_id: 5,
-        position: 1,
-        created_at: "2023-01-01T12:00:00Z",
-        updated_at: "2023-01-01T12:00:00Z",
-        src: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop",
-      },
-    ],
-    category: "Food & Beverage",
-    inStock: true,
-    rating: 4.9,
-    reviewCount: 145,
-    tags: ["coffee", "artisan", "premium"],
-    vendor: "BeanCraft",
-    variants: [],
-    options: [],
-  },
-];
+// Fetch first 5 products from the API
+export async function getFeaturedProducts(): Promise<Product[]> {
+  try {
+    const apiProducts = await getAllProducts({ limit: 5 });
+    return apiProducts.map(mapApiToProduct);
+  } catch (error) {
+    console.error("Failed to fetch featured products:", error);
+    return [];
+  }
+}
+
+// For backward compatibility, keep the constant but make it a Promise
+// This will be used in server components with await
+// In client components, use the useQuery hook with getFeaturedProducts
+export const FEATURED_PRODUCTS_PROMISE = getFeaturedProducts();
