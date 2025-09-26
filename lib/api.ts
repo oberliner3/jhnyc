@@ -159,7 +159,6 @@ async function apiRequest<T>(
     }
 
     const data = await response.json();
-    console.log(`API Response from ${endpoint}:`, data);
     return data;
   } catch (error) {
     console.error(`API Request failed for ${endpoint}:`, error);
