@@ -122,9 +122,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="font-medium">Address</p>
-                  <p className="text-muted-foreground">
-                    {APP_CONTACTS.address.office}
-                  </p>
+                  <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: APP_CONTACTS.address.office }} />
                 </div>
               </div>
 

@@ -53,7 +53,7 @@ export function Footer() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4" />
-                <span>{APP_CONTACTS.address.office}</span>
+                <span dangerouslySetInnerHTML={{ __html: APP_CONTACTS.address.office }} />
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Phone className="h-4 w-4" />
