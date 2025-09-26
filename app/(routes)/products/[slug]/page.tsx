@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { generateSEO } from "@/lib/seo";
 import { getAllProducts, getProductByHandle } from "@/lib/api";
-import { ProductDetails } from "./product-details";
+import { ProductDetailsServer } from "./product-details-server";
 
 export const revalidate = 60; // ISR: revalidate product detail pages every 60 seconds
 
@@ -51,7 +51,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="px-4 py-8 container">
-      <ProductDetails slug={slug} />
+      <ProductDetailsServer slug={slug} />
     </div>
   );
 }

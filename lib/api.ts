@@ -181,8 +181,8 @@ export async function getAllProducts(options?: {
 
   const queryString = params.toString();
   const endpoint = queryString
-    ? `/cosmos/products?${queryString}`
-    : "/cosmos/products";
+    ? `/api/products?${queryString}`
+    : "/api/products";
 
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
@@ -201,8 +201,8 @@ export async function getAllProducts(options?: {
 export async function searchProducts(query: string): Promise<ApiProduct[]> {
   const encodedQuery = encodeURIComponent(query);
   try {
-    const data = await apiRequest<ApiProduct[]>(`/cosmos/products/search?q=${encodedQuery}`);
-    return Array.isArray(data) ? data : [];
+    const data = await apiRequest<{ products: ApiProduct[] }>(`/api/products?search=${encodedQuery}`);
+    return Array.isArray(data.products) ? data.products : [];
   } catch (error) {
     console.warn(`[API] Failed to search products for "${query}":`, error);
     return [];
@@ -213,20 +213,14 @@ export async function searchProducts(query: string): Promise<ApiProduct[]> {
  * Get a specific product by ID
  */
 export async function getProductById(id: number): Promise<ApiProduct> {
-  return apiRequest<ApiProduct>(`/cosmos/products/${id}`);
+  return apiRequest<ApiProduct>(`/api/products/${id}`);
 }
 
 /**
  * Get a specific product by handle
  */
 export async function getProductByHandle(handle: string): Promise<ApiProduct> {
-  // Backend doesn't expose handle endpoint; use search and exact-match by handle
-  const candidates = await searchProducts(handle);
-  const matched = candidates.find((p) => p.handle === handle);
-  if (!matched) {
-    throw new Error(`Product with handle '${handle}' not found`);
-  }
-  return matched;
+  return apiRequest<ApiProduct>(`/api/products/handle/${handle}`);
 }
 
 /**
@@ -235,8 +229,8 @@ export async function getProductByHandle(handle: string): Promise<ApiProduct> {
 export async function getProductsByVendor(vendor: string): Promise<ApiProduct[]> {
   const encodedVendor = encodeURIComponent(vendor);
   try {
-    const data = await apiRequest<ApiProduct[]>(`/cosmos/products?vendor=${encodedVendor}`);
-    return Array.isArray(data) ? data : [];
+    const data = await apiRequest<{ products: ApiProduct[] }>(`/api/products?vendor=${encodedVendor}`);
+    return Array.isArray(data.products) ? data.products : [];
   } catch (error) {
     console.warn(`[API] Failed to fetch products for vendor "${vendor}":`, error);
     return [];

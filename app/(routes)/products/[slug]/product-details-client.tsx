@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Star, Truck, RefreshCw, Shield } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -15,24 +14,12 @@ import { ProductReviews } from '@/components/product/product-reviews';
 import { AddReviewForm } from '@/components/product/add-review-form';
 import { getImageProxyUrl } from "@/lib/api";
 
-interface ProductDetailsProps {
-  slug: string;
+interface ProductDetailsClientProps {
+  product: Product;
 }
 
-async function getProduct(slug: string): Promise<Product> {
-  const res = await fetch(`/api/products/${slug}`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch product");
-  }
-  return res.json();
-}
-
-export function ProductDetails({ slug }: ProductDetailsProps) {
+export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
   const { addItem } = useCart();
-  const { data: product, isLoading, isError } = useQuery({
-    queryKey: ["product", slug],
-    queryFn: () => getProduct(slug),
-  });
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
@@ -67,14 +54,6 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
     setSelectedVariant(variant);
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError || !product) {
-    return <div>Error loading product.</div>;
-  }
-
   const discountPercentage =
     product.compareAtPrice && selectedVariant
       ? Math.round(
@@ -93,7 +72,7 @@ export function ProductDetails({ slug }: ProductDetailsProps) {
         <div className="relative bg-muted rounded-lg aspect-square overflow-hidden">
           <Image
             src={getImageProxyUrl(
-              selectedVariant?.image || product.images[0].src
+              selectedVariant?.image || (product.images && product.images.length > 0 ? product.images[0].src : '/placeholder.svg')
             )}
             alt={product.title}
             fill
