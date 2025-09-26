@@ -2,10 +2,11 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product/product-card'
-import { FEATURED_PRODUCTS } from '@/lib/data/products'
+import { getAllProducts, mapApiToProduct } from '@/lib/api'
 
 export async function FeaturedProducts() {
-  const products = await FEATURED_PRODUCTS
+  const apiProducts = await getAllProducts({ limit: 5 });
+  const products = apiProducts.map(mapApiToProduct);
 
   return (
     <section className="py-16 lg:py-24">

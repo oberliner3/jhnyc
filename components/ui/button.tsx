@@ -55,7 +55,7 @@ function Button({
   )
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
 
 // Preset button wrappers for consistent sizing/spacing across primary flows
 // Usage examples:
@@ -118,3 +118,4 @@ export function IconButton({
 }: ButtonProps) {
   return <Button variant={variant} size={size} className={cn(className)} {...props} />
 }
+

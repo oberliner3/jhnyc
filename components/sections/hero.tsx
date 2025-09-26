@@ -1,9 +1,21 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Play } from "lucide-react";
 import { PrimaryCTA, SecondaryCTA } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 export function Hero() {
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 	return (
 		<section className="relative bg-gradient-to-br from-background via-muted/50 to-primary/10 overflow-hidden">
 			<div className="px-4 py-16 lg:py-24 container">
@@ -30,13 +42,28 @@ export function Hero() {
 									<ArrowRight className="ml-2 w-5 h-5" />
 								</Link>
 							</PrimaryCTA>
-							<SecondaryCTA className="px-8 text-lg">
-								{/**
-								 * TODO: PopUp VideoPlayer
-								 */}
-								<Play className="mr-2 w-5 h-5" />
-								Watch Story
-							</SecondaryCTA>
+							<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+								<DialogTrigger asChild>
+									<SecondaryCTA className="px-8 text-lg">
+										<Play className="mr-2 w-5 h-5" />
+										Watch Story
+									</SecondaryCTA>
+								</DialogTrigger>
+								<DialogContent className="max-w-3xl">
+									<DialogHeader>
+										<DialogTitle>Our Story</DialogTitle>
+									</DialogHeader>
+									<div className="aspect-video">
+										<iframe
+											className="w-full h-full rounded-lg"
+											src="https://www.youtube.com/embed/x-vyU_MGg4M"
+											title="YouTube video player"
+											allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+											allowFullScreen
+										></iframe>
+									</div>
+								</DialogContent>
+							</Dialog>
 						</div>
 
 						{/* Social Proof */}
@@ -76,13 +103,13 @@ export function Hero() {
 								priority
 							/>
 							{/* Floating Cards */}
-							<div className="top-6 right-6 absolute bg-white/90 shadow-lg backdrop-blur-sm p-4 rounded-lg">
+							<div className="top-6 right-6 absolute bg-card/90 shadow-lg backdrop-blur-sm p-4 rounded-lg">
 								<div className="flex items-center gap-2">
 									<div className="bg-green-500 rounded-full w-2 h-2"></div>
 									<span className="font-medium text-sm">Free Shipping</span>
 								</div>
 							</div>
-							<div className="bottom-6 left-6 absolute bg-white/90 shadow-lg backdrop-blur-sm p-4 rounded-lg">
+							<div className="bottom-6 left-6 absolute bg-card/90 shadow-lg backdrop-blur-sm p-4 rounded-lg">
 								<div className="flex items-center gap-2">
 									<span className="font-bold text-primary text-2xl">20%</span>
 									<span className="text-sm">Off Today</span>

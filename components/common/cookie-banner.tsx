@@ -34,11 +34,11 @@ export function CookieBanner() {
       declineButtonText="Reject non‑essential"
       cookieName="originz-cookie-consent"
       expires={180}
-      containerClasses="w-full border-t bg-background"
+      containerClasses="w-full border-t bg-background z-50"
       contentClasses="container px-4 py-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
       buttonWrapperClasses="flex items-center gap-3"
-      buttonClasses="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4"
-      declineButtonClasses="inline-flex items-center justify-center whitespace-nowrap rounded-md border text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4"
+      buttonClasses="cookie-consent-button"
+      declineButtonClasses="cookie-consent-decline-button"
       style={{ boxShadow: '0 -1px 0 var(--border)' }}
       onAccept={() => {
         const consent = buildConsent(true)
