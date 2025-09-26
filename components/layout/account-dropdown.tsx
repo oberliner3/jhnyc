@@ -48,6 +48,9 @@ export function AccountDropdown() {
           <Link href="/account">Account</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
+          <Link href="/account/profile">Profile</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href="/account/orders">Orders</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

@@ -36,6 +36,22 @@ export interface ProductVariant {
   inStock: boolean;
   image?: string;
 }
+
+export interface OrderItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
+export interface Order {
+  id: string;
+  date: string;
+  status: string;
+  total: number;
+  items: OrderItem[];
+}
 export interface ProductOption {
   id: number;
   name: string;
