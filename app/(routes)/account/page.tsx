@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import { generateSEO } from '@/lib/seo'
 import { AccountGate } from '@/components/account/account-gate'
+import { AccountDashboardSkeleton } from '@/components/skeletons/account-skeleton'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = generateSEO({
   title: 'Account',
@@ -9,6 +11,10 @@ export const metadata: Metadata = generateSEO({
 })
 
 export default function AccountPage() {
-  return <AccountGate />
+  return (
+    <Suspense fallback={<AccountDashboardSkeleton />}>
+      <AccountGate />
+    </Suspense>
+  )
 }
 

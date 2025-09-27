@@ -21,7 +21,7 @@ export function Header() {
   const cartItemCount = getTotalItems()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/60 shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Mobile menu */}
         <MobileNav />
@@ -35,9 +35,10 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium hover:text-primary transition-colors"
+              className="text-sm font-medium text-gray-700 hover:text-primary transition-colors relative group"
             >
               {item.name}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
             </Link>
           ))}
         </nav>
@@ -48,10 +49,12 @@ export function Header() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           {/* Mobile search */}
           <IconButton
-            className="md:hidden"
+            variant="ghost"
+            size="sm"
+            className="md:hidden text-gray-600 hover:text-gray-900"
             onClick={() => setIsSearchOpen(!isSearchOpen)}
           >
             <Search className="h-5 w-5" />
@@ -62,12 +65,17 @@ export function Header() {
           <AccountDropdown />
 
           {/* Cart */}
-          <IconButton className="relative" onClick={toggleCart}>
+          <IconButton 
+            variant="ghost" 
+            size="sm" 
+            className="relative text-gray-600 hover:text-gray-900" 
+            onClick={toggleCart}
+          >
             <ShoppingCart className="h-5 w-5" />
             {cartItemCount > 0 && (
               <Badge
                 variant="destructive"
-                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs"
+                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-500 hover:bg-red-600"
               >
                 {cartItemCount}
               </Badge>

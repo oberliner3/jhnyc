@@ -1,8 +1,10 @@
 // biome-ignore assist/source/organizeImports: <>
 import type { Metadata } from "next";
 import { ProductCard } from "@/components/product/product-card";
+import { ProductGridSkeleton } from "@/components/skeletons/product-card-skeleton";
 import { generateSEO } from "@/lib/seo";
 import { getAllProducts, mapApiToProduct } from "@/lib/api";
+import { Suspense } from "react";
 
 export const revalidate = 60; // ISR: revalidate this page every 60 seconds
 
@@ -13,11 +15,21 @@ export const metadata: Metadata = generateSEO({
   path: "/products",
 });
 
-export default async function ProductsPage() {
+async function ProductsList() {
   // Fetch from Cosmos API (server-side)
   const apiProducts = await getAllProducts({ limit: 24 });
   const products = apiProducts.map(mapApiToProduct);
 
+  return (
+    <div className="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
+
+export default function ProductsPage() {
   return (
     <div className="px-4 py-8 container">
       <div className="mb-8">
@@ -29,11 +41,9 @@ export default async function ProductsPage() {
         </p>
       </div>
 
-      <div className="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      <Suspense fallback={<ProductGridSkeleton count={24} />}>
+        <ProductsList />
+      </Suspense>
     </div>
   );
 }

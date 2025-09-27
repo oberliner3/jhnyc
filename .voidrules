@@ -1,0 +1,83 @@
+# VoidRules Configuration for Agentic Workflows in a TypeScript/Next.js Project
+
+# General
+extends: 
+  - recommended
+  - prettier/recommended #Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
+
+# Environment
+environment:
+  browser: true
+  node: true
+  es2021: true
+
+# Parser
+parser: "@typescript-eslint/parser"
+
+# Parser Options
+parserOptions:
+  ecmaVersion: 2021
+  sourceType: module
+  ecmaFeatures:
+    jsx: true
+
+# Plugins
+plugins:
+  - react
+  - react-hooks
+  - "@typescript-eslint"
+  - simple-import-sort
+  - unused-imports
+
+# Rules
+rules:
+  # General JavaScript/TypeScript Rules
+  semi: "error"
+  quotes: ["error", "double", { "avoidEscape": true }]
+  no-unused-vars: "off" # Handled by unused-imports/no-unused-vars
+  no-console: "warn" # Allow console.log in development, but warn in production
+  no-debugger: "warn"
+
+  # TypeScript Specific Rules
+  "@typescript-eslint/explicit-function-return-type": "off"
+  "@typescript-eslint/explicit-module-boundary-types": "off"
+  "@typescript-eslint/no-explicit-any": "warn" # Allow 'any' type, but warn about it
+  "@typescript-eslint/no-unused-vars": "off" # Handled by unused-imports/no-unused-vars
+  "@typescript-eslint/no-var-requires": "off"
+
+  # React & React Hooks Rules
+  react/jsx-uses-react: "off"
+  react/react-in-jsx-scope: "off"
+  react/prop-types: "off"
+  react-hooks/rules-of-hooks: "error"
+  react-hooks/exhaustive-deps: "warn"
+
+  # Agentic Workflow Rules (Example - Adjust as Needed)
+  # Enforce consistent use of comments for task delegation or reasoning steps
+  "require-jsdoc": [
+    "warn",
+    {
+      "require": {
+        "FunctionDeclaration": true,
+        "MethodDefinition": false,
+        "ClassDeclaration": false,
+        "ArrowFunctionExpression": false,
+        "FunctionExpression": false,
+      }
+    }
+  ],
+  # Enforce specific naming conventions for agent-related functions/variables
+  "camelcase": "warn",
+
+  # Import Sorting Rules
+  "simple-import-sort/imports": "error",
+  "simple-import-sort/exports": "error",
+  "unused-imports/no-unused-imports": "error",
+
+  # Formatting (Prettier - handled by extends)
+  "prettier/prettier": "error"
+
+#Ignore Patterns
+ignorePatterns:
+  - "dist/*"
+  - "*.d.ts"

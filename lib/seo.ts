@@ -73,6 +73,9 @@ export function generateSEO({
       yandex: "",
       yahoo: "",
     },
+    pinterest:{
+richPin: ""
+    },
     appleWebApp: {
       capable: true,
       statusBarStyle: "black-translucent",

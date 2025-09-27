@@ -38,7 +38,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         const variantName = product.options
           .map((opt) => initialOptions[opt.name])
           .join(" / ");
-        const variant = product.variants.find((v) => v.name === variantName);
+        const variant = product.variants.find((v) => v.title === variantName);
         setSelectedVariant(variant || product.variants[0]);
       }
     }
@@ -52,15 +52,15 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
     const variantName = product.options
       .map((opt) => newOptions[opt.name])
       .join(" / ");
-    const variant = product.variants.find((v) => v.name === variantName);
+    const variant = product.variants.find((v) => v.title === variantName);
     setSelectedVariant(variant);
   };
 
   const discountPercentage =
-    product.compareAtPrice && selectedVariant
+    product.compare_at_price && selectedVariant
       ? Math.round(
-          ((product.compareAtPrice - selectedVariant.price) /
-            product.compareAtPrice) *
+          ((product.compare_at_price - selectedVariant.price) /
+            product.compare_at_price) *
             100
         )
       : 0;
@@ -74,7 +74,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         <div className="relative bg-muted rounded-lg aspect-square overflow-hidden">
           <Image
             src={getImageProxyUrl(
-              selectedVariant?.image || (product.images && product.images.length > 0 ? product.images[0].src : '/placeholder.svg')
+              selectedVariant?.featured_image || (product.images && product.images.length > 0 ? product.images[0].src : '/placeholder.svg')
             )}
             alt={product.title}
             fill
@@ -131,7 +131,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
               ))}
             </div>
             <span className="text-muted-foreground text-sm">
-              {product.rating} ({product.reviewCount} reviews)
+              {product.rating} ({product.review_count} reviews)
             </span>
           </div>
         </div>
@@ -172,15 +172,15 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
             <span className="font-bold text-3xl">
               {formatPrice(currentPrice)}
             </span>
-            {product.compareAtPrice && (
+            {product.compare_at_price && (
               <span className="text-muted-foreground text-lg line-through">
-                {formatPrice(product.compareAtPrice)}
+                {formatPrice(product.compare_at_price)}
               </span>
             )}
           </div>
-          {product.compareAtPrice && discountPercentage > 0 && (
+          {product.compare_at_price && discountPercentage > 0 && (
             <p className="text-green-600 text-sm">
-              You save {formatPrice(product.compareAtPrice - currentPrice)} (
+              You save {formatPrice(product.compare_at_price - currentPrice)} (
               {discountPercentage}%)
             </p>
           )}
@@ -197,17 +197,17 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
           <Button
             size="lg"
             className="w-full"
-            disabled={!selectedVariant?.inStock}
+            disabled={!selectedVariant?.available}
             onClick={() => {
               if (selectedVariant) {
                 addItem(product, selectedVariant, 1);
               }
             }}
           >
-            {selectedVariant?.inStock ? "Add to Cart" : "Out of Stock"}
+            {selectedVariant?.available ? "Add to Cart" : "Out of Stock"}
           </Button>
 
-          {selectedVariant?.inStock && (
+          {selectedVariant?.available && (
             <Button variant="outline" size="lg" className="w-full">
               Buy Now
             </Button>
@@ -238,7 +238,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 
         <Separator />
 
-        <AddReviewForm productId={product.id} />
+        <AddReviewForm productId={Number(product.id)} />
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ export function useSearch(products: ApiProduct[]) {
     category: "",
     minPrice: 180,
     maxPrice: 10_000,
-    inStock: false,
+    in_stock: false,
   });
 
   const filteredProducts = react.useMemo(() => {
@@ -26,7 +26,7 @@ export function useSearch(products: ApiProduct[]) {
         filters.category === "" || product.category === filters.category;
       const matchesPrice =
         product.price >= filters.minPrice && product.price <= filters.maxPrice;
-      const matchesStock = !filters.inStock || product.in_stock;
+      const matchesStock = !filters.in_stock || product.in_stock;
 
       return matchesQuery && matchesCategory && matchesPrice && matchesStock;
     });

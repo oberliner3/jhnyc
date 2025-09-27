@@ -2,12 +2,24 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProductCard } from '@/components/product/product-card'
+import { FeaturedProductsSkeleton } from '@/components/skeletons/featured-products-skeleton'
 import { getAllProducts, mapApiToProduct } from '@/lib/api'
+import { Suspense } from 'react'
 
-export async function FeaturedProducts() {
+async function FeaturedProductsList() {
   const apiProducts = await getAllProducts({ limit: 5 });
   const products = apiProducts.map(mapApiToProduct);
 
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
+
+export function FeaturedProducts() {
   return (
     <section className="py-16 lg:py-24">
       <div className="container px-4">
@@ -28,11 +40,9 @@ export async function FeaturedProducts() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <Suspense fallback={<FeaturedProductsSkeleton />}>
+          <FeaturedProductsList />
+        </Suspense>
       </div>
     </section>
   )

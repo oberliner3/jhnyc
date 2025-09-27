@@ -17,17 +17,17 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
 
-	const discountPercentage = product.compareAtPrice
-		? Math.round(
-				((product.compareAtPrice - product.price) / product.compareAtPrice) *
-					100,
-			)
-		: 0;
+  const discountPercentage = product.compare_at_price
+    ? Math.round(
+      ((product.compare_at_price - product.price) / product.compare_at_price) *
+      100,
+    )
+    : 0;
 
   const hasVariants = product.variants && product.variants.length > 0;
 
   const handleAddToCart = () => {
-    if (!product.inStock) return;
+    if (!product.in_stock) return;
 
     if (!hasVariants && product.variants && product.variants.length > 0) {
       addItem(product, product.variants[0], 1);
@@ -76,16 +76,15 @@ export function ProductCard({ product }: ProductCardProps) {
             {[...Array(5)].map((_, i) => (
               <Star
                 key={`star-${product.id}-${i}`}
-                className={`h-4 w-4 ${
-                  i < Math.floor(product.rating)
+                className={`h-4 w-4 ${i < Math.floor(product.rating)
                     ? "fill-yellow-400 text-yellow-400"
                     : "text-muted-foreground/30"
-                }`}
+                  }`}
               />
             ))}
           </div>
           <span className="text-muted-foreground text-sm">
-            ({product.reviewCount})
+            ({product.review_count})
           </span>
         </div>
 
@@ -95,9 +94,9 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className="font-bold text-lg">
               {formatPrice(product.price)}
             </span>
-            {product.compareAtPrice && (
+            {product.compare_at_price && (
               <span className="text-muted-foreground text-sm line-through">
-                {formatPrice(product.compareAtPrice)}
+                {formatPrice(product.compare_at_price)}
               </span>
             )}
           </div>
@@ -105,7 +104,7 @@ export function ProductCard({ product }: ProductCardProps) {
             size="sm"
             variant="outline"
             className="opacity-0 group-hover:opacity-100 transition-opacity"
-            disabled={!product.inStock}
+            disabled={!product.in_stock}
             onClick={handleAddToCart}
             asChild={hasVariants}
           >

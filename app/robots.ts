@@ -1,67 +1,128 @@
-import { SITE_CONFIG } from "@/lib/constants";
-import { MetadataRoute } from "next";
+import { MetadataRoute } from 'next'
+import { SITE_CONFIG } from '@/lib/constants'
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: "*",
-        allow: "/",
-        disallow: "/private/",
+        userAgent: '*',
+        allow: [
+          '/',
+          '/products/',
+          '/collections/',
+          '/search',
+          '/about',
+          '/contact',
+          '/faq',
+          '/help',
+          '/size-guide',
+          '/care-instructions',
+          '/shipping-delivery',
+          '/returns-exchange',
+          '/refund-policy',
+          '/privacy-policy',
+          '/terms-of-service',
+          '/cookie-policy',
+          '/accessibility-statement',
+          '/blog/',
+          '/news/',
+          '/press',
+          '/careers',
+          '/api/feed/google-merchant',
+        ],
+        disallow: [
+          '/account/',
+          '/cart',
+          '/checkout/',
+          '/admin/',
+          '/api/',
+          '/_next/',
+          '/static/',
+          '/offline',
+          '/404',
+          '/500',
+          '*.json',
+          '*.xml$',
+          '/share',
+          '/upload',
+        ],
+        crawlDelay: 1,
       },
       {
-        userAgent: "GPTBot",
-        disallow: "/",
+        userAgent: 'Googlebot',
+        allow: [
+          '/',
+          '/products/',
+          '/collections/',
+          '/search',
+          '/about',
+          '/contact',
+          '/api/feed/google-merchant',
+        ],
+        disallow: [
+          '/account/',
+          '/cart',
+          '/checkout/',
+          '/admin/',
+          '/api/',
+          '/_next/',
+          '/static/',
+        ],
+        crawlDelay: 0.5,
       },
       {
-        userAgent: "Google-Extended",
-        disallow: "/",
+        userAgent: 'Bingbot',
+        allow: [
+          '/',
+          '/products/',
+          '/collections/',
+          '/search',
+          '/about',
+          '/contact',
+        ],
+        disallow: [
+          '/account/',
+          '/cart',
+          '/checkout/',
+          '/admin/',
+          '/api/',
+          '/_next/',
+          '/static/',
+        ],
+        crawlDelay: 1,
       },
       {
-        userAgent: "CCBot",
-        disallow: "/",
+        userAgent: 'facebookexternalhit',
+        allow: [
+          '/',
+          '/products/',
+          '/collections/',
+        ],
+        disallow: [
+          '/account/',
+          '/cart',
+          '/checkout/',
+          '/admin/',
+          '/api/',
+        ],
       },
       {
-        userAgent: "anthropic-ai",
-        disallow: "/",
-      },
-      {
-        userAgent: "Claude-Web",
-        disallow: "/",
-      },
-      {
-        userAgent: "Bytespider",
-        disallow: "/",
-      },
-      {
-        userAgent: "Omgili",
-        disallow: "/",
-      },
-      {
-        userAgent: "FacebookBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "PerplexityBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "IbouBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "Meta-ExternalAgent",
-        disallow: "/",
-      },
-      {
-        userAgent: "YouBot",
-        disallow: "/",
-      },
-      {
-        userAgent: "Applebot-Extended",
-        disallow: "/",
+        userAgent: 'Twitterbot',
+        allow: [
+          '/',
+          '/products/',
+          '/collections/',
+        ],
+        disallow: [
+          '/account/',
+          '/cart',
+          '/checkout/',
+          '/admin/',
+          '/api/',
+        ],
       },
     ],
     sitemap: `${SITE_CONFIG.url}/sitemap.xml`,
-  };
+    host: SITE_CONFIG.url,
+  }
 }
