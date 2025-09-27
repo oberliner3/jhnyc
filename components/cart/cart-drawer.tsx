@@ -8,8 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/cart-context";
-import type { ShoppingCartItem } from "@/lib/types";
-
 import {
   Sheet,
   SheetContent,
@@ -17,7 +15,6 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
-import { ReactNode } from "react";
 
 export default function CartDrawer() {
   const {
