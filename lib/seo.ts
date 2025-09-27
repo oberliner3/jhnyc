@@ -20,12 +20,15 @@ export function generateSEO({
   const seoUrl = `${SITE_CONFIG.url}${path}`;
 
   return {
+    metadataBase: new URL(SITE_CONFIG.url),
     title: seoTitle,
     description: seoDescription,
     keywords: SITE_CONFIG.keywords,
     authors: [{ name: SITE_CONFIG.author }],
     creator: SITE_CONFIG.author,
     publisher: SITE_CONFIG.name,
+    generator: "X-OriGenZ v0",
+    applicationName: SITE_CONFIG.domain.split(".")[0],
     robots: {
       index: true,
       follow: true,
@@ -42,6 +45,7 @@ export function generateSEO({
       locale: "en_US",
       url: seoUrl,
       title: seoTitle,
+      countryName: "UK",
       description: seoDescription,
       siteName: SITE_CONFIG.name,
       images: [
@@ -60,12 +64,31 @@ export function generateSEO({
       images: [seoImage],
       creator: "@OriGinz",
     },
+    facebook: {
+      appId: "",
+    },
+    verification: {
+      google: "",
+      me: "",
+      yandex: "",
+      yahoo: "",
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: SITE_CONFIG.name,
+      startupImage: {
+        url: "string;",
+        media: "string | undefined;",
+      },
+    },
     icons: {
       icon: "/favicon.ico",
       shortcut: "/favicon-16x16.png",
       apple: "/apple-icon.png",
     },
-    manifest: "/site.webmanifest",
+
+    manifest: "/manifest",
     alternates: {
       canonical: seoUrl,
     },

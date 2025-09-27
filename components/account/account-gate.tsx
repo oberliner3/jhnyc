@@ -2,7 +2,12 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/contexts/auth-context'
-import { PrimaryCTA, SecondaryCTA, DangerButton } from '@/components/ui/button'
+import {
+  PrimaryCTA,
+  SecondaryCTA,
+  DangerButton,
+  IconButton,
+} from "@/components/ui/button";
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -85,15 +90,25 @@ export function AccountGate() {
   return (
     <div className="container px-4 py-8">
       <h1 className="text-3xl font-bold tracking-tight lg:text-4xl mb-4">
-        Welcome, {user.email}
+        Welcome,{" "}
+        {user.user_metadata?.full_name ||
+          user.email?.split("@")[0].toWellFormed}
       </h1>
-      <p className="text-muted-foreground mb-8">Manage your account settings and view your orders.</p>
+      <p className="text-muted-foreground mb-8">
+        Manage your account settings and view your orders.
+      </p>
       <div className="flex gap-4">
         <SecondaryCTA asChild>
           <Link href="/account/addresses">Manage Addresses</Link>
         </SecondaryCTA>
+        <PrimaryCTA asChild>
+          <Link href="/account/profile">Edit Personal Data</Link>
+        </PrimaryCTA>
+        <IconButton>
+          <Link href="/account/cart">My Cart</Link>
+        </IconButton>
         <DangerButton onClick={signOut}>Sign Out</DangerButton>
       </div>
     </div>
-  )
+  );
 }

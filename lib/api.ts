@@ -2,69 +2,15 @@
  * API client for Cosmos API integration
  * Base URL: http://localhost:8000
  */
-import type { Product, ProductImage, ProductOption, ProductVariant } from './types';
 
-// Types specific to the API response structure
-export interface ApiProduct {
-  id: string;
-  title: string;
-  handle: string;
-  body_html: string;
-  price: number;
-  compare_at_price?: number;
-  images: ApiProductImage[];
-  category: string;
-  in_stock: boolean;
-  rating: number;
-  review_count: number;
-  tags: string[];
-  vendor: string;
-  variants: ApiProductVariant[];
-  options: ApiProductOption[];
-  created_at: string;
-  updated_at: string;
-}
+import { SITE_CONFIG } from "./constants";
+import {
+  ApiProduct,
+  ApiProductImage,
+  ApiProductVariant,
+  ApiProductOption,
+} from "./types";
 
-export interface ApiProductImage {
-  id: string;
-  product_id: string;
-  position: number;
-  alt?: string;
-  src: string;
-  width?: number;
-  height?: number;
-  created_at: string;
-  updated_at: string;
-  variant_ids?: string[];
-}
-
-export interface ApiProductVariant {
-  id: string;
-  product_id: string;
-  title: string;
-  option1?: string;
-  option2?: string;
-  option3?: string;
-  sku?: string;
-  requires_shipping: boolean;
-  taxable: boolean;
-  featured_image?: string;
-  available: boolean;
-  price: number;
-  grams: number;
-  compare_at_price?: number;
-  position: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ApiProductOption {
-  id: string;
-  product_id: string;
-  name: string;
-  position: number;
-  values: string[];
-}
 
 
 async function apiRequest<T>(
@@ -75,7 +21,9 @@ async function apiRequest<T>(
   const response = await fetch(url, options);
   if (!response.ok) {
     const errorBody = await response.text();
-    throw new Error(`API request failed with status ${response.status}: ${errorBody}`);
+    throw new Error(
+      `API request failed with status ${response.status}: ${errorBody}`
+    );
   }
   return response.json();
 }
@@ -87,7 +35,7 @@ export async function getAllProducts(options?: {
   limit?: number;
   page?: number;
   fields?: string;
-}): Promise<Product[]> {
+}): Promise<ApiProduct[]> {
   const params = new URLSearchParams();
   if (options?.limit) params.append("limit", options.limit.toString());
   if (options?.page) params.append("page", options.page.toString());
@@ -100,7 +48,9 @@ export async function getAllProducts(options?: {
 
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
-    return Array.isArray(data.products) ? data.products.map(mapApiToProduct) : [];
+    return Array.isArray(data.products)
+      ? data.products.map(mapApiToProduct)
+      : [];
   } catch (error) {
     console.warn(`[API] Failed to fetch products from ${endpoint}:`, error);
     return [];
@@ -110,11 +60,15 @@ export async function getAllProducts(options?: {
 /**
  * Search products by query
  */
-export async function searchProducts(query: string): Promise<Product[]> {
+export async function searchProducts(query: string): Promise<ApiProduct[]> {
   const encodedQuery = encodeURIComponent(query);
   try {
-    const data = await apiRequest<{ products: ApiProduct[] }>(`/api/products?search=${encodedQuery}`);
-    return Array.isArray(data.products) ? data.products.map(mapApiToProduct) : [];
+    const data = await apiRequest<{ products: ApiProduct[] }>(
+      `/api/products?search=${encodedQuery}`
+    );
+    return Array.isArray(data.products)
+      ? data.products.map(mapApiToProduct)
+      : [];
   } catch (error) {
     console.warn(`[API] Failed to search products for "${query}":`, error);
     return [];
@@ -124,7 +78,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
 /**
  * Get a specific product by ID
  */
-export async function getProductById(id: string): Promise<Product> {
+export async function getProductById(id: string): Promise<ApiProduct> {
   const data = await apiRequest<ApiProduct>(`/api/products/${id}`);
   return mapApiToProduct(data);
 }
@@ -132,7 +86,7 @@ export async function getProductById(id: string): Promise<Product> {
 /**
  * Get a specific product by handle
  */
-export async function getProductByHandle(handle: string): Promise<Product> {
+export async function getProductByHandle(handle: string): Promise<ApiProduct> {
   const data = await apiRequest<ApiProduct>(`/api/products/${handle}`);
   return mapApiToProduct(data);
 }
@@ -140,55 +94,80 @@ export async function getProductByHandle(handle: string): Promise<Product> {
 /**
  * Get products filtered by vendor
  */
-export async function getProductsByVendor(vendor: string): Promise<Product[]> {
+export async function getProductsByVendor(
+  vendor: string
+): Promise<ApiProduct[]> {
   const encodedVendor = encodeURIComponent(vendor);
   try {
-    const data = await apiRequest<{ products: ApiProduct[] }>(`/api/products?vendor=${encodedVendor}`);
-    return Array.isArray(data.products) ? data.products.map(mapApiToProduct) : [];
+    const data = await apiRequest<{ products: ApiProduct[] }>(
+      `/api/products?vendor=${encodedVendor}`
+    );
+    return Array.isArray(data.products)
+      ? data.products.map(mapApiToProduct)
+      : [];
   } catch (error) {
-    console.warn(`[API] Failed to fetch products for vendor "${vendor}":`, error);
+    console.warn(
+      `[API] Failed to fetch products for vendor "${vendor}":`,
+      error
+    );
     return [];
   }
 }
 
 /**
  * Get image proxy URL
+ * TODO: Fix
  */
 export function getImageProxyUrl(imageUrl: string): string {
   const encodedUrl = encodeURIComponent(imageUrl);
-  return `https://moritotabi.com/cosmos/image-proxy?url=${encodedUrl}`;
+  return `${SITE_CONFIG.api}/cosmos/image-proxy?url=${encodedUrl}`;
 }
 
 /**
  * Helper function to transform API product to internal Product type
  */
-export function mapApiToProduct(apiProduct: ApiProduct): Product {
+export function mapApiToProduct(apiProduct: ApiProduct): ApiProduct {
   return {
     id: apiProduct.id,
     title: apiProduct.title,
     handle: apiProduct.handle,
     body_html: apiProduct.body_html,
     price: apiProduct.price,
-    compareAtPrice: apiProduct.compare_at_price,
-    images: apiProduct.images as ProductImage[],
+    compare_at_price: apiProduct.compare_at_price,
+    images: apiProduct.images as ApiProductImage[],
     category: apiProduct.category,
-    inStock: apiProduct.in_stock,
+    in_stock: apiProduct.in_stock,
     rating: apiProduct.rating,
-    reviewCount: apiProduct.review_count,
+    review_count: apiProduct.review_count,
     tags: apiProduct.tags,
     vendor: apiProduct.vendor,
-    variants: apiProduct.variants.map((variant: ApiProductVariant): ProductVariant => ({
-      id: variant.id,
-      name: variant.title,
-      price: typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price,
-      inStock: variant.available,
-      image: variant.featured_image,
-    })),
-    options: apiProduct.options.map((option: ApiProductOption): ProductOption => ({
-      id: typeof option.id === 'string' ? parseInt(option.id, 10) : option.id,
-      name: option.name,
-      position: option.position,
-      values: option.values,
-    })),
+    variants: apiProduct.variants.map(
+      (variant: ApiProductVariant): ApiProductVariant => ({
+        id: variant.id,
+        title: variant.title,
+        price: variant.price,
+        available: variant.available,
+        featured_image: variant.featured_image,
+        product_id: variant.product_id,
+        requires_shipping: variant.requires_shipping,
+        taxable: variant.taxable,
+        grams: variant.grams,
+        position: variant.position,
+        created_at: variant.created_at,
+        updated_at: variant.updated_at,
+      })
+    ),
+    options: apiProduct.options.map(
+      (option: ApiProductOption): ApiProductOption => ({
+        name: option.name,
+        position: option.position,
+        values: option.values,
+        product_id: option.product_id,
+        id: option.id,
+      })
+    ),
+
+    created_at: apiProduct.created_at,
+    updated_at: apiProduct.updated_at,
   };
 }

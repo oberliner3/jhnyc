@@ -6,12 +6,12 @@ import { Star, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, stripHtml } from "@/lib/utils";
-import { Product } from "@/lib/types";
+import { ApiProduct } from "@/lib/types";
 import { useCart } from "@/contexts/cart-context";
 import { getImageProxyUrl } from "@/lib/api";
 
 interface ProductCardProps {
-	product: Product;
+  product: ApiProduct;
 }
 
 export function ProductCard({ product }: ProductCardProps) {

@@ -3,13 +3,13 @@
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { ProductCard } from '@/components/product/product-card'
-import type { Product } from '@/lib/types'
+import type { ApiProduct } from "@/lib/types";
 import { searchProducts, mapApiToProduct } from '@/lib/api'
 
-async function getSearchResults(query: string): Promise<Product[]> {
+async function getSearchResults(query: string): Promise<ApiProduct[]> {
   // Query Cosmos directly and map to internal Product type
-  const apiProducts = await searchProducts(query)
-  return apiProducts.map(mapApiToProduct)
+  const apiProducts = await searchProducts(query);
+  return apiProducts.map(mapApiToProduct);
 }
 
 export default function SearchPage() {

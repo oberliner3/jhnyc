@@ -11,7 +11,6 @@ import { subscribeToNewsletter } from '@/app/api/newsletter/actions';
 export function Footer() {
   return (
     <footer className="bg-muted/50 border-t">
-      {/* Newsletter Section */}
       <div className=" text-primary-foreground bg-primary shadow">
         <div className="container px-4 py-12">
           <div className="mx-auto max-w-2xl text-center">
@@ -20,7 +19,10 @@ export function Footer() {
               Subscribe to our newsletter and get 10% off your first order plus
               access to exclusive deals.
             </p>
-            <form action={subscribeToNewsletter} className="flex gap-2 max-w-md mx-auto">
+            <form
+              action={subscribeToNewsletter}
+              className="flex gap-2 max-w-md mx-auto"
+            >
               <Input
                 type="email"
                 name="email"
@@ -40,10 +42,8 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Main Footer */}
       <div className="container px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Company Info */}
           <div className="space-y-4">
             <Logo />
             <p className="text-sm text-muted-foreground">
@@ -53,7 +53,11 @@ export function Footer() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4" />
-                <span dangerouslySetInnerHTML={{ __html: APP_CONTACTS.address.office }} />
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: APP_CONTACTS.address.office,
+                  }}
+                />
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Phone className="h-4 w-4" />

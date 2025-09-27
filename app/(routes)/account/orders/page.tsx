@@ -1,14 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import type { Order } from '@/lib/types';
+import type { DraftOrder } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatPrice } from '@/lib/utils';
 import Image from 'next/image';
 
-async function getOrders(): Promise<Order[]> {
-  const res = await fetch('/api/orders');
+async function getOrders(): Promise<DraftOrder[]> {
+  const res = await fetch("/api/orders");
   if (!res.ok) {
     throw new Error("Failed to fetch orders");
   }
@@ -16,7 +16,7 @@ async function getOrders(): Promise<Order[]> {
 }
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<DraftOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

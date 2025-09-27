@@ -72,7 +72,9 @@ export default function AddressesPage() {
               </div>
             </div>
             <Button type="submit">Add Address</Button>
-            {state?.message && <p className="text-sm text-muted-foreground">{state.message}</p>}
+            {state?.message && (
+              <p className="text-sm text-muted-foreground">{state.message}</p>
+            )}
           </form>
         </div>
         <div>
@@ -82,12 +84,18 @@ export default function AddressesPage() {
               addresses.map((addr) => (
                 <Card key={addr.id}>
                   <CardHeader>
-                    <CardTitle className="capitalize">{addr.type} Address</CardTitle>
+                    <CardTitle className="capitalize">
+                      {addr.type} Address
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p>{addr.first_name} {addr.last_name}</p>
+                    <p>
+                      {addr.full_name} {addr.last_name}
+                    </p>
                     <p>{addr.address}</p>
-                    <p>{addr.city}, {addr.postal_code}</p>
+                    <p>
+                      {addr.city}, {addr.postal_code}
+                    </p>
                     <p>{addr.country}</p>
                   </CardContent>
                 </Card>
@@ -99,5 +107,5 @@ export default function AddressesPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

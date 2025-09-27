@@ -1,14 +1,14 @@
 "use client";
 
 import react from "react";
-import type { Product } from "@/lib/types";
+import type { ApiProduct } from "@/lib/types";
 
-export function useSearch(products: Product[]) {
+export function useSearch(products: ApiProduct[]) {
   const [query, setQuery] = react.useState("");
   const [filters, setFilters] = react.useState({
     category: "",
-    minPrice: 0,
-    maxPrice: 1000,
+    minPrice: 180,
+    maxPrice: 10_000,
     inStock: false,
   });
 
@@ -26,7 +26,7 @@ export function useSearch(products: Product[]) {
         filters.category === "" || product.category === filters.category;
       const matchesPrice =
         product.price >= filters.minPrice && product.price <= filters.maxPrice;
-      const matchesStock = !filters.inStock || product.inStock;
+      const matchesStock = !filters.inStock || product.in_stock;
 
       return matchesQuery && matchesCategory && matchesPrice && matchesStock;
     });

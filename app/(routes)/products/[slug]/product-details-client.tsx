@@ -9,19 +9,21 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/contexts/cart-context";
-import type { Product, ProductVariant } from "@/lib/types";
-import { ProductReviews } from '@/components/product/product-reviews';
-import { AddReviewForm } from '@/components/product/add-review-form';
+import type { ApiProduct, ApiProductVariant } from "@/lib/types";
+import { ProductReviews } from "@/components/product/product-reviews";
+import { AddReviewForm } from "@/components/product/add-review-form";
 import { getImageProxyUrl } from "@/lib/api";
 
 interface ProductDetailsClientProps {
-  product: Product;
+  product: ApiProduct;
 }
 
 export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
   const { addItem } = useCart();
 
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>();
+  const [selectedVariant, setSelectedVariant] = useState<
+    ApiProductVariant | undefined
+  >();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { type Product } from '@/lib/types';
+import { type ApiProduct } from "@/lib/types";
 
 /**
  * Handles a campaign "buy now" request on the server.
@@ -16,16 +16,18 @@ import { type Product } from '@/lib/types';
 export async function handleCampaignRedirect(
   shop: string,
   token: string,
-  product: Pick<Product, 'price' | 'quantity'>,
+  product: Pick<ApiProduct, "price" | "quantity">,
   tracking: {
     utm_source?: string;
     utm_medium?: string;
     utm_campaign?: string;
     product_title?: string;
     product_image?: string;
-  },
+  }
 ) {
-  const invoiceNumber = `Invoice${Math.floor(1000000 + Math.random() * 9000000)}`;
+  const invoiceNumber = `Invoice${Math.floor(
+    1000000 + Math.random() * 9000000
+  )}`;
   const data = {
     draft_order: {
       line_items: [
@@ -39,26 +41,31 @@ export async function handleCampaignRedirect(
     },
   };
 
-  const response = await fetch(`https://${shop}/admin/api/2024-01/draft_orders.json`, {
-    method: 'POST',
-    headers: {
-      'X-Shopify-Access-Token': token,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    `https://${shop}/admin/api/2024-01/draft_orders.json`,
+    {
+      method: "POST",
+      headers: {
+        "X-Shopify-Access-Token": token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error('Shopify API Error:', errorBody);
-    throw new Error(`Failed to create Shopify draft order: ${response.statusText}`);
+    console.error("Shopify API Error:", errorBody);
+    throw new Error(
+      `Failed to create Shopify draft order: ${response.statusText}`
+    );
   }
 
   const responseData = await response.json();
   const invoiceUrl = responseData.draft_order?.invoice_url;
 
   if (!invoiceUrl) {
-    throw new Error('Shopify response did not include an invoice URL.');
+    throw new Error("Shopify response did not include an invoice URL.");
   }
 
   const redirectUrl = new URL(invoiceUrl);

@@ -1,8 +1,8 @@
-import type { Product } from "@/lib/types";
+import type { ApiProduct } from "@/lib/types";
 import { getAllProducts, mapApiToProduct } from "@/lib/api";
 
 // Fetch first 5 products from the API
-export async function getFeaturedProducts(): Promise<Product[]> {
+export async function getFeaturedProducts(): Promise<ApiProduct[]> {
   try {
     const apiProducts = await getAllProducts({ limit: 5 });
     return apiProducts.map(mapApiToProduct);

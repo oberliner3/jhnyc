@@ -62,6 +62,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: "/",
       },
     ],
-    sitemap: SITE_CONFIG.url + "/sitemap.xml",
+    sitemap: `${SITE_CONFIG.url}/sitemap.xml`,
   };
 }

@@ -1,11 +1,14 @@
+const APP_DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || "originz.vercel.app";
+const APP_BRAND = process.env.NEXT_PUBLIC_STORE_NAME || "OriGenZ";
 export const SITE_CONFIG = {
-  name: "OriGinz",
+  name: APP_BRAND,
   description: "Premium e-commerce storefront built with Next.js",
-  domain: "originz.vercel.app",
-  url: "https://originz.vercel.app",
-  ogTitle: "OriGinz - Your One-Stop Shop for Quality Products",
-  ogImage: "https://originz.vercel.app/og.png",
-  author: "OriGinz",
+  domain: APP_DOMAIN,
+  url: "https://" + APP_DOMAIN,
+  api: process.env.PRODUCT_STREAM_API || "localhost:8000",
+  ogTitle: APP_BRAND + " - Your One-Stop Shop for Quality Products",
+  ogImage: APP_DOMAIN + "/og.png",
+  author: APP_BRAND,
   lastUpdate: "September 24, 2025",
   keywords: [
     "e-commerce",

@@ -1,4 +1,4 @@
-import { type Product } from '@/lib/types';
+import { type ApiProduct } from "@/lib/types";
 
 // This file contains utility functions and client-side logic related to marketing campaigns.
 
@@ -18,30 +18,32 @@ import { type Product } from '@/lib/types';
 export function initializeCompaignButton(
   buttonSelector: string,
   qtySelector: string,
-  variationSelector: string,
+  variationSelector: string
 ) {
-  if (typeof window === 'undefined') return; // Only run on the client
+  if (typeof window === "undefined") return; // Only run on the client
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     const buyNowBtn = document.querySelector(buttonSelector);
-    const qtyInput = document.querySelector(qtySelector) as HTMLInputElement | null;
+    const qtyInput = document.querySelector(
+      qtySelector
+    ) as HTMLInputElement | null;
     const variationInput = document.querySelector(
-      variationSelector,
+      variationSelector
     ) as HTMLInputElement | null;
 
     if (buyNowBtn && qtyInput) {
-      buyNowBtn.addEventListener('click', (e: Event) => {
+      buyNowBtn.addEventListener("click", (e: Event) => {
         e.preventDefault();
 
         const qty = parseInt(qtyInput.value, 10) || 1;
-        const href = buyNowBtn.getAttribute('href');
+        const href = buyNowBtn.getAttribute("href");
         if (!href) return;
 
         const url = new URL(href, window.location.origin);
-        url.searchParams.set('quantity', String(qty));
+        url.searchParams.set("quantity", String(qty));
 
         if (variationInput?.value) {
-          url.searchParams.set('variation_id', variationInput.value);
+          url.searchParams.set("variation_id", variationInput.value);
         }
 
         window.location.href = url.toString();
@@ -58,14 +60,16 @@ export function initializeCompaignButton(
  * @param product - The product being purchased.
  * @returns A URL query string.
  */
-export function buildCampaignUrlQuery(product: Pick<Product, 'id' | 'price'>): string {
+export function buildCampaignUrlQuery(
+  product: Pick<ApiProduct, "id" | "price">
+): string {
   const params = new URLSearchParams({
-    go_checkout: '1',
+    go_checkout: "1",
     price: String(product.price),
     product_id: String(product.id),
-    utm_source: 'google',
-    utm_medium: 'cpc',
-    utm_campaign: 'buy-now',
+    utm_source: "google",
+    utm_medium: "cpc",
+    utm_campaign: "buy-now",
   });
   return params.toString();
 }

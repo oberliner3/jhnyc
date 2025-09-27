@@ -8,46 +8,53 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/cart-context";
-import type { CartItem } from "@/lib/types";
+import type { ShoppingCartItem } from "@/lib/types";
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { ReactNode } from "react";
 
 export default function CartDrawer() {
-	const {
-		items,
-		isOpen,
-		toggleCart,
-		removeItem,
-		updateQuantity,
-		clearCart,
-		getTotalPrice,
-	} = useCart();
+  const {
+    items,
+    isOpen,
+    toggleCart,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    getTotalPrice,
+  } = useCart();
 
-	const totalPrice = getTotalPrice();
+  const totalPrice = getTotalPrice();
 
-	return (
+  return (
     <Sheet open={isOpen} onOpenChange={toggleCart}>
       <SheetContent className="flex flex-col">
         <SheetHeader>
           <SheetTitle>Shopping Cart</SheetTitle>
         </SheetHeader>
 
-				{/* Cart Items */}
-				<div className="flex-1 p-4 overflow-y-auto">
-					{items.length === 0 ? (
-						<div className="py-8 text-center">
-							<p className="mb-4 text-gray-500">Your cart is empty</p>
-							<Button onClick={toggleCart}>Continue Shopping</Button>
-						</div>
-					) : (
-						<div className="space-y-4">
-							{items.map((item: CartItem) => {
-								const price = item.variant ? item.variant.price : 0;
-								const imageUrl =
-									item.product.images?.[0]?.src || "/placeholder.svg";
+        {/* Cart Items */}
+        <div className="flex-1 p-4 overflow-y-auto">
+          {items.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="mb-4 text-gray-500">Your cart is empty</p>
+              <Button onClick={toggleCart}>Continue Shopping</Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {items.map((item) => {
+                const price = item.product.price;
+                const imageUrl =
+                  item.product.images?.[0]?.src || "/placeholder.svg";
 
-								return (
-                  <Card key={`${item.product.id}-${item.variant?.id}`}>
+                return (
+                  <Card key={`${item.product.id}-${item.variant}`}>
                     <CardContent className="p-4">
                       <div className="flex gap-3">
                         {/* Product Image */}
@@ -67,9 +74,9 @@ export default function CartDrawer() {
                             {item.product.title}
                           </h3>
                           {item.variant &&
-                            item.variant.name !== "Default Title" && (
+                            item.variant.title !== "Default Title" && (
                               <p className="mb-1 text-gray-500 text-xs">
-                                {item.variant.name}
+                                {item.variant.title}
                               </p>
                             )}
                           <p className="font-semibold text-sm">
@@ -83,7 +90,7 @@ export default function CartDrawer() {
                           size="icon"
                           className="w-8 h-8"
                           onClick={() =>
-                            removeItem(item.product.id, item.variant?.id || 0)
+                            removeItem(item.product.id, item.variant.id || "0")
                           }
                         >
                           <Trash2 className="w-4 h-4" />
@@ -100,7 +107,7 @@ export default function CartDrawer() {
                             onClick={() =>
                               updateQuantity(
                                 item.product.id,
-                                item.variant?.id || 0,
+                                item.variant?.id || "0",
                                 item.quantity - 1
                               )
                             }
@@ -117,7 +124,7 @@ export default function CartDrawer() {
                             onClick={() =>
                               updateQuantity(
                                 item.product.id,
-                                item.variant?.id || 0,
+                                item.variant?.id || " 0",
                                 item.quantity + 1
                               )
                             }
@@ -132,13 +139,13 @@ export default function CartDrawer() {
                     </CardContent>
                   </Card>
                 );
-							})}
-						</div>
-					)}
-				</div>
+              })}
+            </div>
+          )}
+        </div>
 
-				{/* Footer */}
-				{items.length > 0 && (
+        {/* Footer */}
+        {items.length > 0 && (
           <SheetFooter>
             <div className="space-y-4 p-4 border-t w-full">
               {/* Total */}
@@ -176,8 +183,8 @@ export default function CartDrawer() {
               </div>
             </div>
           </SheetFooter>
-				)}
+        )}
       </SheetContent>
     </Sheet>
-	);
+  );
 }
