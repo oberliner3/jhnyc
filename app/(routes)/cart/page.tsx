@@ -39,7 +39,7 @@ export default function CartPage() {
             {items.map((item) => (
               <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg">
               <Image
-                  src={item.image}
+                  src={item.image || "/placeholder.svg"}
                   alt={item.name}
                   width={80}
                   height={80}
