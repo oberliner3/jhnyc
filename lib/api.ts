@@ -17,8 +17,14 @@ async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = endpoint;
-  const response = await fetch(url, options);
+  const url = `${SITE_CONFIG.api}${endpoint}`;
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      "User-Agent": "my-app/1.0.0",
+    },
+  });
   if (!response.ok) {
     const errorBody = await response.text();
     throw new Error(
@@ -34,17 +40,15 @@ async function apiRequest<T>(
 export async function getAllProducts(options?: {
   limit?: number;
   page?: number;
-  fields?: string;
 }): Promise<ApiProduct[]> {
   const params = new URLSearchParams();
   if (options?.limit) params.append("limit", options.limit.toString());
   if (options?.page) params.append("page", options.page.toString());
-  if (options?.fields) params.append("fields", options.fields);
 
   const queryString = params.toString();
   const endpoint = queryString
-    ? `/api/products?${queryString}`
-    : "/api/products";
+    ? `/products?${queryString}`
+    : "/products";
 
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
@@ -64,7 +68,7 @@ export async function searchProducts(query: string): Promise<ApiProduct[]> {
   const encodedQuery = encodeURIComponent(query);
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(
-      `/api/products?search=${encodedQuery}`
+      `/products/search?q=${encodedQuery}`
     );
     return Array.isArray(data.products)
       ? data.products.map(mapApiToProduct)
@@ -79,7 +83,7 @@ export async function searchProducts(query: string): Promise<ApiProduct[]> {
  * Get a specific product by ID
  */
 export async function getProductById(id: string): Promise<ApiProduct> {
-  const data = await apiRequest<ApiProduct>(`/api/products/${id}`);
+  const data = await apiRequest<ApiProduct>(`/products/${id}`);
   return mapApiToProduct(data);
 }
 
@@ -87,7 +91,7 @@ export async function getProductById(id: string): Promise<ApiProduct> {
  * Get a specific product by handle
  */
 export async function getProductByHandle(handle: string): Promise<ApiProduct> {
-  const data = await apiRequest<ApiProduct>(`/api/products/${handle}`);
+  const data = await apiRequest<ApiProduct>(`/products/${handle}`);
   return mapApiToProduct(data);
 }
 
@@ -100,7 +104,7 @@ export async function getProductsByVendor(
   const encodedVendor = encodeURIComponent(vendor);
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(
-      `/api/products?vendor=${encodedVendor}`
+      `/products?vendor=${encodedVendor}`
     );
     return Array.isArray(data.products)
       ? data.products.map(mapApiToProduct)
