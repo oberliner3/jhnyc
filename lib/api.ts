@@ -2,7 +2,9 @@
  * API client for Cosmos API integration
  * Base URL: http://localhost:8000
  */
+import type { Product, ProductImage, ProductOption, ProductVariant } from './types';
 
+// Types specific to the API response structure
 export interface ApiProduct {
   id: string;
   title: string;
@@ -48,9 +50,9 @@ export interface ApiProductVariant {
   taxable: boolean;
   featured_image?: string;
   available: boolean;
-  price: string;
+  price: number;
   grams: number;
-  compare_at_price?: string;
+  compare_at_price?: number;
   position: number;
   created_at: string;
   updated_at: string;
@@ -64,14 +66,18 @@ export interface ApiProductOption {
   values: string[];
 }
 
+
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
   const url = endpoint;
-  return fetch(url, options).then(res => res.json());
-}
-  return fetch(url, options).then(res => res.json());
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`API request failed with status ${response.status}: ${errorBody}`);
+  }
+  return response.json();
 }
 
 /**
@@ -127,7 +133,7 @@ export async function getProductById(id: string): Promise<Product> {
  * Get a specific product by handle
  */
 export async function getProductByHandle(handle: string): Promise<Product> {
-  const data = await apiRequest<ApiProduct>(`/api/products/handle/${handle}`);
+  const data = await apiRequest<ApiProduct>(`/api/products/${handle}`);
   return mapApiToProduct(data);
 }
 
@@ -156,12 +162,33 @@ export function getImageProxyUrl(imageUrl: string): string {
 /**
  * Helper function to transform API product to internal Product type
  */
-export function transformApiProduct(apiProduct: ApiProduct): ApiProduct {
+export function mapApiToProduct(apiProduct: ApiProduct): Product {
   return {
-    ...apiProduct,
-    // Ensure consistent field naming
-    compare_at_price: apiProduct.compare_at_price,
-    in_stock: apiProduct.in_stock,
-    review_count: apiProduct.review_count,
+    id: apiProduct.id,
+    title: apiProduct.title,
+    handle: apiProduct.handle,
+    body_html: apiProduct.body_html,
+    price: apiProduct.price,
+    compareAtPrice: apiProduct.compare_at_price,
+    images: apiProduct.images as ProductImage[],
+    category: apiProduct.category,
+    inStock: apiProduct.in_stock,
+    rating: apiProduct.rating,
+    reviewCount: apiProduct.review_count,
+    tags: apiProduct.tags,
+    vendor: apiProduct.vendor,
+    variants: apiProduct.variants.map((variant: ApiProductVariant): ProductVariant => ({
+      id: variant.id,
+      name: variant.title,
+      price: typeof variant.price === 'string' ? parseFloat(variant.price) : variant.price,
+      inStock: variant.available,
+      image: variant.featured_image,
+    })),
+    options: apiProduct.options.map((option: ApiProductOption): ProductOption => ({
+      id: typeof option.id === 'string' ? parseInt(option.id, 10) : option.id,
+      name: option.name,
+      position: option.position,
+      values: option.values,
+    })),
   };
 }

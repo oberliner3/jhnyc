@@ -1,10 +1,29 @@
 'use client'
 
 import type React from 'react'
-import { createContext, useContext, useEffect, useReducer } from 'react'
-import type { CartItem, CartState, Product, ProductVariant } from '@/lib/types'
+import { createContext, useContext, useEffect, useReducer, useState, useCallback } from 'react'
+import type { CartItem as ApiCartItem, Product, ProductVariant } from '@/lib/types'
+import { useAuth } from './auth-context'
+import { mapApiToProduct } from '@/lib/api'
 
-interface CartContextType extends CartState {
+// --- State Management ---
+
+export interface ClientCartItem {
+  id: string; // This is the API cart_item ID
+  product: Product;
+  variant: ProductVariant;
+  quantity: number;
+  name: string;
+  price: number;
+  image?: string;
+}
+
+export interface ClientCartState {
+  items: ClientCartItem[];
+  isOpen: boolean;
+}
+
+interface CartContextType extends ClientCartState {
   addItem: (product: Product, variant: ProductVariant, quantity?: number) => Promise<void>
   removeItem: (productId: string, variantId: string) => Promise<void>
   updateQuantity: (productId: string, variantId: string, quantity: number) => Promise<void>
@@ -20,11 +39,11 @@ type CartAction =
   | { type: 'UPDATE_QUANTITY'; payload: { productId: string; variantId: string; quantity: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
-  | { type: 'LOAD_CART'; payload: CartItem[] }
+  | { type: 'LOAD_CART'; payload: ClientCartItem[] }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
-const cartReducer = (state: CartState, action: CartAction): CartState => {
+const cartReducer = (state: ClientCartState, action: CartAction): ClientCartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
       const { product, variant, quantity } = action.payload
@@ -38,8 +57,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         return { ...state, items: updatedItems }
       }
 
-      const newItem: CartItem = {
-        id: `${product.id}-${variant.id}`,
+      const newItem: ClientCartItem = {
+        id: `${product.id}-${variant.id}`, // Temporary ID for client-side
         product,
         variant,
         quantity,
@@ -87,59 +106,43 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
   }
 }
 
-import { createClient } from '@/utils/supabase/client';
-import { useAuth } from './auth-context';
-import { mapApiToProduct } from '@/lib/api';
-
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false });
-  const supabase = createClient();
   const { user } = useAuth();
   const [cartId, setCartId] = useState<string | null>(null);
 
-  // Load cart from API or create a new one
-  useEffect(() => {
-    async function loadCart() {
-      if (!user) {
-        // For unauthenticated users, load from localStorage
-        const savedCart = localStorage.getItem('originz-cart');
-        if (savedCart) {
-          try {
-            const cartItems = JSON.parse(savedCart);
-            dispatch({ type: 'LOAD_CART', payload: cartItems });
-          } catch (error) {
-            console.error('Error loading cart from localStorage:', error);
-          }
+  const loadCart = useCallback(async () => {
+    if (!user) {
+      const savedCart = localStorage.getItem('originz-cart');
+      if (savedCart) {
+        try {
+          const cartItems = JSON.parse(savedCart);
+          dispatch({ type: 'LOAD_CART', payload: cartItems });
+        } catch (e) {
+          console.error('Error loading cart from localStorage:', e);
+          localStorage.removeItem('originz-cart');
         }
-        return;
       }
+      return;
+    }
 
-      // For authenticated users, load from DB
-      try {
-        const res = await fetch('/api/cart');
-        if (!res.ok) {
-          throw new Error("Failed to fetch cart");
-        }
-        let cartData = await res.json();
+    try {
+      const res = await fetch('/api/cart');
+      if (!res.ok) throw new Error("Failed to fetch cart");
+      let cartData = await res.json();
 
-        if (!cartData) {
-          // If no cart exists, create one
-          const createRes = await fetch('/api/cart', {
-            method: 'POST',
-          });
-          if (!createRes.ok) {
-            throw new Error("Failed to create cart");
-          }
-          cartData = await createRes.json();
-        }
-        setCartId(cartData.id);
+      if (!cartData || !cartData.id) {
+        const createRes = await fetch('/api/cart', { method: 'POST' });
+        if (!createRes.ok) throw new Error("Failed to create cart");
+        cartData = await createRes.json();
+      }
+      setCartId(cartData.id);
 
-        // Fetch product details for each cart item
-        const itemsWithDetails = await Promise.all(cartData.cart_items.map(async (item: any) => {
+      if (cartData.cart_items && cartData.cart_items.length > 0) {
+        const itemsWithDetails = await Promise.all(cartData.cart_items.map(async (item: ApiCartItem) => {
           const productRes = await fetch(`/api/products/${item.product_id}`);
           const productData = await productRes.json();
           const product = mapApiToProduct(productData);
-
           const variant = product.variants.find((v) => v.id === item.variant_id);
 
           return {
@@ -152,17 +155,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             image: variant?.image || product.images[0]?.src,
           };
         }));
-
         dispatch({ type: 'LOAD_CART', payload: itemsWithDetails });
-      } catch (err) {
-        console.error('Error loading cart from API:', err);
-        setError((err as Error).message);
+      } else {
+        dispatch({ type: 'LOAD_CART', payload: [] });
       }
+    } catch (err) {
+      console.error('Error loading cart from API:', err);
     }
-    loadCart();
   }, [user]);
 
-  // Save cart to localStorage for unauthenticated users
+  useEffect(() => {
+    loadCart();
+  }, [loadCart]);
+
   useEffect(() => {
     if (!user) {
       localStorage.setItem('originz-cart', JSON.stringify(state.items));
@@ -171,22 +176,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addItem = async (product: Product, variant: ProductVariant, quantity: number = 1) => {
     if (!user || !cartId) {
-      // Fallback to local storage for unauthenticated users
       dispatch({ type: 'ADD_ITEM', payload: { product, variant, quantity } });
       return;
     }
-
     try {
       const res = await fetch('/api/cart/items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cart_id: cartId, product_id: product.id, variant_id: variant.id, quantity }),
       });
-      if (!res.ok) throw new Error("Failed to add item to cart");
-      // After adding, refetch cart to update state
-      // This is a simplified approach; a more optimized solution would update local state directly
-      // and then sync with API in background.
-      loadCart(); // Re-load cart to get updated items with details
+      if (!res.ok) throw new Error('Failed to add item');
+      await loadCart();
     } catch (err) {
       console.error('Error adding item to cart:', err);
     }
@@ -197,15 +197,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'REMOVE_ITEM', payload: { productId, variantId } });
       return;
     }
-
     try {
+      const itemToRemove = state.items.find(item => item.product.id === productId && item.variant.id === variantId);
+      if (!itemToRemove) return;
+
       const res = await fetch('/api/cart/items', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cart_id: cartId, product_id: productId, variant_id: variantId }),
+        body: JSON.stringify({ cart_id: cartId, item_id: itemToRemove.id }),
       });
-      if (!res.ok) throw new Error("Failed to remove item from cart");
-      loadCart(); // Re-load cart to get updated items
+      if (!res.ok) throw new Error('Failed to remove item');
+      await loadCart();
     } catch (err) {
       console.error('Error removing item from cart:', err);
     }
@@ -216,45 +218,46 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, variantId, quantity } });
       return;
     }
-
     if (quantity <= 0) {
-      removeItem(productId, variantId);
+      await removeItem(productId, variantId);
       return;
     }
-
     try {
+      const itemToUpdate = state.items.find(item => item.product.id === productId && item.variant.id === variantId);
+      if (!itemToUpdate) return;
+
       const res = await fetch('/api/cart/items', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cart_id: cartId, product_id: productId, variant_id: variantId, quantity }),
+        body: JSON.stringify({ cart_id: cartId, item_id: itemToUpdate.id, quantity }),
       });
-      if (!res.ok) throw new Error("Failed to update item quantity");
-      loadCart(); // Re-load cart to get updated items
+      if (!res.ok) throw new Error('Failed to update quantity');
+      await loadCart();
     } catch (err) {
       console.error('Error updating item quantity:', err);
     }
   };
-
+  
   const clearCart = async () => {
     if (!user || !cartId) {
       dispatch({ type: 'CLEAR_CART' });
       return;
     }
-
     try {
-      // This would ideally be a dedicated API endpoint to clear all items for a cart_id
-      // For now, we'll iterate and delete, or implement a new API route.
-      // For simplicity, let's assume a new API route /api/cart/clear
       const res = await fetch('/api/cart/clear', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cart_id: cartId }),
       });
-      if (!res.ok) throw new Error("Failed to clear cart");
-      loadCart(); // Re-load cart to get updated items
+      if (!res.ok) throw new Error('Failed to clear cart');
+      await loadCart();
     } catch (err) {
       console.error('Error clearing cart:', err);
     }
+  };
+
+  const toggleCart = () => {
+    dispatch({ type: 'TOGGLE_CART' });
   };
 
   const getTotalItems = () => {

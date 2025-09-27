@@ -6,18 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
+import type { Address } from '@/lib/types';
 
 interface Profile {
   id: string;
   full_name: string;
   avatar_url: string;
-  billing_address: any;
-  shipping_address: any;
+  billing_address: Address;
+  shipping_address: Address;
 }
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,8 +31,7 @@ export default function ProfilePage() {
         if (!res.ok) {
           throw new Error("Failed to fetch profile");
         }
-        const data = await res.json();
-        setProfile(data);
+        const data: Profile = await res.json();
         setFullName(data.full_name || '');
       } catch (err) {
         setError((err as Error).message);
@@ -63,8 +62,8 @@ export default function ProfilePage() {
         throw new Error("Failed to update profile");
       }
 
-      const data = await res.json();
-      setProfile(data);
+      const data: Profile = await res.json();
+      setFullName(data.full_name || '');
       alert("Profile updated successfully!");
     } catch (err) {
       setError((err as Error).message);

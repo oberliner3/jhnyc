@@ -44,7 +44,7 @@ export async function GET(request: Request) {
   });
 }
 
-export async function POST(request: Request) {
+export async function POST() {
   // Placeholder for creating a new product (admin only)
   return NextResponse.json({ message: "Product creation not implemented" }, { status: 501 });
 }
