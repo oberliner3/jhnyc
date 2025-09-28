@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
+interface Product {
+  price: number;
+  // Add other product properties if needed
+}
+
+interface CartItem {
+  product_id: string;
+  variant_id: string;
+  quantity: number;
+  products: Product;
+  // Add other cart item properties if needed
+}
+
 type CheckoutInput = {
   shipping_address?: {
     first_name?: string;
@@ -73,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     // Calculate total
     let total = 0;
-    const orderItems = cart.cart_items.map((item: any) => {
+    const orderItems = cart.cart_items.map((item: CartItem) => {
       const product = item.products;
       const price = product.price || 0;
       total += price * item.quantity;
@@ -101,7 +114,7 @@ export async function POST(request: NextRequest) {
     if (orderError) throw orderError;
 
     // Create order items
-    const orderItemsWithOrderId = orderItems.map((item: any) => ({
+    const orderItemsWithOrderId = orderItems.map((item: CartItem) => ({
       ...item,
       order_id: order.id,
     }));

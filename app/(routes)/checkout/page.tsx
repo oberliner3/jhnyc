@@ -3,7 +3,6 @@
 import {
 	AlertCircle,
 	ArrowLeft,
-	CheckCircle,
 	CreditCard,
 	Lock,
 	Mail,

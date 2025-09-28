@@ -39,11 +39,14 @@ export async function POST(request: NextRequest) {
     const productIdString = String(product_id);
 
     // Get or create cart
-    let { data: cart, error: cartError } = await supabase
+    let cart;
+    const { data: fetchedCart, error: cartError } = await supabase
       .from("carts")
       .select("id")
       .eq("user_id", user.id)
       .single();
+
+    cart = fetchedCart;
 
     if (cartError?.code === "PGRST116") {
       // Create new cart if none exists

@@ -37,7 +37,7 @@ export async function PUT(
     // We don't need to convert it as it's already a UUID
 
     // Verify the item belongs to the user's cart
-    const { data: _item, error: fetchError } = await supabase
+    const { error: fetchError } = await supabase
       .from("cart_items")
       .select(
         `
@@ -121,7 +121,7 @@ export async function DELETE(
     );
 
     // Verify the item belongs to the user's cart before deleting
-    const { data: _item, error: fetchError } = await supabase
+    const { error: fetchError } = await supabase
       .from("cart_items")
       .select(
         `
