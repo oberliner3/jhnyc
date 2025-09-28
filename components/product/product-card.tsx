@@ -38,7 +38,7 @@ export function ProductCard({ product }: ProductCardProps) {
 	const imageUrl =
 		product.images && product.images.length > 0
 			? getImageProxyUrl(product.images[0].src)
-			: "https://via.placeholder.com/300x300.png?text=No+Image";
+			: "/og.png";
 
 	return (
 		<div className="group relative bg-card hover:shadow-lg border rounded-lg overflow-hidden text-card-foreground transition-all">
@@ -49,6 +49,7 @@ export function ProductCard({ product }: ProductCardProps) {
 						src={imageUrl}
 						alt={product.title}
 						fill
+						unoptimized
 						className="object-cover group-hover:scale-105 transition-transform"
 						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
 					/>
