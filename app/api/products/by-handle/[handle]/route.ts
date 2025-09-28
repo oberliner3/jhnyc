@@ -22,13 +22,33 @@ export async function GET(
 ) {
   try {
     const { handle } = await context.params;
-    const product = await apiRequest(`/products/${handle}`);
+
+    // Parse query params from the request
+    const searchParams = request.nextUrl.searchParams;
+    const includeVariants = searchParams.get("includeVariants") === "true";
+    const includeImages = searchParams.get("includeImages") !== "false";
+
+    // Build upstream endpoint with optional query params
+    let endpoint = `/products/${handle}`;
+    const queryParams = new URLSearchParams();
+    if (includeVariants) queryParams.append("includeVariants", "true");
+    if (!includeImages) queryParams.append("includeImages", "false");
+    const qs = queryParams.toString();
+    if (qs) endpoint += `?${qs}`;
+
+    const product = await apiRequest(endpoint);
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json(product);
+    // Add cache-control headers for better performance
+    const response = NextResponse.json(product);
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=60, stale-while-revalidate=300"
+    );
+    return response;
   } catch (error) {
     console.error(
       `[API] Failed to fetch product with handle ${

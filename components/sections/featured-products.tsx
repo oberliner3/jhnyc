@@ -4,10 +4,10 @@ import { Suspense } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { FeaturedProductsSkeleton } from "@/components/skeletons/featured-products-skeleton";
 import { Button } from "@/components/ui/button";
-import { getAllProducts } from "@/lib/api";
+import { getCollectionByHandle } from "@/lib/api";
 
 async function FeaturedProductsList() {
-	const apiProducts = await getAllProducts({ limit: 5 });
+	const apiProducts = await getCollectionByHandle("featured");
 	const products = apiProducts;
 
 	return (

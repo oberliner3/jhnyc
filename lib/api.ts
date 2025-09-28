@@ -10,12 +10,13 @@ async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${SITE_CONFIG.api}${endpoint}`;
+  const url = `${SITE_CONFIG.api}/cosmos${endpoint}`;
   const response = await fetch(url, {
     ...options,
     headers: {
       ...options.headers,
       "User-Agent": "ua-x-originz/1.0.0",
+      "X-API-KEY": process.env.PRODUCT_STREAM_X_KEY || "",
     },
   });
   if (!response.ok) {
@@ -102,10 +103,42 @@ export async function getProductsByVendor(
 }
 
 /**
+ * Get products from a collection by handle
+ */
+export async function getCollectionByHandle(
+  handle: string,
+  options?: {
+    limit?: number;
+    page?: number;
+    fields?: string;
+  }
+): Promise<ApiProduct[]> {
+  const params = new URLSearchParams();
+  if (options?.limit) params.append("limit", options.limit.toString());
+  if (options?.page) params.append("page", options.page.toString());
+  if (options?.fields) params.append("fields", options.fields);
+
+  const queryString = params.toString();
+  const endpoint = `/collections/${handle}${
+    queryString ? `?${queryString}` : ""
+  }`;
+
+  try {
+    const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
+    return Array.isArray(data.products) ? data.products : [];
+  } catch (error) {
+    console.warn(
+      `[API] Failed to fetch collection for handle "${handle}":`,
+      error
+    );
+    return [];
+  }
+}
+
+/**
  * Get image proxy URL
- * TODO: Fix
  */
 export function getImageProxyUrl(imageUrl: string): string {
   const encodedUrl = encodeURIComponent(imageUrl);
-  return `${SITE_CONFIG.api}/cosmos/image-proxy?url=${encodedUrl}`;
+  return `${SITE_CONFIG.api}/image-proxy?url=${encodedUrl}`;
 }
