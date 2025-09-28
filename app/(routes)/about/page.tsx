@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_CONFIG } from "@/lib/constants";
 import { generateSEO } from "@/lib/seo";
+
 export const metadata: Metadata = generateSEO({
 	title: "About Us",
 	description:

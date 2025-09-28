@@ -15,7 +15,7 @@ interface ProductPageProps {
 export async function generateStaticParams() {
 
   try {
-    const products = await getAllProducts({ limit: 100, fields: "handle" });
+    const products = await getAllProducts({ limit: 100 });
     return products.filter((p) => p.handle).map((p) => ({ slug: p.handle }));
   } catch {
     
