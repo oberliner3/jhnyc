@@ -86,9 +86,9 @@ export function ProductCard({ product }: ProductCardProps) {
 							/>
 						))}
 					</div>
-					<span className="text-muted-foreground text-sm">
+					{/* <span className="text-muted-foreground text-sm">
 						({product.review_count})
-					</span>
+					</span> */}
 				</div>
 
 				{/* Price */}
