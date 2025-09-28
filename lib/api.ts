@@ -70,15 +70,27 @@ export async function searchProducts(query: string): Promise<ApiProduct[]> {
 /**
  * Get a specific product by ID
  */
-export async function getProductById(id: string): Promise<ApiProduct> {
-  return await apiRequest<ApiProduct>(`/products/${id}`);
+export async function getProductById(id: string): Promise<ApiProduct | null> {
+  try {
+    const data = await apiRequest<{ product: ApiProduct }>(`/products/${id}`);
+    return data.product || null;
+  } catch (error) {
+    console.warn(`[API] Failed to fetch product by ID "${id}":`, error);
+    return null;
+  }
 }
 
 /**
  * Get a specific product by handle
  */
-export async function getProductByHandle(handle: string): Promise<ApiProduct> {
-  return await apiRequest<ApiProduct>(`/products/${handle}`);
+export async function getProductByHandle(handle: string): Promise<ApiProduct | null> {
+  try {
+    const data = await apiRequest<{ product: ApiProduct }>(`/products/${handle}`);
+    return data.product || null;
+  } catch (error) {
+    console.warn(`[API] Failed to fetch product by handle "${handle}":`, error);
+    return null;
+  }
 }
 
 /**

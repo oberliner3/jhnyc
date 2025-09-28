@@ -5,7 +5,7 @@ export type OgType = "website" | "article" | "product";
 export function generateSEO({
   title,
   description,
-  image,
+  image = "/og.png",
   path = "",
 }: {
   title?: string;
@@ -80,14 +80,10 @@ export function generateSEO({
       capable: true,
       statusBarStyle: "black-translucent",
       title: SITE_CONFIG.name,
-      startupImage: {
-        url: "string;",
-        media: "string | undefined;",
-      },
     },
     icons: {
       icon: "/favicon.ico",
-      shortcut: "/favicon-16x16.png",
+      shortcut: "/icon0.svg",
       apple: "/apple-icon.png",
     },
 

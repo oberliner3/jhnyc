@@ -37,17 +37,17 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 	useEffect(() => {
 		if (product) {
 			const initialOptions: Record<string, string> = {};
-			product.options?.forEach((option) => {
+			(product.options || []).forEach((option) => {
 				initialOptions[option.name] = option.values[0];
 			});
 			setSelectedOptions(initialOptions);
 
-			if (product.variants.length > 0) {
-				const variantName = product.options
+			if ((product.variants || []).length > 0) {
+				const variantName = (product.options || [])
 					.map((opt) => initialOptions[opt.name])
 					.join(" / ");
-				const variant = product.variants.find((v) => v.title === variantName);
-				setSelectedVariant(variant || product.variants[0]);
+				const variant = (product.variants || []).find((v) => v.title === variantName);
+				setSelectedVariant(variant || (product.variants || [])[0]);
 			}
 		}
 	}, [product]);
@@ -57,10 +57,10 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 		const newOptions = { ...selectedOptions, [optionName]: value };
 		setSelectedOptions(newOptions);
 
-		const variantName = product.options
+		const variantName = (product.options || [])
 			.map((opt) => newOptions[opt.name])
 			.join(" / ");
-		const variant = product.variants.find((v) => v.title === variantName);
+		const variant = (product.variants || []).find((v) => v.title === variantName);
 		setSelectedVariant(variant);
 	};
 
@@ -83,8 +83,8 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 					<Image
 						src={getImageProxyUrl(
 							selectedVariant?.featured_image ||
-								(product.images && product.images.length > 0
-									? product.images[0].src
+								(((product.images || []).length > 0)
+									? (product.images || [])[0].src
 									: "/placeholder.svg"),
 						)}
 						alt={product.title}
@@ -152,7 +152,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 					product.options.length > 0 &&
 					product.options[0].name !== "Title" && (
 						<div className="space-y-4">
-							{product.options.map((option) => (
+							{(product.options || []).map((option) => (
 								<div key={option.id}>
 									<h3 className="mb-2 font-medium text-sm">{option.name}</h3>
 									<Select
