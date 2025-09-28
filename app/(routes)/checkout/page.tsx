@@ -434,10 +434,8 @@ export default function CheckoutPage() {
 										</div>
 									</div>
 									<div className="space-y-3">
-										<Input placeholder="Card number" />
-										<div className="gap-3 grid grid-cols-2">
-											<Input placeholder="MM/YY" />
-											<Input placeholder="CVC" />
+										<div className="p-4 text-center text-sm text-muted-foreground border rounded-lg">
+											[Secure payment provider integration (e.g., Stripe Elements) will go here]
 										</div>
 									</div>
 								</div>

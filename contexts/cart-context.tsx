@@ -18,6 +18,7 @@ import type {
 	ClientCartState,
 } from "@/lib/types";
 import { useAuth } from "./auth-context";
+import { toast } from "sonner";
 
 export type CartAction =
 	| {
@@ -190,10 +191,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 		variant: ApiProductVariant,
 		quantity: number = 1,
 	) => {
+		dispatch({ type: "ADD_ITEM", payload: { product, variant, quantity } });
+
 		if (!user || !cartId) {
-			dispatch({ type: "ADD_ITEM", payload: { product, variant, quantity } });
 			return;
 		}
+
 		try {
 			const res = await fetch("/api/cart/items", {
 				method: "POST",
@@ -206,33 +209,39 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 				}),
 			});
 			if (!res.ok) throw new Error("Failed to add item");
-			await loadCart();
 		} catch (err) {
 			console.error("Error adding item to cart:", err);
+			toast.error("Failed to add item to cart. Please try again.");
+			// Rollback
+			dispatch({ type: "REMOVE_ITEM", payload: { productId: product.id, variantId: variant.id } });
 		}
 	};
 
 	const removeItem = async (productId: string, variantId: string) => {
+		const itemToRemove = state.items.find(
+			(item) =>
+				item.product.id === productId && item.variant.id === variantId,
+		);
+		if (!itemToRemove) return;
+
+		dispatch({ type: "REMOVE_ITEM", payload: { productId, variantId } });
+
 		if (!user || !cartId) {
-			dispatch({ type: "REMOVE_ITEM", payload: { productId, variantId } });
 			return;
 		}
-		try {
-			const itemToRemove = state.items.find(
-				(item) =>
-					item.product.id === productId && item.variant.id === variantId,
-			);
-			if (!itemToRemove) return;
 
+		try {
 			const res = await fetch("/api/cart/items", {
 				method: "DELETE",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ cart_id: cartId, item_id: itemToRemove.id }),
 			});
 			if (!res.ok) throw new Error("Failed to remove item");
-			await loadCart();
 		} catch (err) {
 			console.error("Error removing item from cart:", err);
+			toast.error("Failed to remove item from cart. Please try again.");
+			// Rollback
+			dispatch({ type: "ADD_ITEM", payload: { product: itemToRemove.product, variant: itemToRemove.variant, quantity: itemToRemove.quantity } });
 		}
 	};
 
@@ -241,24 +250,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 		variantId: string,
 		quantity: number,
 	) => {
+		const itemToUpdate = state.items.find(
+			(item) =>
+				item.product.id === productId && item.variant.id === variantId,
+		);
+		if (!itemToUpdate) return;
+
+		const originalQuantity = itemToUpdate.quantity;
+		dispatch({
+			type: "UPDATE_QUANTITY",
+			payload: { productId, variantId, quantity },
+		});
+
 		if (!user || !cartId) {
-			dispatch({
-				type: "UPDATE_QUANTITY",
-				payload: { productId, variantId, quantity },
-			});
 			return;
 		}
+
 		if (quantity <= 0) {
 			await removeItem(productId, variantId);
 			return;
 		}
-		try {
-			const itemToUpdate = state.items.find(
-				(item) =>
-					item.product.id === productId && item.variant.id === variantId,
-			);
-			if (!itemToUpdate) return;
 
+		try {
 			const res = await fetch("/api/cart/items", {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
@@ -269,17 +282,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 				}),
 			});
 			if (!res.ok) throw new Error("Failed to update quantity");
-			await loadCart();
 		} catch (err) {
 			console.error("Error updating item quantity:", err);
+			toast.error("Failed to update item quantity. Please try again.");
+			// Rollback
+			dispatch({
+				type: "UPDATE_QUANTITY",
+				payload: { productId, variantId, quantity: originalQuantity },
+			});
 		}
 	};
 
 	const clearCart = async () => {
+		const currentItems = state.items;
+		dispatch({ type: "CLEAR_CART" });
+
 		if (!user || !cartId) {
-			dispatch({ type: "CLEAR_CART" });
 			return;
 		}
+
 		try {
 			const res = await fetch("/api/cart/clear", {
 				method: "POST",
@@ -287,9 +308,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 				body: JSON.stringify({ cart_id: cartId }),
 			});
 			if (!res.ok) throw new Error("Failed to clear cart");
-			await loadCart();
 		} catch (err) {
 			console.error("Error clearing cart:", err);
+			toast.error("Failed to clear cart. Please try again.");
+			// Rollback
+			dispatch({ type: "LOAD_CART", payload: currentItems });
 		}
 	};
 

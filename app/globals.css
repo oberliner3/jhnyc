@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'); */
+/*  */
 
 @theme {
   /* Border radius values */
@@ -55,8 +55,9 @@
   --color-shopify-red: #d72c0d;
 
   /* Font families */
-  --font-family-sans: 'Inter', system-ui, sans-serif;
-  --font-family-display: 'Inter', system-ui, sans-serif;
+  --font-family-sans: var(--font-geist-sans);
+  --font-family-display: var(--font-geist-sans);
+  --font-family-mono: var(--font-geist-mono);
 
   /* Animation definitions */
   --animate-fade-in: fade-in 0.6s ease-out;
