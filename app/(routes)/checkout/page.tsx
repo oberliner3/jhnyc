@@ -150,6 +150,11 @@ export default function CheckoutPage() {
 					<div className="flex justify-between items-center">
 						<div>
 							<h1 className="font-bold text-2xl tracking-tight">Checkout</h1>
+							<div className="flex items-center gap-2 text-gray-600 text-sm mt-1">
+								<Lock className="w-4 h-4" />
+								<Shield className="w-4 h-4" />
+								<span>Secure checkout</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -190,7 +195,11 @@ export default function CheckoutPage() {
 						{/* Contact Information */}
 						<div className="bg-white p-6 border rounded-lg">
 							<div className="flex justify-between items-center mb-4">
-								<h2 className="font-semibold text-lg">Contact</h2>
+								<h2 className="font-semibold text-lg flex items-center gap-2">
+									<Mail className="w-4 h-4" />
+									<Phone className="w-4 h-4" />
+									Contact
+								</h2>
 								<Link
 									href="/auth/signin"
 									className="text-blue-600 text-sm hover:underline"
@@ -216,7 +225,11 @@ export default function CheckoutPage() {
 
 						{/* Delivery Information */}
 						<div className="bg-white p-6 border rounded-lg">
-							<h2 className="mb-4 font-semibold text-lg">Delivery</h2>
+							<h2 className="mb-4 font-semibold text-lg flex items-center gap-2">
+								<MapPin className="w-4 h-4" />
+								<Truck className="w-4 h-4" />
+								Delivery
+							</h2>
 							<form onSubmit={handleSubmit} className="space-y-4">
 								{/* Country/Region */}
 								<div>
@@ -338,7 +351,10 @@ export default function CheckoutPage() {
 
 						{/* Shipping Method */}
 						<div className="bg-white p-6 border rounded-lg">
-							<h2 className="mb-4 font-semibold text-lg">Shipping method</h2>
+							<h2 className="mb-4 font-semibold text-lg flex items-center gap-2">
+								<Truck className="w-4 h-4" />
+								Shipping method
+							</h2>
 							<div className="space-y-3">
 								<div className="flex justify-between items-center bg-gray-50 p-4 border rounded-lg">
 									<div className="flex items-center gap-3">
@@ -348,6 +364,7 @@ export default function CheckoutPage() {
 											defaultChecked
 											className="w-4 h-4"
 										/>
+										<Truck className="w-4 h-4 text-gray-600" />
 										<div>
 											<p className="font-medium">Free Shipping</p>
 											<p className="text-gray-600 text-sm">Standard delivery</p>
@@ -365,7 +382,15 @@ export default function CheckoutPage() {
 
 						{/* Payment */}
 						<div className="bg-white p-6 border rounded-lg">
-							<h2 className="mb-4 font-semibold text-lg">Payment</h2>
+							<h2 className="mb-4 font-semibold text-lg flex items-center gap-2">
+								<CreditCard className="w-4 h-4" />
+								Payment
+								<span className="ml-2 flex items-center gap-2 text-gray-600 text-sm">
+									<Lock className="w-4 h-4" />
+									<Shield className="w-4 h-4" />
+									<span>Secure</span>
+								</span>
+							</h2>
 							<p className="mb-4 text-gray-600 text-sm">
 								All transactions are secure and encrypted.
 							</p>
@@ -450,7 +475,10 @@ export default function CheckoutPage() {
 
 						{/* Remember Me */}
 						<div className="bg-white p-6 border rounded-lg">
-							<h2 className="mb-4 font-semibold text-lg">Remember me</h2>
+							<h2 className="mb-4 font-semibold text-lg flex items-center gap-2">
+								<User className="w-4 h-4" />
+								Remember me
+							</h2>
 							<div className="flex items-center gap-2">
 								<input type="checkbox" className="w-4 h-4" />
 								<Label className="text-sm">
