@@ -28,7 +28,7 @@ export function MobileNav() {
 					<span className="sr-only">Open menu</span>
 				</Button>
 			</SheetTrigger>
-			<SheetContent side="left" className="flex flex-col">
+			<SheetContent side="left" className="flex flex-col bg-white">
 				<SheetHeader>
 					<SheetTitle>Menu</SheetTitle>
 				</SheetHeader>

@@ -31,7 +31,7 @@ export default function CartDrawer() {
 
 	return (
 		<Sheet open={isOpen} onOpenChange={toggleCart}>
-			<SheetContent className="flex flex-col">
+			<SheetContent className="flex flex-col bg-white">
 				<SheetHeader>
 					<SheetTitle>Shopping Cart</SheetTitle>
 				</SheetHeader>
