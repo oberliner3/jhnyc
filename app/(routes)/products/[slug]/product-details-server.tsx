@@ -1,4 +1,4 @@
-import { getProductByHandle, mapApiToProduct } from "@/lib/api";
+import { getProductByHandle } from "@/lib/api";
 import { ProductDetailsClient } from "./product-details-client";
 
 interface ProductDetailsServerProps {
@@ -6,8 +6,7 @@ interface ProductDetailsServerProps {
 }
 
 export async function ProductDetailsServer({ slug }: ProductDetailsServerProps) {
-  const apiProduct = await getProductByHandle(slug);
-  const product = mapApiToProduct(apiProduct);
+  const product = await getProductByHandle(slug);
 
   return <ProductDetailsClient product={product} />;
 }

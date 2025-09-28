@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { generateSEO } from "@/lib/seo";
-import { getAllProducts, mapApiToProduct } from "@/lib/api";
+import { getAllProducts } from "@/lib/api";
+import type { ApiProduct } from "@/lib/types";
 import { ProductCard } from "@/components/product/product-card";
 import { CollectionSkeleton } from "@/components/skeletons/collection-skeleton";
 
@@ -50,11 +51,11 @@ export async function generateMetadata({
 
 async function CollectionProducts({ slug }: { slug: string }) {
   
-  let products: ReturnType<typeof mapApiToProduct>[] = [];
+  let products: ApiProduct[] = [];
   
   try {
     const apiProducts = await getAllProducts({ limit: 48 });
-    const allProducts = apiProducts.map(mapApiToProduct);
+    const allProducts = apiProducts;
     
     // Filter products based on collection type
     switch (slug) {

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductGridSkeleton } from "@/components/skeletons/product-card-skeleton";
 import { generateSEO } from "@/lib/seo";
-import { getAllProducts, mapApiToProduct } from "@/lib/api";
+import { getAllProducts } from "@/lib/api";
 import { Suspense } from "react";
 
 export const revalidate = 60; // ISR: revalidate this page every 60 seconds
@@ -18,7 +18,7 @@ export const metadata: Metadata = generateSEO({
 async function ProductsList() {
   // Fetch from Cosmos API (server-side)
   const apiProducts = await getAllProducts({ limit: 24 });
-  const products = apiProducts.map(mapApiToProduct);
+  const products = apiProducts;
 
   return (
     <div className="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

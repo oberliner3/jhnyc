@@ -1,36 +1,66 @@
 import React from 'react';
+import Image from 'next/image';
+
+interface PaymentMethodProps {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+}
+
+function PaymentMethod({ src, alt, width = 38, height = 24 }: PaymentMethodProps) {
+  return (
+    <div className="flex items-center justify-center bg-white rounded border border-gray-200 p-1">
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        className="object-contain"
+        style={{ maxWidth: '100%', height: 'auto' }}
+      />
+    </div>
+  );
+}
 
 export function PaymentMethods() {
   return (
-    <div className="flex items-center space-x-2">
-      <svg width="38" height="24" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pi-visa">
-        <title id="pi-visa">Visa</title>
-        <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#142688"/>
-        <path d="M28.2 10.1h-3.4c-.4 0-.7.2-.9.5l-2.8 7.9c-.2.4-.6.6-1 .6h-3c-.4 0-.7-.2-.9-.5l-2.8-7.9c-.2-.4-.6-.6-1-.6h-3.4c-.4 0-.7.2-.9.5L2.9 20c-.2.4-.6.6-1 .6H.5c-.4 0-.7-.2-.9-.5L0 18.6c0-.4.2-.7.5-.9l2.8-7.9c.2-.4.6-.6 1-.6h3c.4 0 .7.2.9.5l2.8 7.9c.2.4.6.6 1 .6h3.4c.4 0 .7-.2.9-.5l2.8-7.9c.2-.4.6-.6 1-.6h3c.4 0 .7.2.9.5l2.8 7.9c.2.4.6.6 1 .6h2.5c.4 0 .7-.2.9-.5l1.5-4.2c.2-.4.6-.6 1-.6h.5c.4 0 .7.2.9.5l1.5 4.2c.2.4.6.6 1 .6h2.5c.4 0 .7-.2.9-.5l1.5-4.2c.2-.4.6-.6 1-.6h.5c.4 0 .7.2.9.5l1.5 4.2c.2.4.6.6 1 .6h2.5c.4 0 .7-.2.9-.5l1.5-4.2c.2-.4.6-.6 1-.6h.5c.4 0 .7.2.9.5l1.5 4.2c.2.4.6.6 1 .6h2.5c.4 0 .7-.2.9-.5l.5-1.4c.2-.4 0-.7-.5-.9l-2.8-7.9c-.2-.4-.6-.6-1-.6h-3c-.4 0-.7.2-.9-.5l-2.8 7.9c-.2.4-.6.6-1 .6h-3.4c-.4 0-.7-.2-.9-.5l-2.8-7.9c-.2-.4-.6-.6-1-.6z" fill="#fff"/>
-      </svg>
-      <svg width="38" height="24" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pi-mastercard">
-        <title id="pi-mastercard">Mastercard</title>
-        <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#ff5f00"/>
-        <path d="M12 12c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8-8 3.6-8 8z" fill="#eb001b"/>
-        <path d="M20 12c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8-8 3.6-8 8z" fill="#f79e1b"/>
-        <path d="M20 12c0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8 8 3.6 8 8z" fill="#ff5f00"/>
-      </svg>
-      <svg width="38" height="24" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pi-amex">
-        <title id="pi-amex">American Express</title>
-        <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#0077c8"/>
-        <path d="M19 12c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8-8 3.6-8 8z" fill="#fff"/>
-        <path d="M19 12c0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8 8 3.6 8 8z" fill="#0077c8"/>
-        <path d="M22.5 8.5h-7v7h7v-7zm-1 1v5h-5v-5h5z" fill="#0077c8"/>
-        <path d="M27.5 8.5h-2v7h2v-7z" fill="#0077c8"/>
-        <path d="M14.5 8.5h-2v7h2v-7z" fill="#0077c8"/>
-      </svg>
-      <svg width="38" height="24" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pi-paypal">
-        <title id="pi-paypal">PayPal</title>
-        <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#003087"/>
-        <path d="M23.9 8.4c-.3 1.2-1.2 2.1-2.4 2.1h-4.1c-1.2 0-2.1-.8-2.4-2.1-.3-1.2.1-2.4 1-3.1.9-.7 2.1-.7 3.1-.1l.1.1c.3-.2.6-.3.9-.3h.1c.3 0 .6.1.9.3.9-.7 2.1-.7 3.1.1.9.7 1.3 1.9 1 3.1z" fill="#fff"/>
-        <path d="M23.9 8.4c-.3 1.2-1.2 2.1-2.4 2.1h-4.1c-1.2 0-2.1-.8-2.4-2.1-.3-1.2.1-2.4 1-3.1.9-.7 2.1-.7 3.1-.1l.1.1c.3-.2.6-.3.9-.3h.1c.3 0 .6.1.9.3.9-.7 2.1-.7 3.1.1.9.7 1.3 1.9 1 3.1z" fill="#009cde"/>
-        <path d="M23.9 8.4c-.3 1.2-1.2 2.1-2.4 2.1h-4.1c-1.2 0-2.1-.8-2.4-2.1-.3-1.2.1-2.4 1-3.1.9-.7 2.1-.7 3.1-.1l.1.1c.3-.2.6-.3.9-.3h.1c.3 0 .6.1.9.3.9-.7 2.1-.7 3.1.1.9.7 1.3 1.9 1 3.1z" fill="#002f86"/>
-      </svg>
+    <div className="flex items-center gap-2 flex-wrap">
+      {/* Credit Cards */}
+      <PaymentMethod 
+        src="/payment-logos/cards/visa.svg" 
+        alt="Visa" 
+      />
+      <PaymentMethod 
+        src="/payment-logos/cards/mastercard.svg" 
+        alt="Mastercard" 
+      />
+      <PaymentMethod 
+        src="/payment-logos/cards/american-express.svg" 
+        alt="American Express" 
+      />
+      <PaymentMethod 
+        src="/payment-logos/cards/discover.svg" 
+        alt="Discover" 
+      />
+      <PaymentMethod 
+        src="/payment-logos/cards/jcb.svg" 
+        alt="JCB" 
+      />
+      
+      {/* Digital Wallets */}
+      <PaymentMethod 
+        src="/payment-logos/wallets/apple-pay.svg" 
+        alt="Apple Pay" 
+      />
+      <PaymentMethod 
+        src="/payment-logos/wallets/google-pay.svg" 
+        alt="Google Pay" 
+      />
+      <PaymentMethod 
+        src="/payment-logos/apm/paypal.svg" 
+        alt="PayPal" 
+      />
     </div>
   );
 }

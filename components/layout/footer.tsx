@@ -47,9 +47,9 @@ export function Footer() {
 
       {/* Main Footer Content */}
       <div className="container px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand Section */}
-          <div className="space-y-4">
+          <div className="lg:col-span-2 space-y-4">
             <Logo />
             <p className="text-sm text-gray-600 leading-relaxed">
               Your trusted destination for premium products. We&apos;re committed to delivering 
@@ -73,6 +73,125 @@ export function Footer() {
                 <span>{APP_CONTACTS.email.getInTouch}</span>
               </div>
             </div>
+            <div>
+              <h3 className="font-semibold mb-4 text-gray-900">Connect With Us</h3>
+              <div className="flex gap-3">
+                <IconButton variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                  <Facebook className="h-4 w-4" />
+                  <span className="sr-only">Facebook</span>
+                </IconButton>
+                <IconButton variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                  <Twitter className="h-4 w-4" />
+                  <span className="sr-only">Twitter</span>
+                </IconButton>
+                <IconButton variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                  <Instagram className="h-4 w-4" />
+                  <span className="sr-only">Instagram</span>
+                </IconButton>
+              </div>
+            </div>
+          </div>
+
+          {/* Our Policies */}
+          <div>
+            <h3 className="font-semibold mb-4 text-gray-900">Our Policies</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link
+                  href="/policies/privacy"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/policies/return-refund"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Return and Refund Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/policies/shipping"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/policies/terms"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Contact Information
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="font-semibold mb-4 text-gray-900">Quick Links</h3>
+            <ul className="space-y-3">
+              <li>
+                <Link
+                  href="/policies/billing-terms"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Billing Terms And Conditions
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/policies/order-cancellation"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Order Cancellation Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/policies/secure-payment"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Secure Payment
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/policies/cookie"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Cookie Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/track-order"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  Track Order
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/faq"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  FAQ
+                </Link>
+              </li>
+            </ul>
           </div>
 
           {/* Company Links */}
@@ -91,59 +210,6 @@ export function Footer() {
               ))}
             </ul>
           </div>
-
-          {/* Support Links */}
-          <div>
-            <h3 className="font-semibold mb-4 text-gray-900">Customer Care</h3>
-            <ul className="space-y-3">
-              {FOOTER_LINKS.support.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Social & Legal */}
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-semibold mb-4 text-gray-900">Connect With Us</h3>
-              <div className="flex gap-3">
-                <IconButton variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                  <Facebook className="h-4 w-4" />
-                  <span className="sr-only">Facebook</span>
-                </IconButton>
-                <IconButton variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                  <Twitter className="h-4 w-4" />
-                  <span className="sr-only">Twitter</span>
-                </IconButton>
-                <IconButton variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                  <Instagram className="h-4 w-4" />
-                  <span className="sr-only">Instagram</span>
-                </IconButton>
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4 text-gray-900">Legal</h3>
-              <ul className="space-y-3">
-                {FOOTER_LINKS.legal.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -153,24 +219,27 @@ export function Footer() {
       <div className="container px-4 py-6 bg-white border-t">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-600">
-            © 2024 {SITE_CONFIG.name}. All rights reserved.
+            © 2025 {SITE_CONFIG.name}. All rights reserved.
           </p>
           <PaymentMethods />
           <div className="flex flex-wrap gap-4 text-xs text-gray-600">
-            <Link href="/privacy-policy" className="hover:text-gray-900 transition-colors">
+            <Link href="/policies/privacy" className="hover:text-gray-900 transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/terms-of-service" className="hover:text-gray-900 transition-colors">
+            <Link href="/policies/terms" className="hover:text-gray-900 transition-colors">
               Terms of Service
             </Link>
-            <Link href="/returns-exchange" className="hover:text-gray-900 transition-colors">
-              Returns & Exchange
+            <Link href="/policies/return-refund" className="hover:text-gray-900 transition-colors">
+              Return and Refund Policy
             </Link>
-            <Link href="/shipping-delivery" className="hover:text-gray-900 transition-colors">
-              Shipping & Delivery
+            <Link href="/policies/shipping" className="hover:text-gray-900 transition-colors">
+              Shipping Policy
             </Link>
-            <Link href="/rewards-terms" className="hover:text-gray-900 transition-colors">
-              Rewards Terms
+            <Link href="/policies/cookie" className="hover:text-gray-900 transition-colors">
+              Cookie Policy
+            </Link>
+            <Link href="/contact" className="hover:text-gray-900 transition-colors">
+              Contact
             </Link>
           </div>
         </div>

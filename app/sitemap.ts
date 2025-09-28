@@ -4,7 +4,7 @@ import { SITE_CONFIG } from '@/lib/constants'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
-    const products = await getAllProducts();
+  const products = await getAllProducts();
     
     // Core pages
     const corePages: MetadataRoute.Sitemap = [
@@ -247,8 +247,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       {
         url: `${SITE_CONFIG.url}/api/feed/google-merchant`,
         lastModified: new Date(),
-        changeFrequency: "daily",
-        priority: 0.7,
+    changeFrequency: "daily",
+    priority: 0.7,
       },
     ];
 
@@ -331,9 +331,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     
     // Return comprehensive fallback sitemap if product fetch fails
     const fallbackPages: MetadataRoute.Sitemap = [
-      {
-        url: SITE_CONFIG.url,
-        lastModified: new Date(),
+    {
+      url: SITE_CONFIG.url,
+      lastModified: new Date(),
         changeFrequency: "daily",
         priority: 1.0,
       },
@@ -348,14 +348,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changeFrequency: "weekly",
         priority: 0.8,
-      },
-      {
-        url: `${SITE_CONFIG.url}/about`,
-        lastModified: new Date(),
-        changeFrequency: "monthly",
-        priority: 0.8,
-      },
-      {
+    },
+    {
+      url: `${SITE_CONFIG.url}/about`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
         url: `${SITE_CONFIG.url}/contact`,
         lastModified: new Date(),
         changeFrequency: "monthly",
@@ -369,8 +369,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
       {
         url: `${SITE_CONFIG.url}/checkout`,
-        lastModified: new Date(),
-        changeFrequency: "weekly",
+      lastModified: new Date(),
+      changeFrequency: "weekly",
         priority: 0.6,
       },
       {

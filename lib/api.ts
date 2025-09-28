@@ -52,9 +52,7 @@ export async function getAllProducts(options?: {
 
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
-    return Array.isArray(data.products)
-      ? data.products.map(mapApiToProduct)
-      : [];
+    return Array.isArray(data.products) ? data.products : [];
   } catch (error) {
     console.warn(`[API] Failed to fetch products from ${endpoint}:`, error);
     return [];
@@ -70,9 +68,7 @@ export async function searchProducts(query: string): Promise<ApiProduct[]> {
     const data = await apiRequest<{ products: ApiProduct[] }>(
       `/products/search?q=${encodedQuery}`
     );
-    return Array.isArray(data.products)
-      ? data.products.map(mapApiToProduct)
-      : [];
+    return Array.isArray(data.products) ? data.products : [];
   } catch (error) {
     console.warn(`[API] Failed to search products for "${query}":`, error);
     return [];
@@ -83,16 +79,14 @@ export async function searchProducts(query: string): Promise<ApiProduct[]> {
  * Get a specific product by ID
  */
 export async function getProductById(id: string): Promise<ApiProduct> {
-  const data = await apiRequest<ApiProduct>(`/products/${id}`);
-  return mapApiToProduct(data);
+  return await apiRequest<ApiProduct>(`/products/${id}`);
 }
 
 /**
  * Get a specific product by handle
  */
 export async function getProductByHandle(handle: string): Promise<ApiProduct> {
-  const data = await apiRequest<ApiProduct>(`/products/${handle}`);
-  return mapApiToProduct(data);
+  return await apiRequest<ApiProduct>(`/products/${handle}`);
 }
 
 /**
@@ -106,9 +100,7 @@ export async function getProductsByVendor(
     const data = await apiRequest<{ products: ApiProduct[] }>(
       `/products?vendor=${encodedVendor}`
     );
-    return Array.isArray(data.products)
-      ? data.products.map(mapApiToProduct)
-      : [];
+    return Array.isArray(data.products) ? data.products : [];
   } catch (error) {
     console.warn(
       `[API] Failed to fetch products for vendor "${vendor}":`,
@@ -127,51 +119,3 @@ export function getImageProxyUrl(imageUrl: string): string {
   return `${SITE_CONFIG.api}/cosmos/image-proxy?url=${encodedUrl}`;
 }
 
-/**
- * Helper function to transform API product to internal Product type
- */
-export function mapApiToProduct(apiProduct: ApiProduct): ApiProduct {
-  return {
-    id: apiProduct.id,
-    title: apiProduct.title,
-    handle: apiProduct.handle,
-    body_html: apiProduct.body_html,
-    price: apiProduct.price,
-    compare_at_price: apiProduct.compare_at_price,
-    images: apiProduct.images as ApiProductImage[],
-    category: apiProduct.category,
-    in_stock: apiProduct.in_stock,
-    rating: apiProduct.rating,
-    review_count: apiProduct.review_count,
-    tags: apiProduct.tags,
-    vendor: apiProduct.vendor,
-    variants: apiProduct.variants.map(
-      (variant: ApiProductVariant): ApiProductVariant => ({
-        id: variant.id,
-        title: variant.title,
-        price: variant.price,
-        available: variant.available,
-        featured_image: variant.featured_image,
-        product_id: variant.product_id,
-        requires_shipping: variant.requires_shipping,
-        taxable: variant.taxable,
-        grams: variant.grams,
-        position: variant.position,
-        created_at: variant.created_at,
-        updated_at: variant.updated_at,
-      })
-    ),
-    options: apiProduct.options.map(
-      (option: ApiProductOption): ApiProductOption => ({
-        name: option.name,
-        position: option.position,
-        values: option.values,
-        product_id: option.product_id,
-        id: option.id,
-      })
-    ),
-
-    created_at: apiProduct.created_at,
-    updated_at: apiProduct.updated_at,
-  };
-}

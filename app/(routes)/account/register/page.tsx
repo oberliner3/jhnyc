@@ -1,42 +1,45 @@
-import { signup } from './actions'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import Link from "next/link";
+import { useId } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { signup } from "./actions";
 
 export default function RegisterPage() {
-  return (
-    <div className="container px-4 py-8 flex justify-center items-center">
-      <div className="w-full max-w-md">
-        <h1 className="text-3xl font-bold tracking-tight lg:text-4xl mb-8 text-center">
-          Register
-        </h1>
-        <form action={signup} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" />
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" />
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" />
-          </div>
-          <div>
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input id="confirmPassword" name="confirmPassword" type="password" />
-          </div>
-          <Button type="submit" className="w-full">Register</Button>
-        </form>
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Already have an account? {' '}
-          <Link href="/account/login" className="underline">
-            Login
-          </Link>
-        </p>
-      </div>
-    </div>
-  )
+	return (
+		<div className="flex justify-center items-center px-4 py-8 container">
+			<div className="w-full max-w-md">
+				<h1 className="mb-8 font-bold text-3xl lg:text-4xl text-center tracking-tight">
+					Register
+				</h1>
+				<form action={signup} className="space-y-4">
+					<div>
+						<Label htmlFor="fullName">Name</Label>
+						<Input id={useId()} name="fullName" />
+					</div>
+					<div>
+						<Label htmlFor="email">Email</Label>
+						<Input id={useId()} name="email" type="email" />
+					</div>
+					<div>
+						<Label htmlFor="password">Password</Label>
+						<Input id={useId()} name="password" type="password" />
+					</div>
+					<div>
+						<Label htmlFor="confirmPassword">Confirm Password</Label>
+						<Input id={useId()} name="confirmPassword" type="password" />
+					</div>
+					<Button type="submit" className="w-full">
+						Register
+					</Button>
+				</form>
+				<p className="mt-4 text-muted-foreground text-sm text-center">
+					Already have an account?{" "}
+					<Link href="/account/login" className="underline">
+						Login
+					</Link>
+				</p>
+			</div>
+		</div>
+	);
 }

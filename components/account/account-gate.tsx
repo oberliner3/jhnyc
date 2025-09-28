@@ -111,7 +111,7 @@ export function AccountGate() {
               <span className="text-primary">
                 {user.user_metadata?.full_name || user.email?.split("@")[0]}
               </span>
-            </h1>
+      </h1>
             <p className="text-muted-foreground">
               Manage your account, orders, and preferences
             </p>
@@ -326,9 +326,9 @@ export function AccountGate() {
                 <p className="text-muted-foreground mb-4">
                   Add an address to make checkout faster
                 </p>
-                <PrimaryCTA asChild>
+        <PrimaryCTA asChild>
                   <Link href="/account/addresses">Add Address</Link>
-                </PrimaryCTA>
+        </PrimaryCTA>
               </div>
             </CardContent>
           </Card>
