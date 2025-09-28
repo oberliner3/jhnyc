@@ -1,9 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
@@ -18,7 +20,8 @@ export async function GET() {
     .eq("user_id", user.id)
     .single();
 
-  if (error && error.code !== "PGRST116") { // PGRST116 means no rows found (no cart yet)
+  if (error && error.code !== "PGRST116") {
+    // PGRST116 means no rows found (no cart yet)
     console.error("[API] Failed to fetch cart from Supabase:", error);
     return new NextResponse(JSON.stringify({ message: error.message }), {
       status: 500,
@@ -34,7 +37,9 @@ export async function GET() {
 
 export async function POST() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {

@@ -1,11 +1,11 @@
-import React from 'react';
+import type React from "react";
 
 interface FormErrorProps {
-  message?: string;
+	message?: string;
 }
 
 export const FormError: React.FC<FormErrorProps> = ({ message }) => {
-  if (!message) return null;
+	if (!message) return null;
 
-  return <p className="text-red-500 text-sm mt-1">{message}</p>;
+	return <p className="mt-1 text-red-500 text-sm">{message}</p>;
 };

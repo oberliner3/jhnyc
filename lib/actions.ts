@@ -1,7 +1,7 @@
-'use server';
+"use server";
 
-import { redirect } from 'next/navigation';
-import { type ApiProduct } from "@/lib/types";
+import { redirect } from "next/navigation";
+import type { ApiProduct } from "@/lib/types";
 
 /**
  * Handles a campaign "buy now" request on the server.

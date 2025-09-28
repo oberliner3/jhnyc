@@ -1,59 +1,59 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export function ArticleHeader({
-  title,
-  lastUpdate,
+	title,
+	lastUpdate,
 }: {
-  title: string;
-  lastUpdate?: string;
+	title: string;
+	lastUpdate?: string;
 }) {
-  return (
-    <header className="  pb-2">
-      <h1 className="text-3xl font-bold tracking-tight lg:text-4xl mb-2  p-4 text-center ">
-        {title}
-      </h1>
-      {lastUpdate ? (
-        <p className=" text-neutral-600 text-xs p-2">
-          Last updated: <time dateTime={lastUpdate}>{lastUpdate}</time>
-        </p>
-      ) : null}
-    </header>
-  );
+	return (
+		<header className="pb-2">
+			<h1 className="mb-2 p-4 font-bold text-3xl lg:text-4xl text-center tracking-tight">
+				{title}
+			</h1>
+			{lastUpdate ? (
+				<p className="p-2 text-neutral-600 text-xs">
+					Last updated: <time dateTime={lastUpdate}>{lastUpdate}</time>
+				</p>
+			) : null}
+		</header>
+	);
 }
 export function ArticleSection({
-  title,
-  first,
-  children,
+	title,
+	first,
+	children,
 }: {
-  title: string;
-  first: string;
-  children?: ReactNode;
+	title: string;
+	first: string;
+	children?: ReactNode;
 }) {
-  return (
-    <section className="p-2 border-t border-neutral-50">
-      <h2 className="text-2xl font-bold mb-4">{title}</h2>
-      <p className="text-muted-foreground">{first}</p>
-      {children}
-    </section>
-  );
+	return (
+		<section className="p-2 border-neutral-50 border-t">
+			<h2 className="mb-4 font-bold text-2xl">{title}</h2>
+			<p className="text-muted-foreground">{first}</p>
+			{children}
+		</section>
+	);
 }
 
 export function UnorderdList({ items }: { items: string[] }) {
-  return (
-    <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-      {items.map((e, i) => (
-        <li key={i}>{e}</li>
-      ))}
-    </ul>
-  );
+	return (
+		<ul className="space-y-2 pl-6 text-muted-foreground list-disc">
+			{items.map((e) => (
+				<li key={e}>{e}</li>
+			))}
+		</ul>
+	);
 }
 
 export function ArticleWrapper({ children }: { children: ReactNode }) {
-  return (
-    <div className="container px-2 py-4  w-full m-auto mx-auto relative ">
-      <article className="max-w-4xl mx-auto bg-white   shadow rounded-t-lg overflow-hidden rounded py-10 px-4">
-        <div className="prose prose-lg max-w-none space-y-8">{children}</div>
-      </article>
-    </div>
-  );
+	return (
+		<div className="relative m-auto mx-auto px-2 py-4 w-full container">
+			<article className="bg-white shadow mx-auto px-4 py-10 rounded rounded-t-lg max-w-4xl overflow-hidden">
+				<div className="space-y-8 max-w-none prose prose-lg">{children}</div>
+			</article>
+		</div>
+	);
 }

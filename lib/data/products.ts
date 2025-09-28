@@ -1,5 +1,5 @@
-import type { ApiProduct } from "@/lib/types";
 import { getAllProducts } from "@/lib/api";
+import type { ApiProduct } from "@/lib/types";
 
 // Fetch first 5 products from the API
 export async function getFeaturedProducts(): Promise<ApiProduct[]> {

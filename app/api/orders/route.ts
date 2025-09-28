@@ -1,9 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
@@ -32,7 +34,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {

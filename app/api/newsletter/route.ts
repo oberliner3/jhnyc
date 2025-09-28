@@ -1,31 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json()
-    
-    if (!email || !email.includes('@')) {
+    const { email } = await request.json();
+
+    if (!email || !email.includes("@")) {
       return NextResponse.json(
-        { error: 'Valid email is required' },
+        { error: "Valid email is required" },
         { status: 400 }
-      )
+      );
     }
-    
+
     // Here you would integrate with your email service provider
     // For example: Mailchimp, ConvertKit, SendGrid, etc.
-    
+
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     return NextResponse.json(
-      { message: 'Successfully subscribed to newsletter' },
+      { message: "Successfully subscribed to newsletter" },
       { status: 200 }
-    )
-  } catch (_error: unknown) { // eslint-disable-line @typescript-eslint/no-unused-vars
+    );
+  } catch (_error: unknown) {
+    // eslint-disable-line @typescript-eslint/no-unused-vars
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
-    )
+    );
   }
 }
-

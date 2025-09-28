@@ -1,13 +1,13 @@
-'use server'
+"use server";
 
-import { createClient } from '@/utils/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/utils/supabase/server";
 
 export async function subscribeToNewsletter(formData: FormData) {
-  const email = formData.get('email') as string
-  const supabase = await createClient()
+  const email = formData.get("email") as string;
+  const supabase = await createClient();
 
-  await supabase.from('newsletter_subscriptions').insert({ email })
+  await supabase.from("newsletter_subscriptions").insert({ email });
 
-  revalidatePath('/')
+  revalidatePath("/");
 }

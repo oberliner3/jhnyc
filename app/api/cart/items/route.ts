@@ -1,9 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
@@ -36,7 +38,9 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
@@ -70,7 +74,9 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
@@ -81,10 +87,7 @@ export async function DELETE(request: Request) {
 
   const { id } = await request.json();
 
-  const { error } = await supabase
-    .from("cart_items")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from("cart_items").delete().eq("id", id);
 
   if (error) {
     console.error("[API] Failed to remove cart item from Supabase:", error);

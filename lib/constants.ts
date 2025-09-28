@@ -4,10 +4,10 @@ export const SITE_CONFIG = {
   name: APP_BRAND,
   description: "Premium e-commerce storefront built with Next.js",
   domain: APP_DOMAIN,
-  url: "https://" + APP_DOMAIN,
+  url: `https://${APP_DOMAIN}`,
   api: process.env.PRODUCT_STREAM_API || "localhost:8000",
-  ogTitle: APP_BRAND + " - Your One-Stop Shop for Quality Products",
-  ogImage: APP_DOMAIN + "/og.png",
+  ogTitle: `${APP_BRAND} - Your One-Stop Shop for Quality Products`,
+  ogImage: `${APP_DOMAIN}/og.png`,
   author: APP_BRAND,
   lastUpdate: "September 24, 2025",
   keywords: [

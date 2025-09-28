@@ -1,18 +1,16 @@
-// biome-ignore assist/source/organizeImports: <explanation>
-import { Inter } from "next/font/google";
 import type { Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
-
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { AnnouncementBar } from "@/components/layout/announcement-bar";
-import { SchemaMarkup } from "@/components/common/schema-markup";
-import { Providers } from "./providers";
-import { CookieBanner } from "@/components/common/cookie-banner";
-import { PWAProvider } from "@/components/pwa/pwa-provider";
 
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { CookieBanner } from "@/components/common/cookie-banner";
+import { SchemaMarkup } from "@/components/common/schema-markup";
+import { AnnouncementBar } from "@/components/layout/announcement-bar";
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,22 +42,30 @@ export default function RootLayout({
 				<meta name="msapplication-TileColor" content="#336571" />
 				<meta name="msapplication-config" content="/browserconfig.xml" />
 				<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-				<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
-				<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+				<link
+					rel="icon"
+					type="image/png"
+					sizes="32x32"
+					href="/icons/favicon-32x32.png"
+				/>
+				<link
+					rel="icon"
+					type="image/png"
+					sizes="16x16"
+					href="/icons/favicon-16x16.png"
+				/>
 				<link rel="manifest" href="/manifest.json" />
 				<SchemaMarkup />
 			</head>
 			<body className={inter.className}>
 				<Providers>
-					<PWAProvider>
-						<div className="flex flex-col min-h-screen bg-background">
-							<AnnouncementBar />
-							<Header />
-							<main className="flex-grow">{children}</main>
-							<Footer />
-						</div>
-						<CookieBanner />
-					</PWAProvider>
+					<div className="flex flex-col bg-background min-h-screen">
+						<AnnouncementBar />
+						<Header />
+						<main className="flex-grow">{children}</main>
+						<Footer />
+					</div>
+					<CookieBanner />
 				</Providers>
 				<Analytics />
 				<SpeedInsights />

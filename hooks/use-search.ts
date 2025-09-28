@@ -8,7 +8,7 @@ export function useSearch(products: ApiProduct[]) {
   const [filters, setFilters] = react.useState({
     category: "",
     minPrice: 180,
-    maxPrice: 10_000,
+    maxPrice: 100_000,
     in_stock: false,
   });
 

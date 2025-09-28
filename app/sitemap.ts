@@ -1,11 +1,11 @@
-import { MetadataRoute } from 'next'
-import { getAllProducts } from '@/lib/api'
-import { SITE_CONFIG } from '@/lib/constants'
+import type { MetadataRoute } from "next";
+import { getAllProducts } from "@/lib/api";
+import { SITE_CONFIG } from "@/lib/constants";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
-  const products = await getAllProducts();
-    
+    const products = await getAllProducts();
+
     // Core pages
     const corePages: MetadataRoute.Sitemap = [
       {
@@ -247,8 +247,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       {
         url: `${SITE_CONFIG.url}/api/feed/google-merchant`,
         lastModified: new Date(),
-    changeFrequency: "daily",
-    priority: 0.7,
+        changeFrequency: "daily",
+        priority: 0.7,
       },
     ];
 
@@ -269,17 +269,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const productEntries: MetadataRoute.Sitemap = products.map((product) => {
       // Determine priority based on product status and type
       let priority = 0.7; // Default priority
-      
+
       if (product.in_stock) priority += 0.1; // Boost for in-stock items
-      if (product.compare_at_price && product.compare_at_price > product.price) priority += 0.1; // Boost for sale items
+      if (product.compare_at_price && product.compare_at_price > product.price)
+        priority += 0.1; // Boost for sale items
       if (product.rating && product.rating >= 4) priority += 0.1; // Boost for highly rated items
-      
+
       // Cap priority at 0.9 (below homepage)
       priority = Math.min(priority, 0.9);
-      
+
       return {
         url: `${SITE_CONFIG.url}/products/${product.handle}`,
-        lastModified: new Date(product.updated_at || product.created_at || new Date()),
+        lastModified: new Date(
+          product.updated_at || product.created_at || new Date()
+        ),
         changeFrequency: "weekly" as const,
         priority: priority,
       };
@@ -323,17 +326,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Sort by priority (highest first) for better crawling
     allPages.sort((a, b) => (b.priority || 0) - (a.priority || 0));
 
-    console.log(`Generated sitemap with ${allPages.length} pages (${productEntries.length} products)`);
-    
+    console.log(
+      `Generated sitemap with ${allPages.length} pages (${productEntries.length} products)`
+    );
+
     return allPages;
   } catch (error) {
-    console.error('Error generating sitemap:', error);
-    
+    console.error("Error generating sitemap:", error);
+
     // Return comprehensive fallback sitemap if product fetch fails
     const fallbackPages: MetadataRoute.Sitemap = [
-    {
-      url: SITE_CONFIG.url,
-      lastModified: new Date(),
+      {
+        url: SITE_CONFIG.url,
+        lastModified: new Date(),
         changeFrequency: "daily",
         priority: 1.0,
       },
@@ -348,14 +353,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changeFrequency: "weekly",
         priority: 0.8,
-    },
-    {
-      url: `${SITE_CONFIG.url}/about`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
+      },
+      {
+        url: `${SITE_CONFIG.url}/about`,
+        lastModified: new Date(),
+        changeFrequency: "monthly",
+        priority: 0.8,
+      },
+      {
         url: `${SITE_CONFIG.url}/contact`,
         lastModified: new Date(),
         changeFrequency: "monthly",
@@ -369,8 +374,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
       {
         url: `${SITE_CONFIG.url}/checkout`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
+        lastModified: new Date(),
+        changeFrequency: "weekly",
         priority: 0.6,
       },
       {
@@ -398,7 +403,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.3,
       },
     ];
-    
+
     console.log(`Using fallback sitemap with ${fallbackPages.length} pages`);
     return fallbackPages;
   }

@@ -1,5 +1,5 @@
+import type { MetadataRoute } from "next";
 import { SITE_CONFIG } from "@/lib/constants";
-import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -8,7 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#ffffff",
     theme_color: "#336571",
     categories: ["shopping", "ecommerce", "lifestyle", "business"],
-    description: "Premium e-commerce storefront delivering quality products with exceptional service. Shop the latest trends and exclusive deals.",
+    description:
+      "Premium e-commerce storefront delivering quality products with exceptional service. Shop the latest trends and exclusive deals.",
     dir: "auto",
     display: "standalone",
     lang: "en",
@@ -17,7 +18,7 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: SITE_CONFIG.url,
     id: "originz-store",
     prefer_related_applications: false,
- 
+
     shortcuts: [
       {
         name: "Shop All Products",

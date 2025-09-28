@@ -1,4 +1,4 @@
-import { type ApiProduct } from "@/lib/types";
+import type { ApiProduct } from "@/lib/types";
 
 // This file contains utility functions and client-side logic related to marketing campaigns and checkout processing.
 
@@ -59,51 +59,53 @@ export function initializeCampaignButton(
  */
 export function processCheckoutData(checkoutData: {
   items: Array<{
-    productId: string
-    variantId: string
-    quantity: number
-    price: number
-  }>
+    productId: string;
+    variantId: string;
+    quantity: number;
+    price: number;
+  }>;
   customer: {
-    email: string
-    firstName: string
-    lastName: string
-    address: string
-    city: string
-    postalCode: string
-    country: string
-    phone?: string
-  }
+    email: string;
+    firstName: string;
+    lastName: string;
+    address: string;
+    city: string;
+    postalCode: string;
+    country: string;
+    phone?: string;
+  };
   totals: {
-    subtotal: number
-    shipping: number
-    tax: number
-    total: number
-  }
+    subtotal: number;
+    shipping: number;
+    tax: number;
+    total: number;
+  };
 }) {
   // Create Shopify-compatible line items
-  const lineItems = checkoutData.items.map(item => ({
+  const lineItems = checkoutData.items.map((item) => ({
     title: `Product ${item.productId}`,
     price: item.price.toFixed(2),
     quantity: item.quantity,
-    variant_id: item.variantId
-  }))
+    variant_id: item.variantId,
+  }));
 
   // Create customer data
   const customer = {
     email: checkoutData.customer.email,
     first_name: checkoutData.customer.firstName,
     last_name: checkoutData.customer.lastName,
-    addresses: [{
-      first_name: checkoutData.customer.firstName,
-      last_name: checkoutData.customer.lastName,
-      address1: checkoutData.customer.address,
-      city: checkoutData.customer.city,
-      zip: checkoutData.customer.postalCode,
-      country: checkoutData.customer.country,
-      phone: checkoutData.customer.phone
-    }]
-  }
+    addresses: [
+      {
+        first_name: checkoutData.customer.firstName,
+        last_name: checkoutData.customer.lastName,
+        address1: checkoutData.customer.address,
+        city: checkoutData.customer.city,
+        zip: checkoutData.customer.postalCode,
+        country: checkoutData.customer.country,
+        phone: checkoutData.customer.phone,
+      },
+    ],
+  };
 
   // Create shipping address
   const shippingAddress = {
@@ -113,8 +115,8 @@ export function processCheckoutData(checkoutData: {
     city: checkoutData.customer.city,
     zip: checkoutData.customer.postalCode,
     country: checkoutData.customer.country,
-    phone: checkoutData.customer.phone
-  }
+    phone: checkoutData.customer.phone,
+  };
 
   return {
     draft_order: {
@@ -123,9 +125,15 @@ export function processCheckoutData(checkoutData: {
       shipping_address: shippingAddress,
       billing_address: shippingAddress,
       use_customer_default_address: false,
-      note: `Order total: $${checkoutData.totals.total.toFixed(2)} (Subtotal: $${checkoutData.totals.subtotal.toFixed(2)}, Shipping: $${checkoutData.totals.shipping.toFixed(2)}, Tax: $${checkoutData.totals.tax.toFixed(2)})`
-    }
-  }
+      note: `Order total: $${checkoutData.totals.total.toFixed(
+        2
+      )} (Subtotal: $${checkoutData.totals.subtotal.toFixed(
+        2
+      )}, Shipping: $${checkoutData.totals.shipping.toFixed(
+        2
+      )}, Tax: $${checkoutData.totals.tax.toFixed(2)})`,
+    },
+  };
 }
 
 // --- Server-side Utility ---

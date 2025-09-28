@@ -31,7 +31,9 @@ export async function GET(
     return NextResponse.json(product);
   } catch (error) {
     console.error(
-      `[API] Failed to fetch product with handle ${(await context.params).handle} from external API:`,
+      `[API] Failed to fetch product with handle ${
+        (await context.params).handle
+      } from external API:`,
       error
     );
     return NextResponse.json(

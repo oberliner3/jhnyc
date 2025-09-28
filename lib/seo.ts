@@ -73,8 +73,8 @@ export function generateSEO({
       yandex: "",
       yahoo: "",
     },
-    pinterest:{
-richPin: ""
+    pinterest: {
+      richPin: "",
     },
     appleWebApp: {
       capable: true,

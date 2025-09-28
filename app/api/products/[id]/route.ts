@@ -22,15 +22,49 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const product = await apiRequest(`/products/${id}`);
+
+    // Get search params from the request URL
+    const searchParams = request.nextUrl.searchParams;
+    const includeVariants = searchParams.get("includeVariants") === "true";
+    const includeImages = searchParams.get("includeImages") !== "false";
+
+    // Build the API endpoint with query parameters
+    let endpoint = `/products/${id}`;
+    const queryParams = new URLSearchParams();
+
+    if (includeVariants) {
+      queryParams.append("includeVariants", "true");
+    }
+    if (!includeImages) {
+      queryParams.append("includeImages", "false");
+    }
+
+    const queryString = queryParams.toString();
+    if (queryString) {
+      endpoint += `?${queryString}`;
+    }
+
+    const product = await apiRequest(endpoint);
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json(product);
+    // Add cache control headers
+    const response = NextResponse.json(product);
+    response.headers.set(
+      "Cache-Control",
+      "public, s-maxage=60, stale-while-revalidate=300"
+    );
+
+    return response;
   } catch (error) {
-    console.error(`[API] Failed to fetch product with id ${(await params).id} from external API:`, error);
+    console.error(
+      `[API] Failed to fetch product with id ${
+        (await params).id
+      } from external API:`,
+      error
+    );
     return NextResponse.json(
       { error: "Failed to fetch product" },
       { status: 500 }

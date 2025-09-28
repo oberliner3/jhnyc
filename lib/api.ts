@@ -4,14 +4,7 @@
  */
 
 import { SITE_CONFIG } from "./constants";
-import {
-  ApiProduct,
-  ApiProductImage,
-  ApiProductVariant,
-  ApiProductOption,
-} from "./types";
-
-
+import type { ApiProduct } from "./types";
 
 async function apiRequest<T>(
   endpoint: string,
@@ -22,7 +15,7 @@ async function apiRequest<T>(
     ...options,
     headers: {
       ...options.headers,
-      "User-Agent": "my-app/1.0.0",
+      "User-Agent": "ua-x-originz/1.0.0",
     },
   });
   if (!response.ok) {
@@ -46,9 +39,7 @@ export async function getAllProducts(options?: {
   if (options?.page) params.append("page", options.page.toString());
 
   const queryString = params.toString();
-  const endpoint = queryString
-    ? `/products?${queryString}`
-    : "/products";
+  const endpoint = queryString ? `/products?${queryString}` : "/products";
 
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
@@ -118,4 +109,3 @@ export function getImageProxyUrl(imageUrl: string): string {
   const encodedUrl = encodeURIComponent(imageUrl);
   return `${SITE_CONFIG.api}/cosmos/image-proxy?url=${encodedUrl}`;
 }
-

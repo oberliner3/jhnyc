@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, Play } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 import { PrimaryCTA, SecondaryCTA } from "@/components/ui/button";
 import {
 	Dialog,
@@ -11,7 +12,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
 
 export function Hero() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -55,7 +55,7 @@ export function Hero() {
 									</DialogHeader>
 									<div className="aspect-video">
 										<iframe
-											className="w-full h-full rounded-lg"
+											className="rounded-lg w-full h-full"
 											src="https://www.youtube.com/embed/x-vyU_MGg4M"
 											title="YouTube video player"
 											allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

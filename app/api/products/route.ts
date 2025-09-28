@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const vendor = searchParams.get("vendor");
   const limit = Number(searchParams.get("limit")) || 10;
   const page = Number(searchParams.get("page")) || 1;
-  const fields = searchParams.get("fields"); // Comma-separated fields
+  const fields = searchParams.get("fields");
 
   let query = supabase.from("products").select(fields || "*");
 
@@ -46,5 +46,8 @@ export async function GET(request: Request) {
 
 export async function POST() {
   // Placeholder for creating a new product (admin only)
-  return NextResponse.json({ message: "Product creation not implemented" }, { status: 501 });
+  return NextResponse.json(
+    { message: "Product creation not implemented" },
+    { status: 501 }
+  );
 }

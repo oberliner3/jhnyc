@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
-import { SITE_CONFIG } from '@/lib/constants'
+import { NextResponse } from "next/server";
+import { SITE_CONFIG } from "@/lib/constants";
 
 export async function GET() {
   const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
@@ -20,12 +20,12 @@ export async function GET() {
     <loc>${SITE_CONFIG.url}/sitemap-collections.xml</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
   </sitemap>
-</sitemapindex>`
+</sitemapindex>`;
 
   return new NextResponse(sitemapIndex, {
     headers: {
-      'Content-Type': 'application/xml',
-      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+      "Content-Type": "application/xml",
+      "Cache-Control": "public, max-age=3600, s-maxage=3600",
     },
-  })
+  });
 }

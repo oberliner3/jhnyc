@@ -1,9 +1,9 @@
 export default function Loading() {
-  return (
-    <div className="container px-4 py-16">
-      <div className="flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    </div>
-  )
+	return (
+		<div className="px-4 py-16 container">
+			<div className="flex justify-center items-center">
+				<div className="border-primary border-b-2 rounded-full w-8 h-8 animate-spin"></div>
+			</div>
+		</div>
+	);
 }

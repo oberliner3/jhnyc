@@ -1,19 +1,19 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
-  return (
-    <div className="container px-4 py-16 text-center">
-      <div className="max-w-md mx-auto">
-        <h1 className="text-6xl font-bold text-primary mb-4">404</h1>
-        <h2 className="text-2xl font-semibold mb-4">Page Not Found</h2>
-        <p className="text-muted-foreground mb-8">
-          Sorry, we couldn&apos;t find the page you&apos;re looking for.
-        </p>
-        <Button asChild>
-          <Link href="/">Return Home</Link>
-        </Button>
-      </div>
-    </div>
-  )
+	return (
+		<div className="px-4 py-16 text-center container">
+			<div className="mx-auto max-w-md">
+				<h1 className="mb-4 font-bold text-primary text-6xl">404</h1>
+				<h2 className="mb-4 font-semibold text-2xl">Page Not Found</h2>
+				<p className="mb-8 text-muted-foreground">
+					Sorry, we couldn&apos;t find the page you&apos;re looking for.
+				</p>
+				<Button asChild>
+					<Link href="/">Return Home</Link>
+				</Button>
+			</div>
+		</div>
+	);
 }

@@ -1,9 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
 
 export async function GET() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
@@ -33,7 +35,9 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
@@ -42,11 +46,18 @@ export async function PUT(request: Request) {
     });
   }
 
-  const { full_name, avatar_url, billing_address, shipping_address } = await request.json();
+  const { full_name, avatar_url, billing_address, shipping_address } =
+    await request.json();
 
   const { data: updatedProfile, error } = await supabase
     .from("profiles")
-    .update({ full_name, avatar_url, billing_address, shipping_address, updated_at: new Date().toISOString() })
+    .update({
+      full_name,
+      avatar_url,
+      billing_address,
+      shipping_address,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", user.id)
     .select()
     .single();
