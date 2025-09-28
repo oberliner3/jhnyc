@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
-import { getImageProxyUrl } from "@/lib/api";
+
 import type { ApiProduct } from "@/lib/types";
 import { formatPrice, stripHtml } from "@/lib/utils";
 
@@ -37,7 +37,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
 	const imageUrl =
 		product.images && product.images.length > 0
-			? getImageProxyUrl(product.images[0].src)
+			? product.images[0].src
 			: "/og.png";
 
 	return (

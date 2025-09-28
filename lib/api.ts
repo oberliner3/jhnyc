@@ -83,9 +83,13 @@ export async function getProductById(id: string): Promise<ApiProduct | null> {
 /**
  * Get a specific product by handle
  */
-export async function getProductByHandle(handle: string): Promise<ApiProduct | null> {
+export async function getProductByHandle(
+  handle: string
+): Promise<ApiProduct | null> {
   try {
-    const data = await apiRequest<{ product: ApiProduct }>(`/products/${handle}`);
+    const data = await apiRequest<{ product: ApiProduct }>(
+      `/products/${handle}`
+    );
     return data.product || null;
   } catch (error) {
     console.warn(`[API] Failed to fetch product by handle "${handle}":`, error);
@@ -150,7 +154,7 @@ export async function getCollectionByHandle(
 /**
  * Get image proxy URL
  */
-export function getImageProxyUrl(imageUrl: string): string {
-  const encodedUrl = encodeURIComponent(imageUrl);
-  return `${SITE_CONFIG.api}/image-proxy?url=${encodedUrl}`;
-}
+// export function getImageProxyUrl(imageUrl: string): string {
+//   const encodedUrl = encodeURIComponent(imageUrl);
+//   return `${SITE_CONFIG.api}/image-proxy?url=${encodedUrl}`;
+// }

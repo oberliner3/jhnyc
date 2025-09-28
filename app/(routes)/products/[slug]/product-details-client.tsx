@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/cart-context";
-import { getImageProxyUrl } from "@/lib/api";
+
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 
@@ -46,7 +46,9 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 				const variantName = (product.options || [])
 					.map((opt) => initialOptions[opt.name])
 					.join(" / ");
-				const variant = (product.variants || []).find((v) => v.title === variantName);
+				const variant = (product.variants || []).find(
+					(v) => v.title === variantName,
+				);
 				setSelectedVariant(variant || (product.variants || [])[0]);
 			}
 		}
@@ -60,7 +62,9 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 		const variantName = (product.options || [])
 			.map((opt) => newOptions[opt.name])
 			.join(" / ");
-		const variant = (product.variants || []).find((v) => v.title === variantName);
+		const variant = (product.variants || []).find(
+			(v) => v.title === variantName,
+		);
 		setSelectedVariant(variant);
 	};
 
@@ -81,12 +85,12 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 			<div className="space-y-4">
 				<div className="relative bg-muted rounded-lg aspect-square overflow-hidden">
 					<Image
-						src={getImageProxyUrl(
+						src={
 							selectedVariant?.featured_image ||
-								(((product.images || []).length > 0)
-									? (product.images || [])[0].src
-									: "/placeholder.svg"),
-						)}
+							((product.images || []).length > 0
+								? (product.images || [])[0].src
+								: "/placeholder.svg")
+						}
 						alt={product.title}
 						fill
 						className="object-cover"
@@ -106,7 +110,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 								className="relative bg-muted rounded-md aspect-square overflow-hidden"
 							>
 								<Image
-									src={getImageProxyUrl(image.src)}
+									src={image.src}
 									alt={`${product.title} ${index + 2}`}
 									fill
 									className="object-cover"
