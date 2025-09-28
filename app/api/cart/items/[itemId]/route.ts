@@ -109,13 +109,16 @@ export async function DELETE(
     const { itemId } = await context.params;
 
     // Log request details for debugging and monitoring
-    const userAgent = request.headers.get('user-agent') || 'Unknown';
-    const requestId = request.headers.get('x-request-id') || 'no-id';
-    console.log(`[CART] DELETE request for item: ${itemId} by user: ${user.id}`, {
-      requestId,
-      userAgent: userAgent.substring(0, 100), // Limit length
-      timestamp: new Date().toISOString()
-    });
+    const userAgent = request.headers.get("user-agent") || "Unknown";
+    const requestId = request.headers.get("x-request-id") || "no-id";
+    console.log(
+      `[CART] DELETE request for item: ${itemId} by user: ${user.id}`,
+      {
+        requestId,
+        userAgent: userAgent.substring(0, 100), // Limit length
+        timestamp: new Date().toISOString(),
+      }
+    );
 
     // Verify the item belongs to the user's cart before deleting
     const { data: _item, error: fetchError } = await supabase

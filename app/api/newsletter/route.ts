@@ -21,10 +21,9 @@ export async function POST(request: NextRequest) {
       { message: "Successfully subscribed to newsletter" },
       { status: 200 }
     );
-  } catch (_error: unknown) {
-    // eslint-disable-line @typescript-eslint/no-unused-vars
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: `Internal server error ${error}` },
       { status: 500 }
     );
   }
