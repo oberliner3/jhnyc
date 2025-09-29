@@ -2,11 +2,25 @@ import { NextResponse } from "next/server";
 import { getAllProducts } from "@/lib/api";
 import { SITE_CONFIG } from "@/lib/constants";
 import { stripHtml,escapeXml } from "@/lib/utils";
+import type { ApiProduct } from "@/lib/types";
 
+async function fetchAllProducts(): Promise<ApiProduct[]> {
+  const pageSize = 250;
+  let page = 1;
+  const all: ApiProduct[] = [];
+  while (true) {
+    const batch = await getAllProducts({ limit: pageSize, page });
+    if (!batch || batch.length === 0) break;
+    all.push(...batch);
+    if (batch.length < pageSize) break;
+    page++;
+  }
+  return all;
+}
 
 export async function GET() {
   try {
-    const products = await getAllProducts({ limit: 1000 });
+    const products = await fetchAllProducts();
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">

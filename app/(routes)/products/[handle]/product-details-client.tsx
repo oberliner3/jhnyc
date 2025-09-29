@@ -27,9 +27,18 @@ import { formatPrice } from "@/lib/utils";
 import { ProductSchema } from "@/components/common/product-schema";
 import { BuyNowButton } from "@/components/product/buy-now-button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 interface ProductDetailsClientProps {
   product: ApiProduct;
+}
+
+function hasMultipleRealVariants(product: ApiProduct): boolean {
+  const variants = product.variants || [];
+  const nonDefault = variants.filter(
+    (v) => (v.title || "").toLowerCase() !== "default title"
+  );
+  return nonDefault.length > 1;
 }
 
 export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
@@ -238,6 +247,10 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
               variant="default"
               className="inline-flex"
               onClick={() => {
+                if (hasMultipleRealVariants(product) && !selectedVariant) {
+                  toast.error("Please select a product variant");
+                  return;
+                }
                 addItem(product, selectedVariant, quantity);
               }}
               disabled={!product.in_stock}

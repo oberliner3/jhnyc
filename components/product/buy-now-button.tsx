@@ -33,6 +33,15 @@ function createDefaultVariant(product: ApiProduct): ApiProductVariant {
   };
 }
 
+function hasMultipleRealVariants(product: ApiProduct): boolean {
+  const variants = product.variants || [];
+  // Treat multiple variants with non-default titles as "real" variants
+  const nonDefault = variants.filter(
+    (v) => (v.title || "").toLowerCase() !== "default title"
+  );
+  return nonDefault.length > 1;
+}
+
 export function BuyNowButton({
   product,
   variant,
@@ -44,6 +53,12 @@ export function BuyNowButton({
   const handleBuyNow = async () => {
     if (!process.env.NEXT_PUBLIC_SHOPIFY_SHOP) {
       toast.error("Shopify integration not configured");
+      return;
+    }
+
+    // UX guard: require explicit selection only when the product has multiple real variants
+    if (hasMultipleRealVariants(product) && !variant) {
+      toast.error("Please select a product variant");
       return;
     }
 

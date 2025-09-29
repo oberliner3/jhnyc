@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAllProducts } from "@/lib/api";
 import { SITE_CONFIG } from "@/lib/constants";
+import type { ApiProduct } from "@/lib/types";
 
 // Escape special XML characters
 function escapeXml(str: string | undefined | null): string {
@@ -13,10 +14,24 @@ function escapeXml(str: string | undefined | null): string {
     .replace(/'/g, "&apos;");
 }
 
+async function fetchAllProducts(): Promise<ApiProduct[]> {
+  const pageSize = 250;
+  let page = 1;
+  const all: ApiProduct[] = [];
+  while (true) {
+    const batch = await getAllProducts({ limit: pageSize, page });
+    if (!batch || batch.length === 0) break;
+    all.push(...batch);
+    if (batch.length < pageSize) break;
+    page++;
+  }
+  return all;
+}
+
 export async function GET() {
   try {
-    // Fetch all products - increase limit to get all products
-    const products = await getAllProducts({ limit: 100_000_000 });
+    // Fetch all products with pagination to include every item
+    const products = await fetchAllProducts();
     console.log("Total products fetched:", products?.length);
 
     if (!products || products.length === 0) {
