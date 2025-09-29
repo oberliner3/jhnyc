@@ -157,7 +157,11 @@ const config = {
       },
     },
   },
-  plugins: [],
+  // The Tailwind config runs in a Node/CommonJS context. Using require() here
+  // is intentional; ESLint flags require-style imports in TS projects. Disable
+  // that rule for this line only so tooling won't complain.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  plugins: [require("tailwindcss-animate")],
 };
 
 module.exports = config;

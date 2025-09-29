@@ -2,7 +2,6 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { processCheckoutData } from "@/lib/worker";
 import { createShopifyDraftOrder } from "@/lib/shopify-api";
 
 export interface CheckoutItem {
@@ -16,10 +15,13 @@ export interface CheckoutCustomer {
   email: string;
   firstName: string;
   lastName: string;
-  address: string;
-  city: string;
-  postalCode: string;
-  country: string;
+  address: {
+    street: string;
+    city: string;
+    state?: string;
+    postalCode?: string;
+    country: string;
+  };
   phone?: string;
 }
 
@@ -40,7 +42,6 @@ export async function handleCheckout(data: CheckoutData) {
   try {
     const supabase = await createClient();
 
-    // Get current user
     const {
       data: { user },
       error: authError,
@@ -59,19 +60,21 @@ export async function handleCheckout(data: CheckoutData) {
         total: data.totals.total,
         shipping_address: {
           name: `${data.customer.firstName} ${data.customer.lastName}`,
-          address: data.customer.address,
-          city: data.customer.city,
-          postal_code: data.customer.postalCode,
-          country: data.customer.country,
-          phone: data.customer.phone,
+          address: data.customer.address.street,
+          city: data.customer.address.city,
+          state: data.customer.address.state || "",
+          postal_code: data.customer.address.postalCode || "",
+          country: data.customer.address.country,
+          phone: data.customer.phone || "",
         },
         billing_address: {
           name: `${data.customer.firstName} ${data.customer.lastName}`,
-          address: data.customer.address,
-          city: data.customer.city,
-          postal_code: data.customer.postalCode,
-          country: data.customer.country,
-          phone: data.customer.phone,
+          address: data.customer.address.street,
+          city: data.customer.address.city,
+          state: data.customer.address.state || "",
+          postal_code: data.customer.address.postalCode || "",
+          country: data.customer.address.country,
+          phone: data.customer.phone || "",
         },
       })
       .select()
@@ -101,41 +104,80 @@ export async function handleCheckout(data: CheckoutData) {
     }
 
     // Clear user's cart
-    const { error: cartError } = await supabase
-      .from("cart_items")
-      .delete()
-      .eq(
-        "cart_id",
-        (
-          await supabase
-            .from("carts")
-            .select("id")
-            .eq("user_id", user.id)
-            .single()
-        ).data?.id
-      );
+    const { data: cartData } = await supabase
+      .from("carts")
+      .select("id")
+      .eq("user_id", user.id)
+      .single();
 
-    if (cartError) {
-      console.error("Cart clearing error:", cartError);
-      // Don't fail the order for cart clearing issues
+    if (cartData) {
+      const { error: cartError } = await supabase
+        .from("cart_items")
+        .delete()
+        .eq("cart_id", cartData.id);
+
+      if (cartError) {
+        console.error("Cart clearing error:", cartError);
+      }
     }
 
     // If Shopify integration is enabled, create draft order
     if (process.env.SHOPIFY_SHOP && process.env.SHOPIFY_TOKEN) {
       try {
-        // Process the checkout data using the worker
-        const processedData = processCheckoutData(data);
+        const shopifyData = {
+          draft_order: {
+            line_items: data.items.map((item) => ({
+              title: `Product ${item.productId}`,
+              price: item.price.toFixed(2),
+              quantity: item.quantity,
+              variant_id: item.variantId,
+            })),
+            customer: {
+              email: data.customer.email,
+              first_name: data.customer.firstName,
+              last_name: data.customer.lastName,
+              addresses: [
+                {
+                  first_name: data.customer.firstName,
+                  last_name: data.customer.lastName,
+                  address1: data.customer.address.street,
+                  city: data.customer.address.city,
+                  zip: data.customer.address.postalCode || "",
+                  country: data.customer.address.country,
+                  phone: data.customer.phone || "",
+                },
+              ],
+            },
+            shipping_address: {
+              first_name: data.customer.firstName,
+              last_name: data.customer.lastName,
+              address1: data.customer.address.street,
+              city: data.customer.address.city,
+              zip: data.customer.address.postalCode || "",
+              country: data.customer.address.country,
+              phone: data.customer.phone || "",
+            },
+            billing_address: {
+              first_name: data.customer.firstName,
+              last_name: data.customer.lastName,
+              address1: data.customer.address.street,
+              city: data.customer.address.city,
+              zip: data.customer.address.postalCode || "",
+              country: data.customer.address.country,
+              phone: data.customer.phone || "",
+            },
+            use_customer_default_address: false,
+            note: `Order #${order.id}`,
+          },
+        };
 
-        // Create Shopify draft order
-        const draftOrder = await createShopifyDraftOrder(processedData);
+        const draftOrder = await createShopifyDraftOrder(shopifyData);
 
         if (draftOrder?.invoice_url) {
-          // Redirect to Shopify checkout
           redirect(draftOrder.invoice_url);
         }
       } catch (shopifyError) {
         console.error("Shopify integration error:", shopifyError);
-        // Continue with regular checkout if Shopify fails
       }
     }
 

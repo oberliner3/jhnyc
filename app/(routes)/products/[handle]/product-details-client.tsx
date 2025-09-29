@@ -25,6 +25,7 @@ import {
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 import { ProductSchema } from "@/components/common/product-schema";
+import { BuyNowButton } from "@/components/product/buy-now-button";
 
 interface ProductDetailsClientProps {
   product: ApiProduct;
@@ -219,9 +220,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
             Add to Cart
           </Button>
 
-          <Button variant="outline" size="lg" onClick={() => {}}>
-            Buy Now
-          </Button>
+          <BuyNowButton product={product} variant={selectedVariant} />
         </div>
         {/* Description */}
         <Accordion type="single" collapsible className="w-full">

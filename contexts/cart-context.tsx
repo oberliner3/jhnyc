@@ -2,41 +2,41 @@
 
 import type React from "react";
 import {
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useReducer,
-	useState,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
 } from "react";
 import type {
-	ShoppingCartItem as ApiCartItem,
-	ApiProduct,
-	ApiProductVariant,
-	CartContextType,
-	ClientCartItem,
-	ClientCartState,
+  ShoppingCartItem as ApiCartItem,
+  ApiProduct,
+  ApiProductVariant,
+  CartContextType,
+  ClientCartItem,
+  ClientCartState,
 } from "@/lib/types";
 import { useAuth } from "./auth-context";
 import { toast } from "sonner";
 
 export type CartAction =
-	| {
-			type: "ADD_ITEM";
-			payload: {
-				product: ApiProduct;
-				variant: ApiProductVariant;
-				quantity: number;
-			};
-	  }
-	| { type: "REMOVE_ITEM"; payload: { productId: string; variantId: string } }
-	| {
-			type: "UPDATE_QUANTITY";
-			payload: { productId: string; variantId: string; quantity: number };
-	  }
-	| { type: "CLEAR_CART" }
-	| { type: "TOGGLE_CART" }
-	| { type: "LOAD_CART"; payload: ClientCartItem[] };
+  | {
+      type: "ADD_ITEM";
+      payload: {
+        product: ApiProduct;
+        variant: ApiProductVariant;
+        quantity: number;
+      };
+    }
+  | { type: "REMOVE_ITEM"; payload: { productId: string; variantId: string } }
+  | {
+      type: "UPDATE_QUANTITY";
+      payload: { productId: string; variantId: string; quantity: number };
+    }
+  | { type: "CLEAR_CART" }
+  | { type: "TOGGLE_CART" }
+  | { type: "LOAD_CART"; payload: ClientCartItem[] };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -59,13 +59,13 @@ const cartReducer = (
       }
 
       const newItem: ClientCartItem = {
-        id: `${product.id}-${variant?.id || product.id}`, // Use product ID if variant ID is missing
+        id: `${product.id}-${variant.id}`,
         product,
         variant,
         quantity,
         name: product.title,
-        price: variant?.price || product.price, // Use product price if variant price is missing
-        image: variant?.featured_image || product.images[0]?.src,
+        price: variant.price,
+        image: variant.featured_image || product.images[0]?.src,
       };
 
       return { ...state, items: [...state.items, newItem] };
@@ -111,6 +111,27 @@ const cartReducer = (
   }
 };
 
+function createDefaultVariant(product: ApiProduct): ApiProductVariant {
+  const firstVariant = product.variants?.[0];
+  return {
+    id: firstVariant?.id || product.id,
+    product_id: product.id,
+    title: firstVariant?.title || "Default Title",
+    price: product.price,
+    sku: firstVariant?.sku || "",
+    grams: firstVariant?.grams || 0,
+    featured_image: product.images?.[0]?.src,
+    available: product.in_stock,
+    requires_shipping: firstVariant?.requires_shipping ?? true,
+    taxable: firstVariant?.taxable ?? true,
+    compare_at_price: product.compare_at_price,
+    position: 1,
+
+    created_at: product.created_at,
+    updated_at: product.updated_at,
+  };
+}
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -152,33 +173,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         const itemsWithDetails = await Promise.all(
           cartData.cart_items.map(async (item: ApiCartItem) => {
             const product = item.product;
-            const variant = product.variants?.find(
-              (v) => v.id === item.variant_id
-            );
-
-            // If no variant is found or product has no variants, create a default variant from the product
-            const finalVariant = variant ||
-              product.variants?.[0] || {
-                id: product.id, // Use product ID as variant ID if no variants
-                title: product.title, // Default title
-                price: product.price, // Use product price
-                sku: product.variants[0].sku, // Use product SKU
-                grams: product.variants[0].grams, // Use product grams
-                featured_image: product.images?.[0]?.src, // Use product's first image
-                available: product.in_stock, // Use product's in_stock status
-                option1: null,
-                option2: null,
-                option3: null,
-              };
+            const variant =
+              product.variants?.find((v) => v.id === item.variant_id) ||
+              createDefaultVariant(product);
 
             return {
               id: item.id,
               product,
-              variant: finalVariant,
+              variant,
               quantity: item.quantity,
               name: product.title,
-              price: finalVariant?.price || product.price,
-              image: finalVariant?.featured_image || product.images[0]?.src,
+              price: variant.price,
+              image: variant.featured_image || product.images[0]?.src,
             };
           })
         );
@@ -203,35 +209,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const addItem = async (
     product: ApiProduct,
-    selectedVariant?: ApiProductVariant, // Make selectedVariant optional
+    selectedVariant?: ApiProductVariant,
     quantity: number = 1
   ) => {
-    // Determine the variant to use. If no selectedVariant, try to use the first available variant,
-    // or construct a default one from the product itself.
-    // Determine the variant to use.
-    // If no selectedVariant, try to use the first available variant.
-    // If no variants at all, the variant_id sent to backend will be null.
-    const variantToSend = selectedVariant || product.variants?.[0];
-
-    // For client-side state, we still need a full variant object for display purposes.
-    // If no actual variant, create a synthetic one based on the product.
-    const clientSideVariant = variantToSend || {
-      id: product.id, // Use product ID as variant ID for client-side if no actual variant
-      title: "Default Title",
-      price: product.price,
-      sku: product.variants[0].sku,
-      grams: product.variants[0].grams,
-      featured_image: product.images?.[0]?.src,
-      available: product.in_stock,
-      option1: null,
-      option2: null,
-      option3: null,
-    };
+    const variant = selectedVariant || createDefaultVariant(product);
 
     dispatch({
       type: "ADD_ITEM",
-      payload: { product, variant: clientSideVariant, quantity },
+      payload: { product, variant, quantity },
     });
+
+    toast.success(`${product.title} added to cart`);
 
     if (!user || !cartId) {
       return;
@@ -244,18 +232,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         body: JSON.stringify({
           cart_id: cartId,
           product_id: product.id,
-          variant_id: variantToSend?.id || null, // Send null if no actual variant
+          variant_id: variant.id,
           quantity,
         }),
       });
       if (!res.ok) throw new Error("Failed to add item");
     } catch (err) {
       console.error("Error adding item to cart:", err);
-      toast.error("Failed to add item to cart. Please try again.");
-      // Rollback
+      toast.error("Failed to sync cart. Please try again.");
       dispatch({
         type: "REMOVE_ITEM",
-        payload: { productId: product.id, variantId: variantToSend.id },
+        payload: { productId: product.id, variantId: variant.id },
       });
     }
   };
@@ -281,8 +268,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!res.ok) throw new Error("Failed to remove item");
     } catch (err) {
       console.error("Error removing item from cart:", err);
-      toast.error("Failed to remove item from cart. Please try again.");
-      // Rollback
+      toast.error("Failed to remove item. Please try again.");
       dispatch({
         type: "ADD_ITEM",
         payload: {
@@ -332,8 +318,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!res.ok) throw new Error("Failed to update quantity");
     } catch (err) {
       console.error("Error updating item quantity:", err);
-      toast.error("Failed to update item quantity. Please try again.");
-      // Rollback
+      toast.error("Failed to update quantity. Please try again.");
       dispatch({
         type: "UPDATE_QUANTITY",
         payload: { productId, variantId, quantity: originalQuantity },
@@ -359,7 +344,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (err) {
       console.error("Error clearing cart:", err);
       toast.error("Failed to clear cart. Please try again.");
-      // Rollback
       dispatch({ type: "LOAD_CART", payload: currentItems });
     }
   };
@@ -374,8 +358,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getTotalPrice = () => {
     return state.items.reduce((total, item) => {
-      const price = item.variant ? item.variant.price : 0;
-      return total + price * item.quantity;
+      return total + item.variant.price * item.quantity;
     }, 0);
   };
 
@@ -394,9 +377,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 export const useCart = () => {
-	const context = useContext(CartContext);
-	if (context === undefined) {
-		throw new Error("useCart must be used within a CartProvider");
-	}
-	return context;
+  const context = useContext(CartContext);
+  if (context === undefined) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
 };

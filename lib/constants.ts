@@ -1,11 +1,13 @@
 const APP_DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || "originz.vercel.app";
 const APP_BRAND = process.env.NEXT_PUBLIC_STORE_NAME || "OriGenZ";
+const API_BASE = process.env.PRODUCT_STREAM_API || "http://localhost:8000";
+
 export const SITE_CONFIG = {
   name: APP_BRAND,
   description: "Premium e-commerce storefront built with Next.js",
   domain: APP_DOMAIN,
   url: `https://${APP_DOMAIN}`,
-  api: process.env.PRODUCT_STREAM_API || "localhost:8000",
+  api: API_BASE,
   ogTitle: `${APP_BRAND} - Your One-Stop Shop for Quality Products`,
   ogImage: `${APP_DOMAIN}/og.png`,
   author: APP_BRAND,
@@ -43,6 +45,7 @@ export const buildAddress = ({
   state: string;
   zipCode: string;
 }): string => `${street}, ${city},<br/> ${state} ${zipCode}`;
+
 export const APP_CONTACTS = {
   email: {
     getInTouch: buildEmail("hello"),
@@ -65,6 +68,7 @@ export const APP_CONTACTS = {
     }),
   },
 };
+
 export const NAVIGATION_ITEMS = [
   { name: "Home", href: "/" },
   { name: "Products", href: "/products" },
