@@ -45,14 +45,14 @@ export function useFormValidation({
     {}
   );
 
-  const validateField = React.useCallback((field: string, value: any) => {
+  const validateField = React.useCallback((field: string, value: unknown) => {
     try {
       const fieldPath = field.split(".");
-      const schema =
+      const schema: z.ZodTypeAny =
         fieldPath.length > 1 && fieldPath[0] in checkoutSchema.shape
           ? (checkoutSchema.shape[
               fieldPath[0] as keyof typeof checkoutSchema.shape
-            ] as z.ZodObject<any>)
+            ] as z.ZodTypeAny)
           : checkoutSchema;
 
       const toValidate =
@@ -69,7 +69,7 @@ export function useFormValidation({
   }, []);
 
   const setFieldValue = React.useCallback(
-    (field: string, value: any) => {
+    (field: string, value: unknown) => {
       setFormData((prev) => {
         const fieldPath = field.split(".");
         if (fieldPath.length > 1) {

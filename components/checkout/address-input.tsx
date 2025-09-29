@@ -3,13 +3,12 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { CommandInput } from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 
 interface AddressInputProps {
@@ -41,27 +40,24 @@ export function AddressInput({
   const [suggestions, setSuggestions] = useState<AddressDetails[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const debouncedFetchSuggestions = useCallback(
-    useDebounce(async (input: string) => {
-      if (input.length < 3) return;
+  const debouncedFetchSuggestions = useDebounce(async (input: string) => {
+    if (input.length < 3) return;
 
-      setLoading(true);
-      try {
-        // Here you would integrate with your preferred address verification service
-        // For example, Google Places API, Loqate, etc.
-        const response = await fetch(
-          `/api/address/suggest?q=${encodeURIComponent(input)}`
-        );
-        const data = await response.json();
-        setSuggestions(data.suggestions || []);
-      } catch (error) {
-        console.error("Failed to fetch address suggestions:", error);
-      } finally {
-        setLoading(false);
-      }
-    }, 300),
-    []
-  );
+    setLoading(true);
+    try {
+      // Here you would integrate with your preferred address verification service
+      // For example, Google Places API, Loqate, etc.
+      const response = await fetch(
+        `/api/address/suggest?q=${encodeURIComponent(input)}`
+      );
+      const data = await response.json();
+      setSuggestions(data.suggestions || []);
+    } catch (error) {
+      console.error("Failed to fetch address suggestions:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, 300);
 
   useEffect(() => {
     if (value) {

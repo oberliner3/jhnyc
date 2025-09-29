@@ -44,7 +44,7 @@ export function PhoneInput({
         countryCode
       );
       isValid = phoneNumber.isValid();
-    } catch (err) {
+    } catch {
       isValid = false;
     }
 

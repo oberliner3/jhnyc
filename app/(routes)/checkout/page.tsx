@@ -20,46 +20,27 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
-import { countries } from "@/lib/countries";
 import { cn, formatPrice } from "@/lib/utils";
 import { checkoutSchema } from "@/lib/validations";
 import { handleCheckout } from "./actions";
 import { CountrySelector } from "@/components/checkout/country-selector";
 import { AddressInput } from "@/components/checkout/address-input";
 import { PhoneInput } from "@/components/checkout/phone-input";
-import { useFormValidation, type CheckoutFormData } from "@/hooks/use-form-validation";
+import { useFormValidation } from "@/hooks/use-form-validation";
 import { CountryCode } from "libphonenumber-js";
 
-interface AddressDetails {
-	email: string;
-	firstName: string;
-	lastName: string;
-	address: string;
-	city: string;
-	postalCode: string;
-	country: string;
-	phone?: string;
-	apartment?: string;
-}
+// AddressDetails type is intentionally inlined where needed
 
 export default function CheckoutPage() {
-	const router = useRouter();
-	const { items, getTotalPrice, clearCart } = useCart();
-	const { user } = useAuth();
-	const [isProcessing, setIsProcessing] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-  const [phoneValid, setPhoneValid] = useState(false);
-  const { formData, setFieldValue, validationState, isValid } = useFormValidation({
+  const router = useRouter();
+  const { items, getTotalPrice, clearCart } = useCart();
+  const { user } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { formData, setFieldValue, validationState } = useFormValidation({
     initialData: {
       email: user?.email || "",
       firstName: "",
@@ -69,90 +50,86 @@ export default function CheckoutPage() {
         city: "",
         country: "US",
         postalCode: "",
-        state: ""
+        state: "",
       },
-      phone: ""
-    }
+      phone: "",
+    },
   });
 
-	const totalPrice = getTotalPrice();
-	const shipping = totalPrice > 50 ? 0 : 9.99;
-	const tax = totalPrice * 0.08; // 8% tax
-	const finalTotal = totalPrice + shipping + tax;
+  const totalPrice = getTotalPrice();
+  const shipping = totalPrice > 50 ? 0 : 9.99;
+  const tax = totalPrice * 0.08; // 8% tax
+  const finalTotal = totalPrice + shipping + tax;
 
-	const inputFirtNameId = useId();
-	const inputLastNameId = useId();
-	const inputEmailId = useId();
-	const inputPhoneId = useId();
-	const inputCityId = useId();
-	const inputAddressId = useId();
-	const inputCountryId = useId();
-	const inputApartmentId = useId();
-	const inputPostalCodeId = useId();
+  const inputFirtNameId = useId();
+  const inputLastNameId = useId();
+  const inputEmailId = useId();
+  const inputCityId = useId();
+  const inputPostalCodeId = useId();
 
-	useEffect(() => {
-		if (items.length === 0) {
-			router.push("/cart");
-		}
-	}, [items, router]);
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push("/cart");
+    }
+  }, [items, router]);
 
-	const handleInputChange = (field: string, value: string) => {
-		setFieldValue(field, value);
-		setError(null);
-	};
+  const handleInputChange = (field: string, value: string) => {
+    setFieldValue(field, value);
+    setError(null);
+  };
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setIsProcessing(true);
-		setError(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    setError(null);
 
-		try {
-			// Validate form data
-			const validatedData = checkoutSchema.parse(formData);
+    try {
+      // Validate form data
+      const validatedData = checkoutSchema.parse(formData);
 
-			// Create order data
-			const orderData = {
-				items: items.map((item) => ({
-					productId: item.product.id,
-					variantId: item.variant.id,
-					quantity: item.quantity,
-					price: item.variant.price,
-				})),
-				customer: validatedData,
-				totals: {
-					subtotal: totalPrice,
-					shipping,
-					tax,
-					total: finalTotal,
-				},
-			};
+      // Create order data
+      const orderData = {
+        items: items.map((item) => ({
+          productId: item.product.id,
+          variantId: item.variant.id,
+          quantity: item.quantity,
+          price: item.variant.price,
+        })),
+        customer: validatedData,
+        totals: {
+          subtotal: totalPrice,
+          shipping,
+          tax,
+          total: finalTotal,
+        },
+      };
 
-			// Process checkout
-			const result = await handleCheckout(orderData);
+      // Process checkout
+      const result = await handleCheckout(orderData);
 
-			if (result.success) {
-				// Clear cart and redirect to success page
-				clearCart();
-				router.push(`/checkout/success?order=${result.orderId}`);
-			} else {
-				setError(result.error || "Checkout failed. Please try again.");
-			}
-		} catch (err) {
-			if (err instanceof Error) {
-				setError(err.message);
-			} else {
-				setError("An unexpected error occurred. Please try again.");
-			}
-		} finally {
-			setIsProcessing(false);
-		}
-	};
+      if (result.success) {
+        // Clear cart and redirect to success page
+        clearCart();
+        router.push(`/checkout/success?order=${result.orderId}`);
+      } else {
+        setError(result.error || "Checkout failed. Please try again.");
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-	if (items.length === 0) {
-		return null; // Will redirect
-	}
+  if (items.length === 0) {
+    return null; // Will redirect
+  }
 
-	return (
+  return (
     <div className="bg-gray-50 min-h-screen">
       <div className="mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
@@ -656,5 +633,4 @@ export default function CheckoutPage() {
       </div>
     </div>
   );
-
 }

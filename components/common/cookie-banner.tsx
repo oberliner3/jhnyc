@@ -2,7 +2,6 @@
 
 import { SITE_CONFIG } from "@/lib/constants";
 import CookieConsent, { Cookies } from "react-cookie-consent";
-import { Button } from "@/components/ui/button";
 
 
 declare global {
