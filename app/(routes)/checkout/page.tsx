@@ -32,14 +32,13 @@ import { PhoneInput } from "@/components/checkout/phone-input";
 import { useFormValidation } from "@/hooks/use-form-validation";
 import { CountryCode } from "libphonenumber-js";
 
-// AddressDetails type is intentionally inlined where needed
-
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneValid, setPhoneValid] = useState(false);
   const { formData, setFieldValue, validationState } = useFormValidation({
     initialData: {
       email: user?.email || "",
@@ -58,7 +57,7 @@ export default function CheckoutPage() {
 
   const totalPrice = getTotalPrice();
   const shipping = totalPrice > 50 ? 0 : 9.99;
-  const tax = totalPrice * 0.08; // 8% tax
+  const tax = totalPrice * 0.08;
   const finalTotal = totalPrice + shipping + tax;
 
   const inputFirtNameId = useId();
@@ -513,7 +512,7 @@ export default function CheckoutPage() {
             <Button
               onClick={handleSubmit}
               className="bg-blue-600 hover:bg-blue-700 w-full h-12 text-white"
-              disabled={isProcessing}
+              disabled={isProcessing || (formData.phone ? !phoneValid : false)}
             >
               {isProcessing ? (
                 <>

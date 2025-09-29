@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCw, Shield, Truck } from "lucide-react";
+import { Minus, Plus, RefreshCw, Shield, Truck } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -26,6 +26,7 @@ import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 import { ProductSchema } from "@/components/common/product-schema";
 import { BuyNowButton } from "@/components/product/buy-now-button";
+import { Input } from "@/components/ui/input";
 
 interface ProductDetailsClientProps {
   product: ApiProduct;
@@ -40,6 +41,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
   const [selectedOptions, setSelectedOptions] = useState<
     Record<string, string>
   >({});
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     if (product) {
@@ -75,6 +77,12 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
     setSelectedVariant(variant);
   };
 
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity >= 1 && newQuantity <= 99) {
+      setQuantity(newQuantity);
+    }
+  };
+
   const discountPercentage =
     product.compare_at_price && selectedVariant
       ? Math.round(
@@ -85,7 +93,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
       : 0;
 
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;
-  console.log(product);
+
   return (
     <div className="gap-8 lg:gap-12 grid lg:grid-cols-2 p-4">
       <ProductSchema product={product} />
@@ -138,25 +146,6 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
           <h1 className="font-bold text-3xl lg:text-4xl tracking-tight">
             {product.title}
           </h1>
-
-          {/* Rating */}
-          {/* <div className="flex items-center gap-2 mt-2"> */}
-          {/* <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={`star-${product.id}-${i}`}
-                  className={`h-5 w-5 ${
-                    i < Math.floor(product.rating)
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-muted-foreground/30"
-                  }`}
-                />
-              ))}
-            </div>  */}
-          {/* <span className="text-muted-foreground text-sm">
-              {product.rating} ({product.review_count} reviews)
-            </span> */}
-          {/* </div> */}
         </div>
 
         {/* Options */}
@@ -204,24 +193,66 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
           {product.compare_at_price && discountPercentage > 0 && (
             <p className="text-green-600 text-sm">
               You save {formatPrice(product.compare_at_price - currentPrice)} (
-              {discountPercentage} %)
+              {discountPercentage}%)
             </p>
           )}
         </div>
-        {/* Add to Cart */}
-        <div className="space-y-4 flex row-auto">
+
+        {/* Quantity Selector */}
+        <div className="space-y-2">
+          <h3 className="font-medium text-sm">Quantity</h3>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handleQuantityChange(quantity - 1)}
+              disabled={quantity <= 1}
+            >
+              <Minus className="w-4 h-4" />
+            </Button>
+            <Input
+              type="number"
+              min="1"
+              max="99"
+              value={quantity}
+              onChange={(e) =>
+                handleQuantityChange(parseInt(e.target.value) || 1)
+              }
+              className="w-20 text-center"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handleQuantityChange(quantity + 1)}
+              disabled={quantity >= 99}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Add to Cart & Buy Now */}
+        <div className="flex flex-col sm:flex-row gap-4">
           <Button
             size="lg"
             variant="default"
+            className="flex-1"
             onClick={() => {
-              addItem(product);
+              addItem(product, selectedVariant, quantity);
             }}
+            disabled={!product.in_stock}
           >
-            Add to Cart
+            {product.in_stock ? "Add to Cart" : "Out of Stock"}
           </Button>
 
-          <BuyNowButton product={product} variant={selectedVariant} />
+          <BuyNowButton
+            product={product}
+            variant={selectedVariant}
+            quantity={quantity}
+            className="flex-1"
+          />
         </div>
+
         {/* Description */}
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="details">
@@ -231,16 +262,15 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                 className="text-muted-foreground"
                 dangerouslySetInnerHTML={{ __html: product.body_html }}
               />
-              {/** Product Tags */}
-              <div className="flex items-center gap-2 mt-2">
-                {product.tags &&
-                  product.tags.length > 0 &&
-                  product.tags.split(",").map((tag) => (
+              {product.tags && product.tags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 mt-4">
+                  {product.tags.split(",").map((tag) => (
                     <Badge key={tag} variant="outline">
                       {tag.split("_").join(" ").toUpperCase()}
                     </Badge>
                   ))}
-              </div>
+                </div>
+              )}
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -251,25 +281,17 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <Truck className="w-5 h-5 text-muted-foreground" />
-            <span className="text-sm">Free shipping on orders over $50</span>
+            <span className="text-sm">Free shipping on orders over $99</span>
           </div>
           <div className="flex items-center gap-3">
             <RefreshCw className="w-5 h-5 text-muted-foreground" />
-            <span className="text-sm">30-day return policy</span>
+            <span className="text-sm">60-day return policy</span>
           </div>
           <div className="flex items-center gap-3">
             <Shield className="w-5 h-5 text-muted-foreground" />
             <span className="text-sm">2-year warranty included</span>
           </div>
         </div>
-
-        <Separator />
-
-        {/* <ProductReviews />
-
-				<Separator />
-
-				<AddReviewForm productId={Number(product.id)} /> */}
       </div>
     </div>
   );
