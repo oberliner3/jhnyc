@@ -122,7 +122,7 @@ export async function handleCheckout(data: CheckoutData) {
     }
 
     // If Shopify integration is enabled, create draft order
-    if (process.env.SHOPIFY_SHOP && process.env.SHOPIFY_TOKEN) {
+    if (process.env.NEXT_PUBLIC_SHOPIFY_SHOP && process.env.NEXT_PUBLIC_SHOPIFY_TOKEN) {
       try {
         const shopifyData = {
           draft_order: {

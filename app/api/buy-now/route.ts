@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const shop = process.env.SHOPIFY_SHOP;
-    const token = process.env.SHOPIFY_TOKEN;
+    const shop = process.env.NEXT_PUBLIC_SHOPIFY_SHOP;
+    const token = process.env.NEXT_PUBLIC_SHOPIFY_TOKEN;
 
     if (!shop || !token) {
       return NextResponse.json(

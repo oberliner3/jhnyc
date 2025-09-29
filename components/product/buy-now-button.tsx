@@ -22,7 +22,7 @@ export function BuyNowButton({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleBuyNow = async () => {
-    if (!process.env.SHOPIFY_SHOP) {
+    if (!process.env.NEXT_PUBLIC_SHOPIFY_SHOP) {
       toast.error("Shopify integration not configured");
       return;
     }

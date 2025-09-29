@@ -44,12 +44,12 @@ interface ShopifyDraftOrderData {
 }
 
 export async function createShopifyDraftOrder(data: ShopifyDraftOrderData) {
-  if (!process.env.SHOPIFY_SHOP || !process.env.SHOPIFY_TOKEN) {
+  if (!process.env.NEXT_PUBLIC_SHOPIFY_SHOP || !process.env.NEXT_PUBLIC_SHOPIFY_TOKEN) {
     throw new Error("Shopify configuration missing");
   }
 
-  const shop = process.env.SHOPIFY_SHOP;
-  const token = process.env.SHOPIFY_TOKEN;
+  const shop = process.env.NEXT_PUBLIC_SHOPIFY_SHOP;
+  const token = process.env.NEXT_PUBLIC_SHOPIFY_TOKEN;
 
   const response = await fetch(
     `https://${shop}/admin/api/2024-01/draft_orders.json`,
