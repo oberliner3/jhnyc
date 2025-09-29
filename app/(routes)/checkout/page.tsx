@@ -38,6 +38,7 @@ import { CountrySelector } from "@/components/checkout/country-selector";
 import { AddressInput } from "@/components/checkout/address-input";
 import { PhoneInput } from "@/components/checkout/phone-input";
 import { useFormValidation, type CheckoutFormData } from "@/hooks/use-form-validation";
+import { CountryCode } from "libphonenumber-js";
 
 interface AddressDetails {
 	email: string;
@@ -170,206 +171,240 @@ export default function CheckoutPage() {
                 <Lock className="w-4 h-4" />
                 <Shield className="w-4 h-4" />
                 <span>Secure checkout</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="gap-8 grid lg:grid-cols-[2fr_1fr]">
-          {/* Checkout Form */}
-          <div className="space-y-6">
-            {/* Express Checkout */}
-            <div className="bg-white p-6 border rounded-lg">
-              <h2 className="mb-4 font-semibold text-lg">Express checkout</h2>
-              <div className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="bg-purple-600 hover:bg-purple-700 border-purple-600 w-full h-12 text-white"
-                >
-                  Shop Pay
-                </Button>
-                <Button
-                  variant="outline"
-                  className="bg-yellow-500 hover:bg-yellow-600 border-yellow-500 w-full h-12 text-white"
-                >
-                  PayPal
-                </Button>
-                <Button
-                  variant="outline"
-                  className="bg-black hover:bg-gray-800 border-black w-full h-12 text-white"
-                >
-                  Google Pay
-                </Button>
+          <div className="gap-8 grid lg:grid-cols-[2fr_1fr]">
+            {/* Checkout Form */}
+            <div className="space-y-6">
+              {/* Express Checkout */}
+              <div className="bg-white p-6 border rounded-lg">
+                <h2 className="mb-4 font-semibold text-lg">Express checkout</h2>
+                <div className="space-y-3">
+                  <Button
+                    variant="outline"
+                    className="bg-purple-600 hover:bg-purple-700 border-purple-600 w-full h-12 text-white"
+                  >
+                    Shop Pay
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="bg-yellow-500 hover:bg-yellow-600 border-yellow-500 w-full h-12 text-white"
+                  >
+                    PayPal
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="bg-black hover:bg-gray-800 border-black w-full h-12 text-white"
+                  >
+                    Google Pay
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            {/* Contact Information */}
-            <div className="bg-white p-6 border rounded-lg">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="font-semibold text-lg flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <Phone className="w-4 h-4" />
-                  Contact
+              {/* Contact Information */}
+              <div className="bg-white p-6 border rounded-lg">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="font-semibold text-lg flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    <Phone className="w-4 h-4" />
+                    Contact
+                  </h2>
+                  <Link
+                    href="/auth/signin"
+                    className="text-blue-600 text-sm hover:underline"
+                  >
+                    Sign in
+                  </Link>
+                </div>
+                <div>
+                  <Label htmlFor={inputEmailId}>
+                    Email or mobile phone number
+                  </Label>
+                  <Input
+                    id={inputEmailId}
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    placeholder="Enter your email or phone"
+                    required
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              {/* Delivery Information */}
+              <div className="bg-white p-6 border rounded-lg">
+                <h2 className="mb-4 font-semibold text-lg flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  <Truck className="w-4 h-4" />
+                  Delivery
                 </h2>
-                <Link
-                  href="/auth/signin"
-                  className="text-blue-600 text-sm hover:underline"
-                >
-                  Sign in
-                </Link>
-              </div>
-              <div>
-                <Label htmlFor={inputEmailId}>
-                  Email or mobile phone number
-                </Label>
-                <Input
-                  id={inputEmailId}
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="Enter your email or phone"
-                  required
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            {/* Delivery Information */}
-            <div className="bg-white p-6 border rounded-lg">
-              <h2 className="mb-4 font-semibold text-lg flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                <Truck className="w-4 h-4" />
-                Delivery
-              </h2>
-              <div className="space-y-4">
-                {/* Country/Region */}
-                <CountrySelector
-                  value={formData.address?.country || "US"}
-                  onValueChange={(value) => handleInputChange("address.country", value)}
-                  error={validationState["address.country"]?.error || undefined}
-                />
-
-                {/* Name Fields */}
-                <div className="gap-4 grid grid-cols-2">
-                  <div>
-                    <Label
-                      htmlFor={inputFirtNameId}
-                      className={cn(validationState.firstName?.error && "text-destructive")}
-                    >
-                      First name
-                    </Label>
-                    <Input
-                      id={inputFirtNameId}
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange("firstName", e.target.value)}
-                      className={cn(
-                        "mt-1",
-                        validationState.firstName?.error && "border-destructive"
-                      )}
-                      required
-                    />
-                    {validationState.firstName?.error && (
-                      <span className="text-sm text-destructive">
-                        {validationState.firstName.error}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor={inputLastNameId}
-                      className={cn(validationState.lastName?.error && "text-destructive")}
-                    >
-                      Last name
-                    </Label>
-                    <Input
-                      id={inputLastNameId}
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange("lastName", e.target.value)}
-                      className={cn(
-                        "mt-1",
-                        validationState.lastName?.error && "border-destructive"
-                      )}
-                      required
-                    />
-                    {validationState.lastName?.error && (
-                      <span className="text-sm text-destructive">
-                        {validationState.lastName.error}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Address */}
-                <AddressInput
-                  value={formData.address?.street || ""}
-                  onChange={(value) => handleInputChange("address.street", value)}
-                  onAddressSelect={(address) => {
-                    handleInputChange("address.street", address.street);
-                    handleInputChange("address.city", address.city);
-                    handleInputChange("address.postalCode", address.postalCode);
-                    // Some countries might not have states
-                    if (address.state) {
-                      handleInputChange("address.state", address.state);
+                <div className="space-y-4">
+                  {/* Country/Region */}
+                  <CountrySelector
+                    value={formData.address?.country || "US"}
+                    onValueChange={(value) =>
+                      handleInputChange("address.country", value)
                     }
-                  }}
-                  error={validationState["address.street"]?.error || undefined}
-                />
+                    error={
+                      validationState["address.country"]?.error || undefined
+                    }
+                  />
 
-                {/* Apartment/Suite (using state field) */}
-                <Input
-                  placeholder="Apartment, suite, etc. (optional)"
-                  value={formData.address?.state || ""}
-                  onChange={(e) => handleInputChange("address.state", e.target.value)}
-                  className="mt-1"
-                />
-
-                {/* City and Postal Code */}
-                <div className="gap-4 grid grid-cols-2">
-                  <div>
-                    <Label
-                      htmlFor={inputCityId}
-                      className={cn(validationState["address.city"]?.error && "text-destructive")}
-                    >
-                      City
-                    </Label>
-                    <Input
-                      id={inputCityId}
-                      value={formData.address?.city || ""}
-                      onChange={(e) => handleInputChange("address.city", e.target.value)}
-                      className={cn(
-                        "mt-1",
-                        validationState["address.city"]?.error && "border-destructive"
+                  {/* Name Fields */}
+                  <div className="gap-4 grid grid-cols-2">
+                    <div>
+                      <Label
+                        htmlFor={inputFirtNameId}
+                        className={cn(
+                          validationState.firstName?.error && "text-destructive"
+                        )}
+                      >
+                        First name
+                      </Label>
+                      <Input
+                        id={inputFirtNameId}
+                        value={formData.firstName}
+                        onChange={(e) =>
+                          handleInputChange("firstName", e.target.value)
+                        }
+                        className={cn(
+                          "mt-1",
+                          validationState.firstName?.error &&
+                            "border-destructive"
+                        )}
+                        required
+                      />
+                      {validationState.firstName?.error && (
+                        <span className="text-sm text-destructive">
+                          {validationState.firstName.error}
+                        </span>
                       )}
-                      required
-                    />
-                    {validationState["address.city"]?.error && (
-                      <span className="text-sm text-destructive">
-                        {validationState["address.city"].error}
-                      </span>
-                    )}
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor={inputLastNameId}
+                        className={cn(
+                          validationState.lastName?.error && "text-destructive"
+                        )}
+                      >
+                        Last name
+                      </Label>
+                      <Input
+                        id={inputLastNameId}
+                        value={formData.lastName}
+                        onChange={(e) =>
+                          handleInputChange("lastName", e.target.value)
+                        }
+                        className={cn(
+                          "mt-1",
+                          validationState.lastName?.error &&
+                            "border-destructive"
+                        )}
+                        required
+                      />
+                      {validationState.lastName?.error && (
+                        <span className="text-sm text-destructive">
+                          {validationState.lastName.error}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor={inputPostalCodeId}>
-                      Postal code
-                    </Label>
-                    <Input
-                      id={inputPostalCodeId}
-                      value={formData.address?.postalCode || ""}
-                      onChange={(e) => handleInputChange("address.postalCode", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
 
-                {/* Phone */}
-                <PhoneInput
-                  value={formData.phone || ""}
-                  onChange={(value, isValid) => {
-                    handleInputChange("phone", value);
-                    setPhoneValid(isValid);
-                  }}
-                  countryCode={formData.address?.country || "US"}
-                  error={validationState.phone?.error || undefined}
-                />
+                  {/* Address */}
+                  <AddressInput
+                    value={formData.address?.street || ""}
+                    onChange={(value) =>
+                      handleInputChange("address.street", value)
+                    }
+                    onAddressSelect={(address) => {
+                      handleInputChange("address.street", address.street);
+                      handleInputChange("address.city", address.city);
+                      handleInputChange(
+                        "address.postalCode",
+                        address.postalCode
+                      );
+                      // Some countries might not have states
+                      if (address.state) {
+                        handleInputChange("address.state", address.state);
+                      }
+                    }}
+                    error={
+                      validationState["address.street"]?.error || undefined
+                    }
+                  />
+
+                  {/* Apartment/Suite (using state field) */}
+                  <Input
+                    placeholder="Apartment, suite, etc. (optional)"
+                    value={formData.address?.state || ""}
+                    onChange={(e) =>
+                      handleInputChange("address.state", e.target.value)
+                    }
+                    className="mt-1"
+                  />
+
+                  {/* City and Postal Code */}
+                  <div className="gap-4 grid grid-cols-2">
+                    <div>
+                      <Label
+                        htmlFor={inputCityId}
+                        className={cn(
+                          validationState["address.city"]?.error &&
+                            "text-destructive"
+                        )}
+                      >
+                        City
+                      </Label>
+                      <Input
+                        id={inputCityId}
+                        value={formData.address?.city || ""}
+                        onChange={(e) =>
+                          handleInputChange("address.city", e.target.value)
+                        }
+                        className={cn(
+                          "mt-1",
+                          validationState["address.city"]?.error &&
+                            "border-destructive"
+                        )}
+                        required
+                      />
+                      {validationState["address.city"]?.error && (
+                        <span className="text-sm text-destructive">
+                          {validationState["address.city"].error}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <Label htmlFor={inputPostalCodeId}>Postal code</Label>
+                      <Input
+                        id={inputPostalCodeId}
+                        value={formData.address?.postalCode || ""}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "address.postalCode",
+                            e.target.value
+                          )
+                        }
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <PhoneInput
+                    value={formData.phone || ""}
+                    onChange={(value, isValid) => {
+                      handleInputChange("phone", value);
+                      setPhoneValid(isValid);
+                    }}
+                    countryCode={
+                      (formData.address?.country as CountryCode) || "US"
+                    }
+                    error={validationState.phone?.error || undefined}
+                  />
                 </div>
               </div>
             </div>
@@ -620,6 +655,6 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 
 }

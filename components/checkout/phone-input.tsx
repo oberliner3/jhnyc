@@ -6,15 +6,15 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { countries } from "@/lib/countries";
 import {
-  parsePhoneNumber,
+  parsePhoneNumberWithError,
   AsYouType,
-  isValidPhoneNumber,
+  CountryCode,
 } from "libphonenumber-js";
 
 interface PhoneInputProps {
   value: string;
   onChange: (value: string, isValid: boolean) => void;
-  countryCode: string;
+  countryCode: CountryCode;
   error?: string;
   label?: string;
   required?: boolean;
@@ -29,7 +29,7 @@ export function PhoneInput({
   required = false,
 }: PhoneInputProps) {
   const formatter = React.useMemo(
-    () => new AsYouType(countryCode as any),
+    () => new AsYouType(countryCode),
     [countryCode]
   );
 
@@ -39,9 +39,13 @@ export function PhoneInput({
     let isValid = false;
 
     try {
-      isValid = isValidPhoneNumber(formattedValue, countryCode as any);
-    } catch (error) {
-      console.error("Phone validation error:", error);
+      const phoneNumber = parsePhoneNumberWithError(
+        formattedValue,
+        countryCode
+      );
+      isValid = phoneNumber.isValid();
+    } catch (err) {
+      isValid = false;
     }
 
     onChange(formattedValue, isValid);
