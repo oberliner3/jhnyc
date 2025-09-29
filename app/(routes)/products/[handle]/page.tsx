@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ProductDetailsSkeleton } from "@/components/skeletons/product-details-skeleton";
 import { getAllProducts, getProductByHandle } from "@/lib/api";
-import { notFound } from "next/navigation";
 import { ProductDetailsClient } from "./product-details-client";
 import { ProductProvider } from "@/contexts/product-context";
 import { SITE_CONFIG } from "@/lib/constants";
 import { generateSEO } from "@/lib/seo";
 import { ProductSchema } from "@/components/common/product-schema";
+import notFound from "@/app/not-found";
 
 export const revalidate = 60;
 
@@ -57,9 +57,9 @@ async function ProductPageContent({ handle }: { handle: string }) {
 
   return (
     <>
-      <ProductSchema product={product} />
+      <ProductSchema product={product!} />
       <ProductProvider initialProduct={product}>
-        <ProductDetailsClient product={product} />
+        <ProductDetailsClient product={product!} />
       </ProductProvider>
     </>
   );
