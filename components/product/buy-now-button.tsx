@@ -5,6 +5,7 @@ import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 import { toast } from "sonner";
+import { buyNowAction } from "@/lib/actions";
 
 interface BuyNowButtonProps {
   product: ApiProduct;
@@ -50,59 +51,39 @@ export function BuyNowButton({
 }: BuyNowButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleBuyNow = async () => {
-    if (!process.env.NEXT_PUBLIC_SHOPIFY_SHOP) {
-      toast.error("Shopify integration not configured");
-      return;
-    }
+  // UX guard: require explicit selection only when the product has multiple real variants
+  if (hasMultipleRealVariants(product) && !variant) {
+    // Show a disabled button with guidance if no variant selected
+    return (
+      <Button disabled className={className} size="lg">
+        <ShoppingBag className="mr-2 w-4 h-4" />
+        Select a variant
+      </Button>
+    );
+  }
 
-    // UX guard: require explicit selection only when the product has multiple real variants
-    if (hasMultipleRealVariants(product) && !variant) {
-      toast.error("Please select a product variant");
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const selectedVariant = variant || product.variants?.[0] || createDefaultVariant(product);
-
-      const formData = new FormData();
-      formData.append("productId", selectedVariant.product_id);
-      formData.append("variantId", selectedVariant.id);
-      formData.append("price", selectedVariant.price.toString());
-      formData.append("quantity", quantity.toString());
-      formData.append("productTitle", product.title);
-      formData.append("productImage", product.images?.[0]?.src || "");
-
-      const response = await fetch("/api/buy-now", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.invoiceUrl) {
-        window.location.href = data.invoiceUrl;
-      } else {
-        throw new Error(data.error || "Failed to create checkout");
-      }
-    } catch (error) {
-      console.error("Buy now error:", error);
-      toast.error("Failed to initiate checkout. Please try again.");
-      setIsLoading(false);
-    }
-  };
+  const selectedVariant = variant || product.variants?.[0] || createDefaultVariant(product);
 
   return (
-    <Button
-      onClick={handleBuyNow}
-      disabled={isLoading || !product.in_stock}
-      className={className}
-      size="lg"
+    <form
+      action={buyNowAction}
+      onSubmit={() => setIsLoading(true)}
     >
-      <ShoppingBag className="mr-2 w-4 h-4" />
-      {isLoading ? "Processing..." : "Buy Now"}
-    </Button>
+      <input type="hidden" name="productId" value={selectedVariant.product_id} />
+      <input type="hidden" name="variantId" value={selectedVariant.id} />
+      <input type="hidden" name="price" value={selectedVariant.price} />
+      <input type="hidden" name="quantity" value={quantity} />
+      <input type="hidden" name="productTitle" value={product.title} />
+      <input type="hidden" name="productImage" value={product.images?.[0]?.src || ""} />
+      <Button
+        type="submit"
+        disabled={isLoading || !product.in_stock}
+        className={className}
+        size="lg"
+      >
+        <ShoppingBag className="mr-2 w-4 h-4" />
+        {isLoading ? "Processing..." : "Buy Now"}
+      </Button>
+    </form>
   );
 }
