@@ -84,37 +84,6 @@ export function Footer() {
 								<span>{APP_CONTACTS.email.getInTouch}</span>
 							</div>
 						</div>
-						<div>
-							<h3 className="mb-4 font-semibold text-gray-900">
-								Connect With Us
-							</h3>
-							<div className="flex gap-3">
-								<IconButton
-									variant="ghost"
-									size="sm"
-									className="text-gray-600 hover:text-gray-900"
-								>
-									<Facebook className="w-4 h-4" />
-									<span className="sr-only">Facebook</span>
-								</IconButton>
-								<IconButton
-									variant="ghost"
-									size="sm"
-									className="text-gray-600 hover:text-gray-900"
-								>
-									<Twitter className="w-4 h-4" />
-									<span className="sr-only">Twitter</span>
-								</IconButton>
-								<IconButton
-									variant="ghost"
-									size="sm"
-									className="text-gray-600 hover:text-gray-900"
-								>
-									<Instagram className="w-4 h-4" />
-									<span className="sr-only">Instagram</span>
-								</IconButton>
-							</div>
-						</div>
 					</div>
 
 					{/* Our Policies */}
@@ -246,47 +215,50 @@ export function Footer() {
 					<p className="text-gray-600 text-sm">
 						© 2025 {SITE_CONFIG.name}. All rights reserved.
 					</p>
+					<FooterBottomLinks />
 					<PaymentMethods />
-					<div className="flex flex-wrap gap-4 text-gray-600 text-xs">
-						<Link
-							href="/policies/privacy"
-							className="hover:text-gray-900 transition-colors"
-						>
-							Privacy Policy
-						</Link>
-						<Link
-							href="/policies/terms"
-							className="hover:text-gray-900 transition-colors"
-						>
-							Terms of Service
-						</Link>
-						<Link
-							href="/policies/return-refund"
-							className="hover:text-gray-900 transition-colors"
-						>
-							Return and Refund Policy
-						</Link>
-						<Link
-							href="/policies/shipping"
-							className="hover:text-gray-900 transition-colors"
-						>
-							Shipping Policy
-						</Link>
-						<Link
-							href="/policies/cookie"
-							className="hover:text-gray-900 transition-colors"
-						>
-							Cookie Policy
-						</Link>
-						<Link
-							href="/contact"
-							className="hover:text-gray-900 transition-colors"
-						>
-							Contact
-						</Link>
-					</div>
 				</div>
 			</div>
 		</footer>
+	);
+}
+
+function FooterBottomLinks() {
+	return (
+		<div className="flex flex-wrap gap-4 text-gray-600 text-xs">
+			<Link
+				href="/policies/privacy"
+				className="hover:text-gray-900 transition-colors"
+			>
+				Privacy Policy
+			</Link>
+			<Link
+				href="/policies/terms"
+				className="hover:text-gray-900 transition-colors"
+			>
+				Terms of Service
+			</Link>
+			<Link
+				href="/policies/return-refund"
+				className="hover:text-gray-900 transition-colors"
+			>
+				Return and Refund Policy
+			</Link>
+			<Link
+				href="/policies/shipping"
+				className="hover:text-gray-900 transition-colors"
+			>
+				Shipping Policy
+			</Link>
+			<Link
+				href="/policies/cookie"
+				className="hover:text-gray-900 transition-colors"
+			>
+				Cookie Policy
+			</Link>
+			<Link href="/contact" className="hover:text-gray-900 transition-colors">
+				Contact
+			</Link>
+		</div>
 	);
 }
