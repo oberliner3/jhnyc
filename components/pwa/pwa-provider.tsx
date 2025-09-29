@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { InstallPrompt } from "./install-prompt";
 
 export function PWAProvider({ children }: { children: React.ReactNode }) {

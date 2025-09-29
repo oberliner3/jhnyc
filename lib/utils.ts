@@ -39,6 +39,8 @@ export function generateImage({
 export function stripHtml(html: string): string {
   return html.replace(/(<([^>]+)>)/gi, "");
 }
+
+// Escape XML special characters to keep feeds valid
 export function escapeXml(str: string | undefined | null): string {
   if (!str) return "";
   return String(str)

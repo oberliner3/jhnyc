@@ -37,7 +37,6 @@ export async function GET() {
           hasSale ? product.compare_at_price! : product.price
         );
         const salePrice = hasSale ? formatPriceForGMC(product.price) : null;
-        const productType = normalizeProductType(product.product_type);
         const weight = formatWeight(product.variants?.[0]?.grams);
 
         return `
@@ -51,14 +50,11 @@ export async function GET() {
       <g:image_link>${escapeXml(
         product.images?.[0]?.src || `${SITE_CONFIG.url}/placeholder.svg`
       )}</g:image_link>
-      <g:availability>${
-        product.in_stock ? "in stock" : "out of stock"
-      }</g:availability>
+      <g:availability>in stock</g:availability>
       <g:price>${escapeXml(basePrice)}</g:price>
       ${salePrice ? `<g:sale_price>${escapeXml(salePrice)}</g:sale_price>` : ""}
       <g:brand>${escapeXml(product.vendor || SITE_CONFIG.name)}</g:brand>
       <g:condition>new</g:condition>
-      <g:product_type>${escapeXml(productType)}</g:product_type>
       <g:google_product_category>166</g:google_product_category>
       <g:mpn>${escapeXml(String(product.id))}</g:mpn>
       <g:gtin></g:gtin>
@@ -90,12 +86,8 @@ export async function GET() {
       <g:custom_label_0>${escapeXml(String(product.rating || 0))}</g:custom_label_0>
       <g:custom_label_1>${escapeXml(String(product.review_count || 0))}</g:custom_label_1>
       <g:custom_label_2>${escapeXml(product.vendor || "Unknown")}</g:custom_label_2>
-      <g:custom_label_3>${
-        product.in_stock ? "Available" : "Out of Stock"
-      }</g:custom_label_3>
-      <g:custom_label_4>${
-        hasSale ? "On Sale" : "Regular Price"
-      }</g:custom_label_4>
+      <g:custom_label_3>${product.in_stock ? "Available" : "Out of Stock"}</g:custom_label_3>
+      <g:custom_label_4>${hasSale ? "On Sale" : "Regular Price"}</g:custom_label_4>
     </item>`;
       })
       .join("")}
@@ -112,67 +104,6 @@ export async function GET() {
     console.error("Error generating Google Merchant feed:", error);
     return new NextResponse("Error generating feed", { status: 500 });
   }
-}
-
-function getGoogleCategory(category: string | undefined): string {
-  if (!category) return "166";
-
-  const categoryMap: Record<string, string> = {
-    electronics: "172",
-    clothing: "1604",
-    shoes: "187",
-    accessories: "166",
-    home: "632",
-    beauty: "172",
-    sports: "499",
-    books: "784",
-    toys: "220",
-    automotive: "888",
-    health: "499",
-    jewelry: "166",
-    bags: "166",
-    watches: "166",
-    furniture: "632",
-    kitchen: "632",
-    garden: "632",
-    office: "166",
-    baby: "2984",
-    pet: "1281",
-    travel: "166",
-    music: "166",
-    movies: "166",
-    games: "166",
-    software: "166",
-    tools: "632",
-    outdoor: "499",
-    fitness: "499",
-    art: "166",
-    crafts: "166",
-    party: "166",
-    seasonal: "166",
-    clearance: "166",
-    sale: "166",
-    new: "166",
-    featured: "166",
-    bestseller: "166",
-    trending: "166",
-  };
-
-  return categoryMap[category.toLowerCase()] || "166";
-}
-
-// Normalize product_type into Google-preferred breadcrumb format: "A > B > C"
-function normalizeProductType(input?: string): string {
-  if (!input) return "General";
-  // Remove leading/trailing whitespace and any leading separators
-  const trimmed = input.trim().replace(/^([>\/\-\s])+/, "");
-  // Split on '>' or '/' and normalize spacing/casing
-  const parts = trimmed
-    .split(/>|\//)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0);
-  if (parts.length === 0) return "General";
-  return parts.join(" > ");
 }
 
 // Format price per Google spec: two decimals + space + currency (e.g., "273.00 USD")

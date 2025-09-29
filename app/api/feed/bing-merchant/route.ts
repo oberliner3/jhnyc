@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { getAllProducts } from "@/lib/api";
 import { SITE_CONFIG } from "@/lib/constants";
-import type { ApiProduct } from "@/lib/types";
+import type { ApiProduct, ApiProductOption, ApiProductVariant } from "@/lib/types";
+
+type ApiProductWithRaw = ApiProduct & { raw_json?: string };
 
 // Escape special XML characters
 function escapeXml(str: string | undefined | null): string {
@@ -43,12 +45,10 @@ export async function GET() {
     for (const product of products) {
       try {
         // Parse raw_json to get actual product data with variants
-        const productData = product.raw_json 
-          ? JSON.parse(product.raw_json) 
-          : product;
-        
-        const variants = productData.variants || [];
-        const options = productData.options || [];
+        const raw = (product as ApiProductWithRaw).raw_json;
+        const productData: ApiProduct = raw ? (JSON.parse(raw) as ApiProduct) : (product as ApiProduct);
+        const variants: ApiProductVariant[] = productData.variants || [];
+        const options: ApiProductOption[] = productData.options || [];
         
         if (!variants || variants.length === 0) {
           console.log("Product missing variants:", product.id);
@@ -58,10 +58,10 @@ export async function GET() {
         for (const variant of variants) {
           try {
             const colorOption = options.find(
-              (option: any) => option.name.toLowerCase() === "color"
+              (option: ApiProductOption) => option.name.toLowerCase() === "color"
             );
             const sizeOption = options.find(
-              (option: any) => option.name.toLowerCase() === "size"
+              (option: ApiProductOption) => option.name.toLowerCase() === "size"
             );
 
             let color = "";
