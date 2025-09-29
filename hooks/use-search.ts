@@ -18,12 +18,12 @@ export function useSearch(products: ApiProduct[]) {
         query === "" ||
         product.title.toLowerCase().includes(query.toLowerCase()) ||
         product.body_html.toLowerCase().includes(query.toLowerCase()) ||
-        product.tags.some((tag) =>
-          tag.toLowerCase().includes(query.toLowerCase())
-        );
+        product.tags
+          .split(",")
+          .some((tag) => tag.toLowerCase().includes(query.toLowerCase()));
 
       const matchesCategory =
-        filters.category === "" || product.category === filters.category;
+        filters.category === "" || product.product_type === filters.category;
       const matchesPrice =
         product.price >= filters.minPrice && product.price <= filters.maxPrice;
       const matchesStock = !filters.in_stock || product.in_stock;

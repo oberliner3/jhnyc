@@ -1,4 +1,4 @@
-import { type CookieOptions, createServerClient } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function createClient() {
@@ -13,36 +13,30 @@ export async function createClient() {
 
   return createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore
+          .getAll()
+          .map((c) => ({ name: c.name, value: c.value }));
       },
-      set(name: string, value: string, options: CookieOptions) {
+      setAll(cookies) {
         try {
-          cookieStore.set({ name, value, ...options });
+          cookies.forEach(({ name, value, options }) =>
+            cookieStore.set({ name, value, ...options })
+          );
         } catch (error) {
-          // The `cookies().set()` method can only be called in a Server Action or Route Handler.
-          // Log for visibility in development; ignore in production to avoid noisy logs.
           if (process.env.NODE_ENV !== "production") {
-            console.error("[Supabase] Failed to set cookie", {
-              name,
-              message: (error as Error)?.message,
-            });
+            console.error("[Supabase] Failed to set cookies", error);
           }
         }
       },
-      remove(name: string, options: CookieOptions) {
-        try {
-          cookieStore.set({ name, value: "", ...options });
-        } catch (error) {
-          // The `cookies().set()` method can only be called in a Server Action or Route Handler.
-          if (process.env.NODE_ENV !== "production") {
-            console.error("[Supabase] Failed to remove cookie", {
-              name,
-              message: (error as Error)?.message,
-            });
-          }
-        }
-      },
+    },
+    cookieOptions: {
+      name: "__supabase",
+      domain: process.env.NEXT_PUBLIC_SITE_URL,
+      path: "/",
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
     },
   });
 }

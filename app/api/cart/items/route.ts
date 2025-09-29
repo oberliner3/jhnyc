@@ -124,3 +124,105 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    console.log("[CART] Removing item from cart...");
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error("[CART] Authentication error:", authError?.message);
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const body = await request.json();
+    const { cart_id, item_id } = body;
+
+    if (!cart_id || !item_id) {
+      return NextResponse.json(
+        { message: "Invalid cart ID or item ID" },
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const { error } = await supabase
+      .from("cart_items")
+      .delete()
+      .eq("cart_id", cart_id)
+      .eq("id", item_id);
+
+    if (error) throw error;
+
+    console.log(`[CART] Removed cart item: ${item_id} from cart: ${cart_id}`);
+    return NextResponse.json(
+      { message: "Item removed successfully" },
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("[CART] Error removing item from cart:", error);
+    return NextResponse.json(
+      { message: "Failed to remove item from cart" },
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    console.log("[CART] Updating item quantity in cart...");
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      console.error("[CART] Authentication error:", authError?.message);
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const body = await request.json();
+    const { cart_id, item_id, quantity } = body;
+
+    if (!cart_id || !item_id || quantity === undefined || quantity < 0) {
+      return NextResponse.json(
+        { message: "Invalid cart ID, item ID, or quantity" },
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from("cart_items")
+      .update({ quantity, updated_at: new Date().toISOString() })
+      .eq("cart_id", cart_id)
+      .eq("id", item_id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log(`[CART] Updated quantity for item: ${item_id} in cart: ${cart_id} to ${quantity}`);
+    return NextResponse.json(data, {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("[CART] Error updating item quantity in cart:", error);
+    return NextResponse.json(
+      { message: "Failed to update item quantity in cart" },
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+}

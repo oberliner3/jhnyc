@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAllProducts } from "@/lib/api";
 import { SITE_CONFIG } from "@/lib/constants";
+import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 
 export async function GET() {
   try {
@@ -11,27 +12,56 @@ export async function GET() {
   <channel>
     <title>${SITE_CONFIG.name} - Product Feed</title>
     <link>${SITE_CONFIG.url}</link>
-    <description>Product feed for Google Merchant Center</description>
+    <description>Product feed for Bing Merchant Center</description>
     ${products
-      .map(
-        (product) => `
+      .flatMap((product: ApiProduct) =>
+        product.variants.map((variant: ApiProductVariant) => {
+          const colorOption = product.options.find(
+            (option) => option.name.toLowerCase() === "color"
+          );
+          const sizeOption = product.options.find(
+            (option) => option.name.toLowerCase() === "size"
+          );
+
+          let color = "";
+          let size = "";
+
+          if (colorOption) {
+            const colorIndex = product.options.indexOf(colorOption);
+            if (colorIndex === 0) color = variant.option1 || "";
+            if (colorIndex === 1) color = variant.option2 || "";
+            if (colorIndex === 2) color = variant.option3 || "";
+          }
+
+          if (sizeOption) {
+            const sizeIndex = product.options.indexOf(sizeOption);
+            if (sizeIndex === 0) size = variant.option1 || "";
+            if (sizeIndex === 1) size = variant.option2 || "";
+            if (sizeIndex === 2) size = variant.option3 || "";
+          }
+
+          return `
     <item>
-      <g:id>${product.id}</g:id>
-      <g:title><![CDATA[${product.title}]]></g:title>
+      <g:id>${variant.id}</g:id>
+      <g:title><![CDATA[${product.title} - ${variant.title}]]></g:title>
       <g:description><![CDATA[${
         product.body_html?.replace(/<[^>]*>/g, "") || product.title
       }]]></g:description>
-      <g:link>${SITE_CONFIG.url}/products/${product.handle}</g:link>
+      <g:link>${SITE_CONFIG.url}/products/${product.handle}?variant=${
+            variant.id
+          }</g:link>
       <g:image_link>${
-        product.images?.[0]?.src || `${SITE_CONFIG.url}/placeholder.svg`
+        variant.featured_image ||
+        product.images?.[0]?.src ||
+        `${SITE_CONFIG.url}/placeholder.svg`
       }</g:image_link>
       <g:availability>${
-        product.in_stock ? "in stock" : "out of stock"
+        variant.available ? "in stock" : "out of stock"
       }</g:availability>
-      <g:price>${product.price} USD</g:price>
+      <g:price>${variant.price} USD</g:price>
       ${
-        product.compare_at_price
-          ? `<g:sale_price>${product.price} USD</g:sale_price>`
+        variant.compare_at_price
+          ? `<g:sale_price>${variant.price} USD</g:sale_price>`
           : ""
       }
       <g:brand>${product.vendor || SITE_CONFIG.name}</g:brand>
@@ -40,46 +70,20 @@ export async function GET() {
       <g:google_product_category>${getGoogleCategory(
         product.product_type
       )}</g:google_product_category>
-      <g:mpn>${product.id}</g:mpn>
-      <g:gtin></g:gtin>
+      <g:mpn>${variant.sku || variant.id}</g:mpn>
+      <g:gtin>${variant.sku || ""}</g:gtin>
+      ${color ? `<g:color>${color}</g:color>` : ""}
+      ${size ? `<g:size>${size}</g:size>` : ""}
       <g:shipping_weight>${
-        product.variants?.[0]?.grams ? `${product.variants[0].grams}g` : "100g"
+        variant.grams ? `${variant.grams}g` : "100g"
       }</g:shipping_weight>
       <g:shipping>
         <g:country>US</g:country>
         <g:service>Standard</g:service>
         <g:price>9.99 USD</g:price>
       </g:shipping>
-      <g:shipping>
-        <g:country>US</g:country>
-        <g:service>Express</g:service>
-        <g:price>19.99 USD</g:price>
-      </g:shipping>
-      ${
-        (product.tags &&
-          product.tags.length > 0 &&
-          product.tags
-            .split(",")
-            .map(
-              (tag) =>
-                `<g:product_detail><g:attribute_name>tag</g:attribute_name><g:attribute_value>${tag
-                  .split("_")
-                  .join(" ")
-                  .toUpperCase()}</g:attribute_value></g:product_detail>`
-            )
-            .join("")) ||
-        ""
-      }
-      <g:custom_label_0>${product.rating || 0}</g:custom_label_0>
-      <g:custom_label_1>${product.review_count || 0}</g:custom_label_1>
-      <g:custom_label_2>${product.vendor || "Unknown"}</g:custom_label_2>
-      <g:custom_label_3>${
-        product.in_stock ? "Available" : "Out of Stock"
-      }</g:custom_label_3>
-      <g:custom_label_4>${
-        product.compare_at_price ? "On Sale" : "Regular Price"
-      }</g:custom_label_4>
-    </item>`
+    </item>`;
+        })
       )
       .join("")}
   </channel>
@@ -92,7 +96,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("Error generating Google Merchant feed:", error);
+    console.error("Error generating Bing Merchant feed:", error);
     return new NextResponse("Error generating feed", { status: 500 });
   }
 }

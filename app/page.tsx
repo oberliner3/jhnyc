@@ -6,23 +6,32 @@ import { Partners } from "@/components/sections/partners";
 import { Reviews } from "@/components/sections/reviews";
 import { generateSEO } from "@/lib/seo";
 
-export const revalidate = 60; // ISR: revalidate this page every 60 seconds
+export const revalidate = 60;
 
 export const metadata = generateSEO({
-	title: "Premium E-Commerce Store",
-	description:
-		"Discover premium products with exceptional quality and service. Shop our curated collection of the latest trends and timeless classics.",
+  title: "Premium E-Commerce Store",
+  description:
+    "Discover premium products with exceptional quality and service. Shop our curated collection of the latest trends and timeless classics.",
 });
 
 export default function HomePage() {
-	return (
-		<>
-			<Hero />
-			<FeaturedProducts />
-			<InfoSections />
-			<Partners />
-			<Reviews />
-			<Newsletter />
-		</>
-	);
+  return (
+    <div className="mx-auto container">
+      <Hero />
+      <FeaturedProducts />
+      <InfoSections />
+      <Partners />
+      <Reviews />
+      {typeof window !== "undefined" && !localStorage.getItem("visited") && (
+        <>
+          <Newsletter />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `localStorage.setItem('visited','1')`,
+            }}
+          />
+        </>
+      )}
+    </div>
+  );
 }

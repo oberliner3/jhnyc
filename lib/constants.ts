@@ -18,6 +18,12 @@ export const SITE_CONFIG = {
     "products",
     "storefront",
   ],
+  cookieConfig: {
+    name: "originz-cookie-consent",
+    expires: 180,
+    sameSite: "Lax",
+    secure: process.env.NODE_ENV === "production",
+  },
 };
 
 export const buildEmail = (handle: string, ltd: string = SITE_CONFIG.domain) =>

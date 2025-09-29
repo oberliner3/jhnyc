@@ -30,7 +30,7 @@ export interface CartState {
 export interface CartContextType extends ClientCartState {
   addItem: (
     product: ApiProduct,
-    variant: ApiProductVariant,
+    variant?: ApiProductVariant, // Make variant optional here
     quantity?: number
   ) => Promise<void>;
   removeItem: (productId: string, variantId: string) => Promise<void>;
@@ -96,11 +96,11 @@ export interface ApiProduct {
   price: number;
   compare_at_price?: number;
   images: ApiProductImage[];
-  category: string;
+  product_type: string;
   in_stock: boolean;
   rating: number;
   review_count: number;
-  tags: string[];
+  tags: string;
   vendor: string;
   variants: ApiProductVariant[];
   options: ApiProductOption[];

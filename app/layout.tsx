@@ -6,13 +6,14 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { CookieBanner } from "@/components/common/cookie-banner";
-import { SchemaMarkup } from "@/components/common/schema-markup";
+import { WebsiteSchema } from "@/components/common/website-schema";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "./providers";
+import ErrorBoundary from "@/components/common/error-boundary";
 
 
 
@@ -56,10 +57,11 @@ export default function RootLayout({
 					sizes="16x16"
 					href="/icons/favicon-16x16.png"
 				/>
-				<link rel="manifest" href="/manifest.json" />
-				<SchemaMarkup />
+				<link rel="manifest" href="/manifest" />
+				<WebsiteSchema />
 			</head>
-			<body>
+			<body className='will-change-scroll'>
+				<ErrorBoundary>
 				<Providers>
 					<div className="flex flex-col bg-background min-h-screen">
 						<AnnouncementBar />
@@ -70,6 +72,7 @@ export default function RootLayout({
 					<CookieBanner />
 					<Toaster />
 				</Providers>
+				</ErrorBoundary>
 				<Analytics />
 				<SpeedInsights />
 			</body>
