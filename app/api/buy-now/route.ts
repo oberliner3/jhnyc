@@ -11,9 +11,11 @@ export async function POST(request: NextRequest) {
     const productTitle = formData.get("productTitle") as string;
     const productImage = formData.get("productImage") as string;
 
-    if (!productId || !variantId || !price || !quantity) {
+    const hasValidPrice = Number.isFinite(price);
+    const hasValidQuantity = Number.isFinite(quantity) && quantity >= 1;
+    if (!productId || !variantId || !hasValidPrice || !hasValidQuantity) {
       return NextResponse.json(
-        { success: false, error: "Missing required fields" },
+        { success: false, error: "Missing or invalid required fields" },
         { status: 400 }
       );
     }

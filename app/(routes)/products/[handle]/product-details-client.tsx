@@ -74,7 +74,8 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
     const variant = (product.variants || []).find(
       (v) => v.title === variantName
     );
-    setSelectedVariant(variant);
+    // Fallback to first available variant to avoid undefined selections
+    setSelectedVariant(variant || (product.variants || [])[0]);
   };
 
   const handleQuantityChange = (newQuantity: number) => {
@@ -140,7 +141,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
       {/* Product Info */}
       <div className="space-y-6">
         <div>
-          <Badge variant="destructive" className="m-2 p-2">
+          <Badge variant="outline" className="m-2 p-2">
             {product.product_type}
           </Badge>
           <h1 className="font-bold text-3xl lg:text-4xl tracking-tight">
@@ -184,72 +185,72 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
             <span className="font-bold text-3xl">
               {formatPrice(currentPrice)}
             </span>
-            {product.compare_at_price && (
-              <span className="text-muted-foreground text-lg line-through">
-                {formatPrice(product.compare_at_price)}
-              </span>
-            )}
+            {product.compare_at_price &&
+              product.compare_at_price >= product.price && (
+                <span className="text-muted-foreground text-lg line-through">
+                  {formatPrice(product.compare_at_price)}
+                </span>
+              )}
           </div>
           {product.compare_at_price && discountPercentage > 0 && (
             <p className="text-green-600 text-sm">
               You save {formatPrice(product.compare_at_price - currentPrice)} (
-              {discountPercentage}%)
+              {discountPercentage}%) AA
             </p>
           )}
         </div>
 
-        {/* Quantity Selector */}
-        <div className="space-y-2">
-          <h3 className="font-medium text-sm">Quantity</h3>
-          <div className="flex items-center gap-3">
+        {/* Add to Cart & Buy Now */}
+        <div className="relative flex flex-col gap-2">
+          <div className="flex justify-around w-full">
+            <div className="inline-flex">
+              <div className="flex">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleQuantityChange(quantity - 1)}
+                  disabled={quantity <= 1}
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <Input
+                  type="number"
+                  min="1"
+                  max="99"
+                  value={quantity}
+                  onChange={(e) =>
+                    handleQuantityChange(parseInt(e.target.value) || 1)
+                  }
+                  className="w-20 text-center"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleQuantityChange(quantity + 1)}
+                  disabled={quantity >= 99}
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
             <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleQuantityChange(quantity - 1)}
-              disabled={quantity <= 1}
+              size="lg"
+              variant="default"
+              className="inline-flex"
+              onClick={() => {
+                addItem(product, selectedVariant, quantity);
+              }}
+              disabled={!product.in_stock}
             >
-              <Minus className="w-4 h-4" />
-            </Button>
-            <Input
-              type="number"
-              min="1"
-              max="99"
-              value={quantity}
-              onChange={(e) =>
-                handleQuantityChange(parseInt(e.target.value) || 1)
-              }
-              className="w-20 text-center"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleQuantityChange(quantity + 1)}
-              disabled={quantity >= 99}
-            >
-              <Plus className="w-4 h-4" />
+              {product.in_stock ? "Add to Cart" : "Out of Stock"}
             </Button>
           </div>
-        </div>
-
-        {/* Add to Cart & Buy Now */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Button
-            size="lg"
-            variant="default"
-            className="flex-1"
-            onClick={() => {
-              addItem(product, selectedVariant, quantity);
-            }}
-            disabled={!product.in_stock}
-          >
-            {product.in_stock ? "Add to Cart" : "Out of Stock"}
-          </Button>
 
           <BuyNowButton
             product={product}
             variant={selectedVariant}
             quantity={quantity}
-            className="flex-1"
+            className="inline-flex bg-orange-400"
           />
         </div>
 

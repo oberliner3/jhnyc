@@ -13,6 +13,26 @@ interface BuyNowButtonProps {
   className?: string;
 }
 
+function createDefaultVariant(product: ApiProduct): ApiProductVariant {
+  const firstVariant = product.variants?.[0];
+  return {
+    id: firstVariant?.id || product.id,
+    product_id: product.id,
+    title: firstVariant?.title || "Default Title",
+    price: product.price,
+    sku: firstVariant?.sku || "",
+    grams: firstVariant?.grams || 0,
+    featured_image: product.images?.[0]?.src,
+    available: product.in_stock,
+    requires_shipping: firstVariant?.requires_shipping ?? true,
+    taxable: firstVariant?.taxable ?? true,
+    compare_at_price: product.compare_at_price,
+    position: 1,
+    created_at: product.created_at,
+    updated_at: product.updated_at,
+  };
+}
+
 export function BuyNowButton({
   product,
   variant,
@@ -30,16 +50,10 @@ export function BuyNowButton({
     setIsLoading(true);
 
     try {
-      const selectedVariant = variant || product.variants?.[0];
-
-      if (!selectedVariant) {
-        toast.error("Please select a product variant");
-        setIsLoading(false);
-        return;
-      }
+      const selectedVariant = variant || product.variants?.[0] || createDefaultVariant(product);
 
       const formData = new FormData();
-      formData.append("productId", product.id);
+      formData.append("productId", selectedVariant.product_id);
       formData.append("variantId", selectedVariant.id);
       formData.append("price", selectedVariant.price.toString());
       formData.append("quantity", quantity.toString());

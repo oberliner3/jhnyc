@@ -5,7 +5,7 @@ import { GeistMono } from "geist/font/mono";
 
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { CookieBanner } from "@/components/common/cookie-banner";
+
 import { WebsiteSchema } from "@/components/common/website-schema";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { Footer } from "@/components/layout/footer";
@@ -45,21 +45,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Originz" />
         <meta name="msapplication-TileColor" content="#336571" />
-        <meta name="msapplication-config" content="/browserconfig.xml" />
-        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/icons/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/icons/favicon-16x16.png"
-        />
-        <link rel="manifest" href="/manifest" />
+
         <WebsiteSchema />
       </head>
       <body className="will-change-scroll">
@@ -71,7 +57,7 @@ export default function RootLayout({
               <main className="flex-grow">{children}</main>
               <Footer />
             </div>
-            <CookieBanner />
+           
             <Toaster />
           </Providers>
         </ErrorBoundary>

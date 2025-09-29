@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getAllProducts } from "@/lib/api";
 import { SITE_CONFIG } from "@/lib/constants";
+import { stripHtml,escapeXml } from "@/lib/utils";
+
 
 export async function GET() {
   try {
@@ -9,42 +11,44 @@ export async function GET() {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
   <channel>
-    <title>${SITE_CONFIG.name} - Product Feed</title>
-    <link>${SITE_CONFIG.url}</link>
+    <title>${escapeXml(SITE_CONFIG.name)} - Product Feed</title>
+    <link>${escapeXml(SITE_CONFIG.url)}</link>
     <description>Product feed for Google Merchant Center</description>
     ${products
-      .map(
-        (product) => `
+      .map((product) => {
+        const hasSale =
+          typeof product.compare_at_price === "number" &&
+          product.compare_at_price > product.price;
+        const basePrice = formatPriceForGMC(
+          hasSale ? product.compare_at_price! : product.price
+        );
+        const salePrice = hasSale ? formatPriceForGMC(product.price) : null;
+        const productType = normalizeProductType(product.product_type);
+        const weight = formatWeight(product.variants?.[0]?.grams);
+
+        return `
     <item>
-      <g:id>${product.id}</g:id>
-      <g:title><![CDATA[${product.title}]]></g:title>
+      <g:id>${escapeXml(String(product.id))}</g:id>
+      <g:title><![CDATA[${product.title?.replace(/<[^>]*>/g, "")}]]></g:title>
       <g:description><![CDATA[${
-        product.body_html?.replace(/<[^>]*>/g, "") || product.title
+        stripHtml(product.body_html)?.replace(/<[^>]*>/g, "") || product.title
       }]]></g:description>
-      <g:link>${SITE_CONFIG.url}/products/${product.handle}</g:link>
-      <g:image_link>${
+      <g:link>${escapeXml(SITE_CONFIG.url)}/products/${escapeXml(product.handle)}</g:link>
+      <g:image_link>${escapeXml(
         product.images?.[0]?.src || `${SITE_CONFIG.url}/placeholder.svg`
-      }</g:image_link>
+      )}</g:image_link>
       <g:availability>${
         product.in_stock ? "in stock" : "out of stock"
       }</g:availability>
-      <g:price>${product.price} USD</g:price>
-      ${
-        product.compare_at_price
-          ? `<g:sale_price>${product.price} USD</g:sale_price>`
-          : ""
-      }
-      <g:brand>${product.vendor || SITE_CONFIG.name}</g:brand>
+      <g:price>${escapeXml(basePrice)}</g:price>
+      ${salePrice ? `<g:sale_price>${escapeXml(salePrice)}</g:sale_price>` : ""}
+      <g:brand>${escapeXml(product.vendor || SITE_CONFIG.name)}</g:brand>
       <g:condition>new</g:condition>
-      <g:product_type>${product.product_type || "General"}</g:product_type>
-      <g:google_product_category>${getGoogleCategory(
-        product.product_type
-      )}</g:google_product_category>
-      <g:mpn>${product.id}</g:mpn>
+      <g:product_type>${escapeXml(productType)}</g:product_type>
+      <g:google_product_category>166</g:google_product_category>
+      <g:mpn>${escapeXml(String(product.id))}</g:mpn>
       <g:gtin></g:gtin>
-      <g:shipping_weight>${
-        product.variants?.[0]?.grams ? `${product.variants[0].grams}g` : "100g"
-      }</g:shipping_weight>
+      <g:shipping_weight>${escapeXml(weight)}</g:shipping_weight>
       <g:shipping>
         <g:country>US</g:country>
         <g:service>Standard</g:service>
@@ -62,25 +66,24 @@ export async function GET() {
             .split(",")
             .map(
               (tag) =>
-                `<g:product_detail><g:attribute_name>tag</g:attribute_name><g:attribute_value>${tag
-                  .split("_")
-                  .join(" ")
-                  .toUpperCase()}</g:attribute_value></g:product_detail>`
+                `<g:product_detail><g:attribute_name>tag</g:attribute_name><g:attribute_value>${escapeXml(
+                  tag.split("_").join(" ").toUpperCase()
+                )}</g:attribute_value></g:product_detail>`
             )
             .join("")) ||
         ""
       }
-      <g:custom_label_0>${product.rating || 0}</g:custom_label_0>
-      <g:custom_label_1>${product.review_count || 0}</g:custom_label_1>
-      <g:custom_label_2>${product.vendor || "Unknown"}</g:custom_label_2>
+      <g:custom_label_0>${escapeXml(String(product.rating || 0))}</g:custom_label_0>
+      <g:custom_label_1>${escapeXml(String(product.review_count || 0))}</g:custom_label_1>
+      <g:custom_label_2>${escapeXml(product.vendor || "Unknown")}</g:custom_label_2>
       <g:custom_label_3>${
         product.in_stock ? "Available" : "Out of Stock"
       }</g:custom_label_3>
       <g:custom_label_4>${
-        product.compare_at_price ? "On Sale" : "Regular Price"
+        hasSale ? "On Sale" : "Regular Price"
       }</g:custom_label_4>
-    </item>`
-      )
+    </item>`;
+      })
       .join("")}
   </channel>
 </rss>`;
@@ -142,4 +145,30 @@ function getGoogleCategory(category: string | undefined): string {
   };
 
   return categoryMap[category.toLowerCase()] || "166";
+}
+
+// Normalize product_type into Google-preferred breadcrumb format: "A > B > C"
+function normalizeProductType(input?: string): string {
+  if (!input) return "General";
+  // Remove leading/trailing whitespace and any leading separators
+  const trimmed = input.trim().replace(/^([>\/\-\s])+/, "");
+  // Split on '>' or '/' and normalize spacing/casing
+  const parts = trimmed
+    .split(/>|\//)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+  if (parts.length === 0) return "General";
+  return parts.join(" > ");
+}
+
+// Format price per Google spec: two decimals + space + currency (e.g., "273.00 USD")
+function formatPriceForGMC(amount: number, currency: string = "USD"): string {
+  const cents = Number.isFinite(amount) ? amount : 0;
+  return `${cents.toFixed(2)} ${currency}`;
+}
+
+// Format weight in grams with required space before unit (e.g., "100 g")
+function formatWeight(grams?: number): string {
+  const g = typeof grams === "number" && grams > 0 ? grams : 100;
+  return `${g} g`;
 }
