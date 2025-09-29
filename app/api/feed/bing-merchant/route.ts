@@ -81,13 +81,15 @@ export async function GET() {
               if (sizeIndex === 2) size = variant.option3 || "";
             }
 
-            const hasSale =
-              typeof variant.compare_at_price === "number" &&
-              variant.compare_at_price > variant.price;
-            const basePrice = formatPriceForGMC(
-              hasSale ? variant.compare_at_price : variant.price
-            );
-            const salePrice = hasSale ? formatPriceForGMC(variant.price) : null;
+            const priceNum = variant.price;
+            const compareNum = variant.compare_at_price;
+            let baseAmount: number = priceNum;
+            let salePrice: string | null = null;
+            if (typeof compareNum === "number" && compareNum > priceNum) {
+              baseAmount = compareNum;
+              salePrice = formatPriceForGMC(priceNum);
+            }
+            const basePrice = formatPriceForGMC(baseAmount);
             const productType = normalizeProductType(
               productData.product_type || product.product_type
             );
