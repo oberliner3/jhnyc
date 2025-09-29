@@ -47,68 +47,54 @@ export function CookieBanner() {
         boxShadow: "0 -1px 0 hsl(var(--border))",
         animation: "var(--animate-fade-in)",
       }}
-      onAccept={() => {}} // Handled by the custom buttons
-      onDecline={() => {}} // Handled by the custom buttons
+      onAccept={() => {
+        const consent = buildConsent(true);
+        Cookies.set(SITE_CONFIG.cookieConfig.name, JSON.stringify(consent), {
+          expires: SITE_CONFIG.cookieConfig.expires,
+          sameSite: "Lax",
+          secure: process.env.NODE_ENV === "production",
+        });
+
+        if (window?.gtag) {
+          window.gtag("consent", "update", {
+            ad_storage: "granted",
+            analytics_storage: "granted",
+          });
+        }
+
+        const banner = document.querySelector(".cookie-consent");
+        if (banner) banner.remove();
+      }}
+      onDecline={() => {
+        const consent = buildConsent(false);
+        Cookies.set(SITE_CONFIG.cookieConfig.name, JSON.stringify(consent), {
+          expires: SITE_CONFIG.cookieConfig.expires,
+          sameSite: "Lax",
+          secure: process.env.NODE_ENV === "production",
+        });
+
+        if (window?.gtag) {
+          window.gtag("consent", "update", {
+            ad_storage: "denied",
+            analytics_storage: "denied",
+          });
+        }
+
+        const banner = document.querySelector(".cookie-consent");
+        if (banner) banner.remove();
+      }}
     >
       <div className="flex-1">
         <p className="text-sm text-muted-foreground">
-          We use cookies to enhance your experience and analyze our traffic. You can
+          We use cookies to enhance your experience and analyze our traffic. You
+          can
           <span className="mx-1 text-foreground font-medium">accept all</span>
           or
-          <span className="mx-1 text-foreground font-medium">reject non-essential</span>
+          <span className="mx-1 text-foreground font-medium">
+            reject non-essential
+          </span>
           cookies.
         </p>
-      </div>
-      <div className="flex items-center gap-2 w-full md:w-auto">
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-1/2 md:w-auto"
-          onClick={() => {
-            const consent = buildConsent(false);
-            Cookies.set(SITE_CONFIG.cookieConfig.name, JSON.stringify(consent), {
-              expires: SITE_CONFIG.cookieConfig.expires,
-              sameSite: "Lax",
-              secure: process.env.NODE_ENV === "production",
-            });
-
-            if (window?.gtag) {
-              window.gtag("consent", "update", {
-                ad_storage: "denied",
-                analytics_storage: "denied",
-              });
-            }
-            // Force close the banner
-            const banner = document.querySelector('.cookie-consent');
-            if (banner) banner.remove();
-          }}
-        >
-          Reject
-        </Button>
-        <Button
-          size="sm"
-          className="w-1/2 md:w-auto"
-          onClick={() => {
-            const consent = buildConsent(true);
-            Cookies.set(SITE_CONFIG.cookieConfig.name, JSON.stringify(consent), {
-              expires: SITE_CONFIG.cookieConfig.expires,
-              sameSite: "Lax",
-              secure: process.env.NODE_ENV === "production",
-            });
-
-            if (window?.gtag) {
-              window.gtag("consent", "update", {
-                ad_storage: "granted",
-                analytics_storage: "granted",
-              });
-            }
-            // Force close the banner
-            const banner = document.querySelector('.cookie-consent');
-            if (banner) banner.remove();
-          }}
-        >
-          Accept All
-        </Button>
       </div>
     </CookieConsent>
   );

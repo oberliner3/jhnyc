@@ -31,11 +31,15 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
 import { countries } from "@/lib/countries";
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { checkoutSchema } from "@/lib/validations";
 import { handleCheckout } from "./actions";
+import { CountrySelector } from "@/components/checkout/country-selector";
+import { AddressInput } from "@/components/checkout/address-input";
+import { PhoneInput } from "@/components/checkout/phone-input";
+import { useFormValidation, type CheckoutFormData } from "@/hooks/use-form-validation";
 
-interface CheckoutFormData {
+interface AddressDetails {
 	email: string;
 	firstName: string;
 	lastName: string;
@@ -53,17 +57,22 @@ export default function CheckoutPage() {
 	const { user } = useAuth();
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [formData, setFormData] = useState<CheckoutFormData>({
-		email: user?.email || "",
-		firstName: "",
-		lastName: "",
-		address: "",
-		city: "",
-		postalCode: "",
-		country: "US",
-		phone: "",
-		apartment: "",
-	});
+  const [phoneValid, setPhoneValid] = useState(false);
+  const { formData, setFieldValue, validationState, isValid } = useFormValidation({
+    initialData: {
+      email: user?.email || "",
+      firstName: "",
+      lastName: "",
+      address: {
+        street: "",
+        city: "",
+        country: "US",
+        postalCode: "",
+        state: ""
+      },
+      phone: ""
+    }
+  });
 
 	const totalPrice = getTotalPrice();
 	const shipping = totalPrice > 50 ? 0 : 9.99;
@@ -86,8 +95,8 @@ export default function CheckoutPage() {
 		}
 	}, [items, router]);
 
-	const handleInputChange = (field: keyof CheckoutFormData, value: string) => {
-		setFormData((prev) => ({ ...prev, [field]: value }));
+	const handleInputChange = (field: string, value: string) => {
+		setFieldValue(field, value);
 		setError(null);
 	};
 
@@ -161,7 +170,6 @@ export default function CheckoutPage() {
                 <Lock className="w-4 h-4" />
                 <Shield className="w-4 h-4" />
                 <span>Secure checkout</span>
-              </div>
             </div>
           </div>
         </div>
@@ -232,129 +240,138 @@ export default function CheckoutPage() {
                 <Truck className="w-4 h-4" />
                 Delivery
               </h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-4">
                 {/* Country/Region */}
-                <div>
-                  <Label htmlFor={inputCountryId}>Country/Region</Label>
-                  <Select
-                    value={formData.country}
-                    onValueChange={(value) => handleInputChange("country", value)}
-                  >
-                    <SelectTrigger id={inputCountryId} className="mt-1">
-                      <SelectValue placeholder="Select a country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countries.map((country) => (
-                        <SelectItem key={country.code} value={country.code}>
-                          {country.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <CountrySelector
+                  value={formData.address?.country || "US"}
+                  onValueChange={(value) => handleInputChange("address.country", value)}
+                  error={validationState["address.country"]?.error || undefined}
+                />
 
                 {/* Name Fields */}
                 <div className="gap-4 grid grid-cols-2">
                   <div>
-                    <Label htmlFor={inputFirtNameId}>
-                      First name (optional)
+                    <Label
+                      htmlFor={inputFirtNameId}
+                      className={cn(validationState.firstName?.error && "text-destructive")}
+                    >
+                      First name
                     </Label>
                     <Input
                       id={inputFirtNameId}
                       value={formData.firstName}
-                      onChange={(e) =>
-                        handleInputChange("firstName", e.target.value)
-                      }
-                      className="mt-1"
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                      className={cn(
+                        "mt-1",
+                        validationState.firstName?.error && "border-destructive"
+                      )}
+                      required
                     />
+                    {validationState.firstName?.error && (
+                      <span className="text-sm text-destructive">
+                        {validationState.firstName.error}
+                      </span>
+                    )}
                   </div>
                   <div>
-                    <Label htmlFor={inputLastNameId}>Last name</Label>
+                    <Label
+                      htmlFor={inputLastNameId}
+                      className={cn(validationState.lastName?.error && "text-destructive")}
+                    >
+                      Last name
+                    </Label>
                     <Input
                       id={inputLastNameId}
                       value={formData.lastName}
-                      onChange={(e) =>
-                        handleInputChange("lastName", e.target.value)
-                      }
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      className={cn(
+                        "mt-1",
+                        validationState.lastName?.error && "border-destructive"
+                      )}
                       required
-                      className="mt-1"
                     />
+                    {validationState.lastName?.error && (
+                      <span className="text-sm text-destructive">
+                        {validationState.lastName.error}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 {/* Address */}
-                <div>
-                  <Label htmlFor={inputAddressId}>Address</Label>
-                  <Input
-                    id={inputAddressId}
-                    value={formData.address}
-                    onChange={(e) =>
-                      handleInputChange("address", e.target.value)
+                <AddressInput
+                  value={formData.address?.street || ""}
+                  onChange={(value) => handleInputChange("address.street", value)}
+                  onAddressSelect={(address) => {
+                    handleInputChange("address.street", address.street);
+                    handleInputChange("address.city", address.city);
+                    handleInputChange("address.postalCode", address.postalCode);
+                    // Some countries might not have states
+                    if (address.state) {
+                      handleInputChange("address.state", address.state);
                     }
-                    placeholder="123 Main Street"
-                    required
-                    className="mt-1"
-                  />
-                </div>
+                  }}
+                  error={validationState["address.street"]?.error || undefined}
+                />
 
-                {/* Apartment */}
-                <div>
-                  <Label htmlFor={inputApartmentId}>
-                    Apartment, suite, etc. (optional)
-                  </Label>
-                  <Input
-                    id={inputApartmentId}
-                    value={formData.apartment}
-                    onChange={(e) =>
-                      handleInputChange("apartment", e.target.value)
-                    }
-                    placeholder="Apt 4B"
-                    className="mt-1"
-                  />
-                </div>
+                {/* Apartment/Suite (using state field) */}
+                <Input
+                  placeholder="Apartment, suite, etc. (optional)"
+                  value={formData.address?.state || ""}
+                  onChange={(e) => handleInputChange("address.state", e.target.value)}
+                  className="mt-1"
+                />
 
                 {/* City and Postal Code */}
                 <div className="gap-4 grid grid-cols-2">
                   <div>
+                    <Label
+                      htmlFor={inputCityId}
+                      className={cn(validationState["address.city"]?.error && "text-destructive")}
+                    >
+                      City
+                    </Label>
+                    <Input
+                      id={inputCityId}
+                      value={formData.address?.city || ""}
+                      onChange={(e) => handleInputChange("address.city", e.target.value)}
+                      className={cn(
+                        "mt-1",
+                        validationState["address.city"]?.error && "border-destructive"
+                      )}
+                      required
+                    />
+                    {validationState["address.city"]?.error && (
+                      <span className="text-sm text-destructive">
+                        {validationState["address.city"].error}
+                      </span>
+                    )}
+                  </div>
+                  <div>
                     <Label htmlFor={inputPostalCodeId}>
-                      Postal code (optional)
+                      Postal code
                     </Label>
                     <Input
                       id={inputPostalCodeId}
-                      value={formData.postalCode}
-                      onChange={(e) =>
-                        handleInputChange("postalCode", e.target.value)
-                      }
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor={inputCityId}>City</Label>
-                    <Input
-                      id={inputCityId}
-                      value={formData.city}
-                      onChange={(e) =>
-                        handleInputChange("city", e.target.value)
-                      }
-                      required
+                      value={formData.address?.postalCode || ""}
+                      onChange={(e) => handleInputChange("address.postalCode", e.target.value)}
                       className="mt-1"
                     />
                   </div>
                 </div>
 
                 {/* Phone */}
-                <div>
-                  <Label htmlFor={inputPhoneId}>Phone number (optional)</Label>
-                  <Input
-                    id={inputPhoneId}
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    placeholder="(555) 123-4567"
-                    className="mt-1"
-                  />
+                <PhoneInput
+                  value={formData.phone || ""}
+                  onChange={(value, isValid) => {
+                    handleInputChange("phone", value);
+                    setPhoneValid(isValid);
+                  }}
+                  countryCode={formData.address?.country || "US"}
+                  error={validationState.phone?.error || undefined}
+                />
                 </div>
-              </form>
+              </div>
             </div>
 
             {/* Shipping Method */}
@@ -603,5 +620,6 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
-  );
+  )
+
 }
