@@ -1,11 +1,19 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
+      container: {
+        center: true,
+        padding: '2rem',
+        screens: {
+          '2xl': '1400px',
+        },
+      },
       colors: {
         'p-bg': 'var(--p-color-bg)',
         'p-bg-inverse': 'var(--p-color-bg-inverse)',
