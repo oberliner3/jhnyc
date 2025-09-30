@@ -1,6 +1,6 @@
 "use client";
 
-import { Minus, Plus, RefreshCw, Shield, Truck } from "lucide-react";
+import { ChevronLeft, ChevronRight, Minus, Plus, RefreshCw, Shield, Truck } from "lucide-react";
 import { SafeHtml } from "@/components/common/safe-html";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -50,6 +50,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
     Record<string, string>
   >({});
   const [quantity, setQuantity] = useState(1);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     if (product) {
@@ -102,45 +103,92 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
       : 0;
 
   const currentPrice = selectedVariant ? selectedVariant.price : product.price;
+  const totalImages = product.images?.length || 0;
+  const currentImage = product.images?.[selectedImageIndex] || {
+    src: selectedVariant?.featured_image || "/og.png",
+    alt: product.title,
+  };
+
+  const handlePreviousImage = () => {
+    setSelectedImageIndex((prev) =>
+      prev === 0 ? totalImages - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setSelectedImageIndex((prev) =>
+      prev === totalImages - 1 ? 0 : prev + 1
+    );
+  };
 
   return (
     <div className="gap-8 lg:gap-12 grid lg:grid-cols-2 p-4">
       <ProductSchema product={product} />
-      {/* Product Images */}
+      {/* Product Images Gallery */}
       <div className="space-y-4">
-        <div className="relative bg-muted rounded-lg aspect-square overflow-hidden">
+        {/* Main Image with Navigation */}
+        <div className="relative bg-muted rounded-lg aspect-square overflow-hidden group">
           <Image
-            src={
-              selectedVariant?.featured_image ||
-              ((product.images || []).length > 0
-                ? (product.images || [])[0].src
-                : "/og.png")
-            }
-            alt={product.title}
+            src={currentImage.src}
+            alt={currentImage.alt || product.title}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-300"
             priority
           />
           {discountPercentage > 0 && (
-            <Badge variant="destructive" className="top-4 left-4 absolute">
+            <Badge variant="destructive" className="top-4 left-4 absolute z-10">
               -{discountPercentage}%
             </Badge>
           )}
+          
+          {/* Image Navigation Arrows */}
+          {totalImages > 1 && (
+            <>
+              <button
+                onClick={handlePreviousImage}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleNextImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                aria-label="Next image"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              
+              {/* Image Counter */}
+              <div className="absolute bottom-4 right-4 bg-black/60 text-white px-2 py-1 rounded text-sm z-10">
+                {selectedImageIndex + 1} / {totalImages}
+              </div>
+            </>
+          )}
         </div>
-        {product.images.length > 1 && (
-          <div className="gap-2 grid grid-cols-4">
-            {product.images.slice(1, 5).map((image, index) => (
-              <div
+        
+        {/* Thumbnail Gallery */}
+        {totalImages > 1 && (
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {product.images.map((image, index) => (
+              <button
                 key={`thumb-${product.id}-${image.id ?? index}`}
-                className="relative bg-muted rounded-md aspect-square overflow-hidden"
+                onClick={() => setSelectedImageIndex(index)}
+                className={`relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border-2 transition-all ${
+                  selectedImageIndex === index
+                    ? "border-primary ring-2 ring-primary/30"
+                    : "border-transparent hover:border-gray-300"
+                }`}
+                aria-label={`View image ${index + 1}`}
               >
                 <Image
                   src={image.src}
-                  alt={`${product.title} ${index + 2}`}
+                  alt={`${product.title} ${index + 1}`}
                   fill
                   className="object-cover"
+                  sizes="80px"
                 />
-              </div>
+              </button>
             ))}
           </div>
         )}

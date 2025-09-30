@@ -11,6 +11,7 @@ import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { Toaster } from "@/components/ui/sonner";
+import DevToolsBlocker from "@/components/common/dev-tools-blocker";
 import { Providers } from "./providers";
 
 export const viewport: Viewport = {
@@ -48,6 +49,7 @@ export default function RootLayout({
       </head>
       <body className="will-change-scroll">
         <ErrorBoundary>
+          <DevToolsBlocker />
           <Providers>
             <div className="flex flex-col bg-background min-h-screen">
               <AnnouncementBar />

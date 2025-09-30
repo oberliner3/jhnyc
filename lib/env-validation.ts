@@ -37,9 +37,9 @@ export function getServerEnv(): ServerEnv {
     return cachedServerEnv;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const msgs = error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
+      const msgs = error.issues.map((err: z.ZodIssue) => `${err.path.join('.')}: ${err.message}`);
       console.error('❌ Server environment validation failed:');
-      msgs.forEach((m) => console.error(`  - ${m}`));
+      msgs.forEach((m: string) => console.error(`  - ${m}`));
       throw new Error(`Server environment validation failed:\n${msgs.join('\n')}`);
     }
     throw error;
@@ -50,9 +50,9 @@ export function getPublicEnv(): PublicEnv {
   if (cachedPublicEnv) return cachedPublicEnv;
   const parsed = publicEnvSchema.safeParse(process.env);
   if (!parsed.success) {
-    const msgs = parsed.error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
+    const msgs = parsed.error.issues.map((err: z.ZodIssue) => `${err.path.join('.')}: ${err.message}`);
     console.warn('⚠ Public environment validation warnings:');
-    msgs.forEach((m) => console.warn(`  - ${m}`));
+    msgs.forEach((m: string) => console.warn(`  - ${m}`));
     // Return best-effort defaults without throwing to avoid crashing the client
     cachedPublicEnv = {
       NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,

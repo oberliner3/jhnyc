@@ -1,11 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { SITE_CONFIG } from "@/lib/constants";
+import { getServerEnv } from "@/lib/env-validation";
 
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${SITE_CONFIG.api}${endpoint}`;
+  const { PRODUCT_STREAM_API } = getServerEnv();
+  const url = `${PRODUCT_STREAM_API}${endpoint}`;
   const response = await fetch(url, options);
   if (!response.ok) {
     const errorBody = await response.text();

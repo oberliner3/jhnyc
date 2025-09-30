@@ -59,7 +59,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-	"group inline-flex justify-center items-center bg-background data-[state=open]:bg-accent/50 data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent hover:bg-accent focus:bg-accent disabled:opacity-50 px-4 py-2 rounded-md outline-none focus-visible:outline-1 focus-visible:ring-[3px] focus-visible:ring-ring/50 w-max h-9 font-medium text-sm transition-[color,box-shadow] data-[state=open]:text-accent-foreground hover:text-accent-foreground focus:text-accent-foreground disabled:pointer-events-none",
+	"group inline-flex justify-center items-center bg-background hover:bg-foreground/[0.04] focus:bg-foreground/[0.05] data-[state=open]:bg-foreground/[0.05] data-[state=open]:hover:bg-foreground/[0.08] data-[state=open]:focus:bg-foreground/[0.08] disabled:opacity-50 px-4 py-2 rounded-md outline-none focus-visible:outline-1 focus-visible:ring-[3px] focus-visible:ring-ring/50 w-max h-9 font-medium text-sm transition-[color,box-shadow] text-foreground disabled:pointer-events-none",
 );
 
 function NavigationMenuTrigger({
@@ -129,7 +129,7 @@ function NavigationMenuLink({
 		<NavigationMenuPrimitive.Link
 			data-slot="navigation-menu-link"
 			className={cn(
-				"data-[active=true]:focus:bg-accent data-[active=true]:hover:bg-accent data-[active=true]:bg-accent/50 data-[active=true]:text-accent-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-ring/50 [&_svg:not([class*='text-'])]:text-muted-foreground flex flex-col gap-1 rounded-sm p-2 text-sm transition-all outline-none focus-visible:ring-[3px] focus-visible:outline-1 [&_svg:not([class*='size-'])]:size-4",
+				"data-[active=true]:bg-foreground/[0.06] data-[active=true]:text-foreground data-[active=true]:focus:bg-foreground/[0.08] data-[active=true]:hover:bg-foreground/[0.08] hover:bg-foreground/[0.04] hover:text-foreground focus:bg-foreground/[0.05] focus:text-foreground focus-visible:ring-ring/50 [&_svg:not([class*='text-'])]:text-muted-foreground flex flex-col gap-1 rounded-sm p-2 text-sm transition-all outline-none focus-visible:ring-[3px] focus-visible:outline-1 [&_svg:not([class*='size-'])]:size-4",
 				className,
 			)}
 			{...props}

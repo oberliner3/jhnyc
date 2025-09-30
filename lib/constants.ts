@@ -159,7 +159,7 @@ export const APP_CONTACTS = {
 
 export const NAVIGATION_ITEMS = [
   { name: "Home", href: "/" },
-  { name: "Products", href: "/products" },
+  { name: "Collections", href: "/collections/all" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];

@@ -14,14 +14,18 @@
     --radius-xl: calc(var(--radius) + 4px);
 
     /* Color system - Light mode (HSL values) */
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --background: 0 0% 100%; /* white */
+    --foreground: 240 10% 3.9%; /* near-black text */
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 142 76% 36%;
-    --primary-foreground: 355 100% 97%;
+
+    /* Brand (blackish / whitish) */
+    --primary: 0 0% 13%;            /* #212121 */
+    --primary-hover: 0 0% 46%;      /* #757575 */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
@@ -32,7 +36,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 142 76% 36%;
+    --ring: 0 0% 46%; /* subtle neutral focus, aligned with hover */
 
     /* Chart colors */
     --chart-1: 12 76% 61%;
@@ -71,8 +75,9 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 142 70% 45%;
-    --primary-foreground: 144 100% 9%;
+    --primary: 0 0% 13%;            /* #212121 */
+    --primary-hover: 0 0% 46%;      /* #757575 */
+    --primary-foreground: 0 0% 100%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
@@ -83,7 +88,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 142 70% 45%;
+    --ring: 0 0% 46%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -108,6 +113,10 @@
 @layer base {
   * {
     @apply border-border;
+  }
+
+  a {
+    @apply text-foreground hover:underline underline-offset-4 hover:text-primary-hover;
   }
 
   body {
@@ -160,7 +169,7 @@
 /* Component: Cookie Banner */
 @layer components {
   .cookie-consent-button {
-    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4;
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary-hover h-9 px-4;
   }
 
   .cookie-consent-decline-button {
