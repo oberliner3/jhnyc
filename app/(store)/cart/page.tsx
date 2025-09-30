@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/cart-context";
 import { formatPrice } from "@/lib/utils";
+import { getProductPlaceholder } from "@/lib/placeholder";
 
 function CartContent() {
 	const { items, removeItem, updateQuantity, getTotalPrice } = useCart();
@@ -43,12 +44,13 @@ function CartContent() {
 						key={item.id}
 						className="flex items-center gap-4 p-4 border rounded-lg"
 					>
-						<Image
-							src={item.image || "/placeholder.svg"}
-							alt={item.name}
+                <Image
+                  src={item.image || getProductPlaceholder(item.name, 200, 200)}
+                  alt={item.name}
 							width={80}
 							height={80}
 							className="rounded-md w-20 h-20 object-cover"
+							unoptimized={!item.image}
 						/>
 						<div className="flex-1">
 							<h3 className="font-semibold">{item.name}</h3>

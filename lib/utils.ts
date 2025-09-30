@@ -19,6 +19,42 @@ export function generateSlug(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Generate placeholder image URL using placeholdit.com
+ * Following the app's theme with proper colors
+ */
+export function generatePlaceholderImage({
+  width = 800,
+  height = 600,
+  text = "Image",
+  bgColor,
+  textColor,
+  fontSize = 48,
+  font = "montserrat",
+}: {
+  width?: number;
+  height?: number;
+  text?: string;
+  bgColor?: string;
+  textColor?: string;
+  fontSize?: number;
+  font?: string;
+} = {}): string {
+  // Default colors based on app theme
+  const defaultBg = "f3f4f6"; // gray-100 equivalent
+  const defaultText = "374151"; // gray-700 equivalent
+  
+  const bg = bgColor || defaultBg;
+  const fg = textColor || defaultText;
+  const encodedText = encodeURIComponent(text);
+  
+  return `https://placeholdit.com/${width}x${height}/${bg}/${fg}?text=${encodedText}&font=${font}&font_size=${fontSize}`;
+}
+
+/**
+ * Legacy function for backward compatibility
+ * @deprecated Use generatePlaceholderImage instead
+ */
 export function generateImage({
   dim,
   bg,
@@ -33,7 +69,13 @@ export function generateImage({
   fg: string | number;
   text: string;
 }): string {
-  return `https://via.placeholder.com/${dim.w}x${dim.h}/${bg}/${fg}?text=${text}`;
+  return generatePlaceholderImage({
+    width: dim.w,
+    height: dim.h,
+    text,
+    bgColor: String(bg),
+    textColor: String(fg),
+  });
 }
 
 export function stripHtml(html: string): string {

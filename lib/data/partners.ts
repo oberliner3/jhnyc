@@ -1,37 +1,57 @@
 import type { Partner } from "@/lib/types";
-import { generateImage } from "../utils";
+import { generatePlaceholderImage } from "../utils";
 
 export const PARTNERS: Partner[] = [
   {
     id: 1,
     name: "TechCorp",
-    logo: "https://via.placeholder.com/120x60/008060/ffffff?text=TechCorp",
+    logo: generatePlaceholderImage({
+      width: 200,
+      height: 100,
+      text: "TechCorp",
+      bgColor: "1f2937", // gray-800
+      textColor: "f3f4f6", // gray-100
+      fontSize: 24,
+    }),
     website: "https://techcorp.com",
   },
   {
     id: 2,
     name: "GreenLife",
-    logo: generateImage({
+    logo: generatePlaceholderImage({
+      width: 200,
+      height: 100,
       text: "GreenLife",
-      bg: "008060",
-      fg: "ffffff",
-      dim: {
-        w: 120,
-        h: 60,
-      },
+      bgColor: "10b981", // emerald-500
+      textColor: "ffffff",
+      fontSize: 24,
     }),
     website: "https://greenlife.com",
   },
   {
     id: 3,
     name: "Urban Style",
-    logo: "https://via.placeholder.com/120x60/008060/ffffff?text=Urban+Style",
+    logo: generatePlaceholderImage({
+      width: 200,
+      height: 100,
+      text: "Urban Style",
+      bgColor: "6366f1", // indigo-500
+      textColor: "ffffff",
+      fontSize: 24,
+    }),
     website: "https://urbanstyle.com",
   },
   {
     id: 4,
     name: "Wellness Co",
-    logo: "https://via.placeholder.com/120x60/008060/ffffff?text=Wellness+Co",
+    logo: generatePlaceholderImage({
+      width: 200,
+      height: 100,
+      text: "Wellness Co",
+      bgColor: "8b5cf6", // violet-500
+      textColor: "ffffff",
+      fontSize: 24,
+    }),
     website: "https://wellness.com",
   },
 ];

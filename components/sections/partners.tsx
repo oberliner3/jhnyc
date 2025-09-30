@@ -27,6 +27,7 @@ export function Partners() {
 								width={120}
 								height={60}
 								className="w-auto h-12"
+								unoptimized
 							/>
 						</div>
 					))}

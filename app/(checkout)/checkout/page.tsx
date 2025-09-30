@@ -31,6 +31,7 @@ import { AddressInput } from "@/components/checkout/address-input";
 import { PhoneInput } from "@/components/checkout/phone-input";
 import { useFormValidation } from "@/hooks/use-form-validation";
 import { CountryCode } from "libphonenumber-js";
+import { getProductPlaceholder } from "@/lib/placeholder";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -489,11 +490,12 @@ export default function CheckoutPage() {
                     <div className="relative flex-shrink-0 w-16 h-16">
                       <div className="bg-gray-100 rounded-md w-full h-full overflow-hidden">
                         <Image
-                          src={item.image || "/placeholder.svg"}
+                          src={item.image || getProductPlaceholder(item.name, 200, 200)}
                           alt={item.name}
                           fill
                           className="object-cover"
                           sizes="64px"
+                          unoptimized={!item.image}
                         />
                       </div>
                       <div className="-top-1 -right-1 absolute z-10 flex justify-center items-center bg-gray-800 rounded-full w-5 h-5 text-white text-xs border border-white">
