@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { APP_CONTACTS } from "@/lib/constants";
 import { generateSEO } from "@/lib/seo";
-import { stripHtml } from "@/lib/utils";
+import { SafeHtml } from "@/components/common/safe-html";
 
 export const metadata: Metadata = generateSEO({
   title: "Contact Us",
@@ -129,12 +129,9 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="font-medium">Address</p>
-                  <p
-                    className="text-muted-foreground"
-                    dangerouslySetInnerHTML={{
-                      __html: stripHtml(APP_CONTACTS.address.office),
-                    }}
-                  />
+                  <div className="text-muted-foreground">
+                    <SafeHtml html={APP_CONTACTS.address.office} />
+                  </div>
                 </div>
               </div>
 

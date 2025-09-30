@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { APP_CONTACTS, FOOTER_LINKS, SITE_CONFIG } from "@/lib/constants";
-import { stripHtml } from "@/lib/utils";
+import { SafeHtml } from "@/components/common/safe-html";
 
 export function Footer() {
   return (
@@ -62,11 +62,9 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-gray-600 text-sm">
                 <MapPin className="w-4 h-4 text-gray-400" />
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: stripHtml(APP_CONTACTS.address.office),
-                  }}
-                />
+                <span>
+                  <SafeHtml html={APP_CONTACTS.address.office} />
+                </span>
               </div>
               <div className="flex items-center gap-2 text-gray-600 text-sm">
                 <Phone className="w-4 h-4 text-gray-400" />

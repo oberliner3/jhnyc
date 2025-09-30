@@ -19,6 +19,21 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+    rules: {
+      "react/no-danger": "error",
+      "react/no-danger-with-children": "error",
+    },
+  },
+  {
+    files: [
+      "components/common/product-schema.tsx",
+      "components/common/website-schema.tsx",
+      "components/common/safe-html.tsx",
+    ],
+    rules: {
+      "react/no-danger": "off",
+      "react/no-danger-with-children": "off",
+    },
   },
 ];
 

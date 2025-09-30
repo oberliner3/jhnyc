@@ -43,12 +43,15 @@ self.addEventListener("activate", (event) => {
 			.keys()
 			.then((cacheNames) => {
 				return Promise.all(
-					cacheNames.map((cacheName) => {
-						if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+					cacheNames
+						.filter(
+							(cacheName) =>
+								cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE,
+						)
+						.map((cacheName) => {
 							console.log("Deleting old cache:", cacheName);
 							return caches.delete(cacheName);
-						}
-					}),
+						}),
 				);
 			})
 			.then(() => {

@@ -154,30 +154,7 @@ export default function CheckoutPage() {
           <div className="gap-8 grid lg:grid-cols-[2fr_1fr]">
             {/* Checkout Form */}
             <div className="space-y-6">
-              {/* Express Checkout */}
-              <div className="bg-white p-6 border rounded-lg">
-                <h2 className="mb-4 font-semibold text-lg">Express checkout</h2>
-                <div className="space-y-3">
-                  <Button
-                    variant="outline"
-                    className="bg-purple-600 hover:bg-purple-700 border-purple-600 w-full h-12 text-white"
-                  >
-                    Shop Pay
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="bg-yellow-500 hover:bg-yellow-600 border-yellow-500 w-full h-12 text-white"
-                  >
-                    PayPal
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="bg-black hover:bg-gray-800 border-black w-full h-12 text-white"
-                  >
-                    Google Pay
-                  </Button>
-                </div>
-              </div>
+              {/* Express Checkout removed */}
 
               {/* Contact Information */}
               <div className="bg-white p-6 border rounded-lg">
@@ -432,7 +409,7 @@ export default function CheckoutPage() {
               </p>
 
               <div className="space-y-4">
-                {/* Credit Card Option */}
+                {/* Cash on Delivery Option */}
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-3 mb-3">
                     <input
@@ -442,37 +419,12 @@ export default function CheckoutPage() {
                       className="w-4 h-4"
                     />
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">Credit card</span>
-                      <div className="flex items-center gap-1">
-                        <Image
-                          src="/payment-logos/cards/visa.svg"
-                          alt="Visa"
-                          width={24}
-                          height={16}
-                          className="object-contain"
-                        />
-                        <Image
-                          src="/payment-logos/cards/mastercard.svg"
-                          alt="Mastercard"
-                          width={24}
-                          height={16}
-                          className="object-contain"
-                        />
-                        <Image
-                          src="/payment-logos/cards/american-express.svg"
-                          alt="American Express"
-                          width={24}
-                          height={16}
-                          className="object-contain"
-                        />
-                        <span className="text-gray-500 text-xs">+5</span>
-                      </div>
+                      <span className="font-medium">Cash on Delivery</span>
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <div className="p-4 text-center text-sm text-muted-foreground border rounded-lg">
-                      [Secure payment provider integration (e.g., Stripe
-                      Elements) will go here]
+                    <div className="p-4 text-sm text-muted-foreground border rounded-lg">
+                      Pay with cash upon delivery. Our courier will collect the payment when your order arrives.
                     </div>
                   </div>
                 </div>

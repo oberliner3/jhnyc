@@ -1,7 +1,6 @@
 import { FeaturedProducts } from "@/components/sections/featured-products";
 import { Hero } from "@/components/sections/hero";
 import { InfoSections } from "@/components/sections/info-sections";
-import { Newsletter } from "@/components/sections/newsletter";
 import { Partners } from "@/components/sections/partners";
 import { Reviews } from "@/components/sections/reviews";
 import { generateSEO } from "@/lib/seo";

@@ -70,10 +70,9 @@ export function ProductCard({ product }: ProductCardProps) {
           <h3 className="font-semibold group-hover:text-primary line-clamp-2 transition-colors">
             <Link href={`/products/${product.handle}`}>{product.title}</Link>
           </h3>
-          <p
-            className="text-muted-foreground text-sm line-clamp-2"
-            dangerouslySetInnerHTML={{ __html: stripHtml(product.body_html) }}
-          />
+          <p className="text-muted-foreground text-sm line-clamp-2">
+            {stripHtml(product.body_html || "")}
+          </p>
         </div>
 
         {/* Rating */}

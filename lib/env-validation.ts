@@ -59,7 +59,7 @@ export function getPublicEnv(): PublicEnv {
       NEXT_PUBLIC_STORE_NAME: process.env.NEXT_PUBLIC_STORE_NAME,
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      NODE_ENV: process.env.NODE_ENV as any,
+      NODE_ENV: process.env.NODE_ENV as 'development' | 'production' | 'test' | undefined,
     };
     return cachedPublicEnv;
   }

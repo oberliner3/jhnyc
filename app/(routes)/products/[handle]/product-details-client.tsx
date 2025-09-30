@@ -1,6 +1,7 @@
 "use client";
 
 import { Minus, Plus, RefreshCw, Shield, Truck } from "lucide-react";
+import { SafeHtml } from "@/components/common/safe-html";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -270,10 +271,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
           <AccordionItem value="details">
             <AccordionTrigger>Details</AccordionTrigger>
             <AccordionContent>
-              <p
-                className="text-muted-foreground"
-                dangerouslySetInnerHTML={{ __html: product.body_html }}
-              />
+              <SafeHtml html={product.body_html || ""} className="text-muted-foreground" />
               {product.tags && product.tags.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 mt-4">
                   {product.tags.split(",").map((tag) => (
