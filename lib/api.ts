@@ -4,19 +4,20 @@
  */
 
 import { API_CONFIG, LIMITS } from "./constants";
-import { getEnv } from "./env-validation";
+import { getServerEnv } from "./env-validation";
 import { ApiClientError, logError, createApiResponse, type ApiResponse } from "./errors";
 import type { ApiProduct } from "./types";
 
-// Get validated environment
-const env = getEnv();
+// Get validated server environment (server-only)
+const serverEnv = getServerEnv();
 
 // Enhanced API request function with retry logic and proper error handling
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${API_CONFIG.BASE_URL}/cosmos${endpoint}`;
+  const base = serverEnv.PRODUCT_STREAM_API.replace(/\/$/, "");
+  const url = `${base}/cosmos${endpoint}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
   
@@ -30,7 +31,7 @@ async function apiRequest<T>(
         headers: {
           ...API_CONFIG.HEADERS,
           ...options.headers,
-          "X-API-KEY": env.PRODUCT_STREAM_X_KEY,
+          "X-API-KEY": serverEnv.PRODUCT_STREAM_X_KEY,
         },
         signal: controller.signal,
       });

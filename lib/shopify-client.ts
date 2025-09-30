@@ -1,9 +1,9 @@
 import { createAdminApiClient } from '@shopify/admin-api-client';
-import { getEnv } from '@/lib/env-validation';
+import { getServerEnv } from '@/lib/env-validation';
 
 // SECURITY: Only use server-side environment variables - NEVER expose tokens to client
 function getShopifyConfig() {
-  const env = getEnv();
+  const env = getServerEnv();
   return {
     shopDomain: env.SHOPIFY_SHOP,
     accessToken: env.SHOPIFY_ACCESS_TOKEN || env.SHOPIFY_TOKEN,

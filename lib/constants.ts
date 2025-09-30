@@ -1,17 +1,23 @@
-import { getEnv } from './env-validation';
+import { getPublicEnv } from './env-validation';
 
-// Validate environment on module load
-const env = getEnv();
+// Public env only (safe for client-side import)
+const publicEnv = getPublicEnv();
+
+const siteDomain = publicEnv.NEXT_PUBLIC_SITE_URL || 'localhost:3000';
+const siteUrl = siteDomain.startsWith('http') ? siteDomain : (isLocalhost(siteDomain) ? `http://${siteDomain}` : `https://${siteDomain}`);
+
+function isLocalhost(host: string) {
+  return host.includes('localhost') || /^(127\.0\.0\.1|0\.0\.0\.0)/.test(host);
+}
 
 export const SITE_CONFIG = {
-  name: env.NEXT_PUBLIC_STORE_NAME || "OriGenZ",
+  name: publicEnv.NEXT_PUBLIC_STORE_NAME || "OriGenZ",
   description: "Premium e-commerce storefront built with Next.js",
-  domain: env.NEXT_PUBLIC_SITE_URL || "originz.vercel.app",
-  url: `https://${env.NEXT_PUBLIC_SITE_URL || "originz.vercel.app"}`,
-  api: env.PRODUCT_STREAM_API,
-  ogTitle: `${env.NEXT_PUBLIC_STORE_NAME || "OriGenZ"} - Your One-Stop Shop for Quality Products`,
-  ogImage: `https://${env.NEXT_PUBLIC_SITE_URL || "originz.vercel.app"}/og.png`,
-  author: env.NEXT_PUBLIC_STORE_NAME || "OriGenZ",
+  domain: siteDomain,
+  url: siteUrl,
+  ogTitle: `${publicEnv.NEXT_PUBLIC_STORE_NAME || "OriGenZ"} - Your One-Stop Shop for Quality Products`,
+  ogImage: `${siteUrl}/og.png`,
+  author: publicEnv.NEXT_PUBLIC_STORE_NAME || "OriGenZ",
   lastUpdate: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
   keywords: [
     "e-commerce",
@@ -28,7 +34,7 @@ export const SITE_CONFIG = {
     name: "originz-cookie-consent",
     expires: 180, // days
     sameSite: "Lax" as const,
-    secure: env.NODE_ENV === "production",
+    secure: (publicEnv.NODE_ENV || 'development') === "production",
     httpOnly: false, // Allow client-side access for consent management
   },
 } as const;
@@ -68,9 +74,9 @@ export const UI_CONFIG = {
   MOBILE_BREAKPOINT: 768, // Mobile breakpoint in pixels
 } as const;
 
-// API Configuration
+// API Configuration (client-safe defaults; server modules should use getServerEnv)
 export const API_CONFIG = {
-  BASE_URL: env.PRODUCT_STREAM_API,
+  BASE_URL: '/api',
   VERSION: 'v1',
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000, // Base retry delay in milliseconds
