@@ -8,16 +8,16 @@ import { Header } from "@/components/layout/header";
  * It's used by all pages in the (store) route group.
  */
 export default function StoreLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return (
-    <>
-      <AnnouncementBar />
-      <Header />
-      <main className="flex-grow">{children}</main>
-      <Footer />
-    </>
-  );
+	return (
+		<>
+			<AnnouncementBar />
+			<Header />
+			<main className="flex-grow">{children}</main>
+			<Footer />
+		</>
+	);
 }

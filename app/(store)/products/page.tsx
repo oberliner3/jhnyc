@@ -1,28 +1,48 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { ProductCard } from "@/components/product/product-card";
-import { ProductGridSkeleton } from "@/components/skeletons/product-card-skeleton";
 import { getAllProducts } from "@/lib/api";
-import { generateSEO } from "@/lib/seo";
+import { Button } from "@/components/ui/button";
+import type { ApiProduct } from "@/lib/types";
 
-export const revalidate = 60;
+function ProductsList() {
+	const [products, setProducts] = useState<ApiProduct[]>([]);
+	const [page, setPage] = useState(1);
+	const [hasMore, setHasMore] = useState(true);
 
-export const metadata: Metadata = generateSEO({
-	title: "Products",
-	description:
-		"Browse our complete collection of premium products. Find everything you need from electronics to fashion and lifestyle items.",
-	path: "/products",
-});
+	useEffect(() => {
+		getAllProducts({ limit: 24, page: 1 }).then((initialProducts) => {
+			setProducts(initialProducts);
+			if (initialProducts.length < 24) {
+				setHasMore(false);
+			}
+		});
+	}, []);
 
-async function ProductsList() {
-	const apiProducts = await getAllProducts({ limit: 24 });
-	const products = apiProducts;
+	const loadMore = async () => {
+		const nextPage = page + 1;
+		const newProducts = await getAllProducts({ limit: 24, page: nextPage });
+		if (newProducts.length > 0) {
+			setProducts((prevProducts) => [...prevProducts, ...newProducts]);
+			setPage(nextPage);
+		} else {
+			setHasMore(false);
+		}
+	};
 
 	return (
-		<div className="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-			{products.map((product) => (
-				<ProductCard key={product.id} product={product} />
-			))}
+		<div>
+			<div className="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+				{products.map((product) => (
+					<ProductCard key={product.id} product={product} />
+				))}
+			</div>
+			{hasMore && (
+				<div className="mt-8 text-center">
+					<Button onClick={loadMore}>Load More</Button>
+				</div>
+			)}
 		</div>
 	);
 }
@@ -39,9 +59,7 @@ export default function ProductsPage() {
 				</p>
 			</div>
 
-			<Suspense fallback={<ProductGridSkeleton count={24} />}>
-				<ProductsList />
-			</Suspense>
+			<ProductsList />
 		</div>
 	);
 }

@@ -55,7 +55,13 @@ export async function generateMetadata({
 	});
 }
 
-async function CollectionProducts({ slug, page = 1 }: { slug: string; page: number }) {
+async function CollectionProducts({
+	slug,
+	page = 1,
+}: {
+	slug: string;
+	page: number;
+}) {
 	let products: ApiProduct[] = [];
 	const productsPerPage = 20;
 	let hasNextPage = false;
@@ -66,7 +72,10 @@ async function CollectionProducts({ slug, page = 1 }: { slug: string; page: numb
 		if (slug === "all") {
 			products = await getAllProducts({ limit: productsPerPage, page });
 			// Fetch one more product to check if there's a next page
-			const nextPageProducts = await getAllProducts({ limit: 1, page: page + 1 });
+			const nextPageProducts = await getAllProducts({
+				limit: 1,
+				page: page + 1,
+			});
 			hasNextPage = nextPageProducts.length > 0;
 		} else {
 			// For other collections, fetch all and filter (can be optimized with backend support)
@@ -86,7 +95,9 @@ async function CollectionProducts({ slug, page = 1 }: { slug: string; page: numb
 					break;
 				case "featured":
 					// Filter products with high ratings
-					filteredProducts = allProducts.filter((p) => p.rating && p.rating >= 4);
+					filteredProducts = allProducts.filter(
+						(p) => p.rating && p.rating >= 4,
+					);
 					break;
 				case "bestsellers":
 					// Filter products with high review counts
@@ -120,7 +131,7 @@ async function CollectionProducts({ slug, page = 1 }: { slug: string; page: numb
 							<ProductCard key={product.id} product={product} />
 						))}
 					</div>
-					
+
 					{/* Pagination */}
 					<div className="flex justify-center items-center gap-4 mt-12">
 						{page > 1 && (
@@ -131,11 +142,9 @@ async function CollectionProducts({ slug, page = 1 }: { slug: string; page: numb
 								</Button>
 							</Link>
 						)}
-						
-						<span className="text-sm text-gray-600">
-							Page {page}
-						</span>
-						
+
+						<span className="text-sm text-gray-600">Page {page}</span>
+
 						{hasNextPage && (
 							<Link href={`/collections/${slug}?page=${page + 1}`}>
 								<Button variant="outline" size="sm">
@@ -155,7 +164,10 @@ async function CollectionProducts({ slug, page = 1 }: { slug: string; page: numb
 	);
 }
 
-export default async function CollectionPage({ params, searchParams }: CollectionPageProps) {
+export default async function CollectionPage({
+	params,
+	searchParams,
+}: CollectionPageProps) {
 	const { slug } = await params;
 	const resolvedSearchParams = await searchParams;
 	const page = Number(resolvedSearchParams?.page) || 1;

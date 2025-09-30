@@ -1,7 +1,7 @@
 export default function ProductDetailLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return <div className="main py-8 mt-4">{children}</div>;
+	return <div className="main py-8 mt-4">{children}</div>;
 }

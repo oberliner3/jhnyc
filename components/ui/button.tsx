@@ -137,6 +137,12 @@ export function IconButton({
 	size = "icon",
 	...props
 }: ButtonProps) {
+	if (process.env.NODE_ENV === "development" && !props["aria-label"]) {
+		console.warn(
+			`Warning: IconButton is missing an aria-label for accessibility. This is required for screen readers to announce the button's purpose.`,
+		);
+	}
+
 	return (
 		<Button
 			variant={variant}

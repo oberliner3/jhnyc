@@ -12,66 +12,67 @@ import notFound from "@/app/not-found";
 export const revalidate = 60;
 
 interface ProductPageProps {
-  params: Promise<{ handle: string }>;
+	params: Promise<{ handle: string }>;
 }
 
 export async function generateStaticParams() {
-  try {
-    const products = await getAllProducts({ limit: 100 });
-    return products.filter((p) => p.handle).map((p) => ({ handle: p.handle }));
-  } catch {
-    return [] as { handle: string }[];
-  }
+	try {
+		const products = await getAllProducts({ limit: 100 });
+		return products.filter((p) => p.handle).map((p) => ({ handle: p.handle }));
+	} catch {
+		return [] as { handle: string }[];
+	}
 }
 
 export async function generateMetadata({
-  params,
+	params,
 }: ProductPageProps): Promise<Metadata> {
-  try {
-    const { handle } = await params;
-    const product = await getProductByHandle(handle);
+	try {
+		const { handle } = await params;
+		const product = await getProductByHandle(handle);
 
-    if (!product) {
-      return generateSEO({ title: "Product Not Found" });
-    }
+		if (!product) {
+			return generateSEO({ title: "Product Not Found" });
+		}
 
-    const seoImage = product.images?.[0]?.src || SITE_CONFIG.ogImage;
+		const seoImage = product.images?.[0]?.src || SITE_CONFIG.ogImage;
 
-    return generateSEO({
-      title: product.title || "",
-      description: product.body_html || "",
-      path: `/products/${product.handle || handle}`,
-      type: "product",
-      image: seoImage,
-    });
-  } catch {
-    return generateSEO({ title: "Product Not Found" });
-  }
+		return generateSEO({
+			title: product.title || "",
+			description: product.body_html || "",
+			path: `/products/${product.handle || handle}`,
+			type: "product",
+			image: seoImage,
+		});
+	} catch {
+		return generateSEO({ title: "Product Not Found" });
+	}
 }
 
 async function ProductPageContent({ handle }: { handle: string }) {
-  const product = await getProductByHandle(handle);
+	const product = await getProductByHandle(handle);
 
-  if (!product) {
-    notFound();
-  }
+	if (!product) {
+		notFound();
+		return null;
+	}
 
-  return (
-    <>
-      <ProductSchema product={product!} />
-      <ProductProvider initialProduct={product}>
-        <ProductDetailsClient product={product!} />
-      </ProductProvider>
-    </>
-  );
+	return (
+		<>
+			<ProductSchema product={product} />
+			<ProductProvider initialProduct={product}>
+				<ProductDetailsClient product={product} />
+			</ProductProvider>
+		</>
+	);
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { handle } = await params;
+	const { handle } = await params;
 
-  return (
-    <Suspense fallback={<ProductDetailsSkeleton />}>
-      <ProductPageContent handle={handle} />
-    </Suspense>
-  );
+	return (
+		<Suspense fallback={<ProductDetailsSkeleton />}>
+			<ProductPageContent handle={handle} />
+		</Suspense>
+	);
 }

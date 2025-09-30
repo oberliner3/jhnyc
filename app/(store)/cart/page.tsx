@@ -1,16 +1,17 @@
 "use client";
 
-import { Minus, Plus, ShoppingCart, X } from "lucide-react";
+import { EmptyCart } from "@/components/cart/empty-cart";
+import { Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CartSkeleton } from "@/components/skeletons/cart-skeleton";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/cart-context";
 import { formatPrice } from "@/lib/utils";
 import { getProductPlaceholder } from "@/lib/placeholder";
+import { QuantityInput } from "@/components/cart/quantity-input";
 
 function CartContent() {
 	const { items, removeItem, updateQuantity, getTotalPrice } = useCart();
@@ -21,18 +22,7 @@ function CartContent() {
 	const total = subtotal + shipping + tax;
 
 	if (items.length === 0) {
-		return (
-			<div className="py-12 text-center">
-				<ShoppingCart className="mx-auto mb-4 w-12 h-12 text-muted-foreground" />
-				<h2 className="mb-2 font-semibold text-2xl">Your cart is empty</h2>
-				<p className="mb-6 text-muted-foreground">
-					Add some items to your cart to get started.
-				</p>
-				<Button asChild>
-					<Link href="/products">Continue Shopping</Link>
-				</Button>
-			</div>
-		);
+		return <EmptyCart />;
 	}
 
 	return (
@@ -44,9 +34,9 @@ function CartContent() {
 						key={item.id}
 						className="flex items-center gap-4 p-4 border rounded-lg"
 					>
-                <Image
-                  src={item.image || getProductPlaceholder(item.name, 200, 200)}
-                  alt={item.name}
+						<Image
+							src={item.image || getProductPlaceholder(item.name, 200, 200)}
+							alt={item.name}
 							width={80}
 							height={80}
 							className="rounded-md w-20 h-20 object-cover"
@@ -70,12 +60,7 @@ function CartContent() {
 							>
 								<Minus className="w-4 h-4" />
 							</Button>
-							<Input
-								type="number"
-								value={item.quantity}
-								className="w-16 text-center"
-								readOnly
-							/>
+							<QuantityInput item={item} />
 							<Button
 								variant="outline"
 								size="icon"

@@ -6,17 +6,17 @@ import { cn } from "@/lib/utils";
 import { getErrorPlaceholder } from "@/lib/placeholder";
 
 interface PlaceholderImageProps {
-  src?: string | null;
-  alt: string;
-  fallbackText?: string;
-  width?: number;
-  height?: number;
-  className?: string;
-  fill?: boolean;
-  sizes?: string;
-  priority?: boolean;
-  quality?: number;
-  onError?: () => void;
+	src?: string | null;
+	alt: string;
+	fallbackText?: string;
+	width?: number;
+	height?: number;
+	className?: string;
+	fill?: boolean;
+	sizes?: string;
+	priority?: boolean;
+	quality?: number;
+	onError?: () => void;
 }
 
 /**
@@ -24,60 +24,60 @@ interface PlaceholderImageProps {
  * Automatically uses unoptimized for SVG placeholders
  */
 export function PlaceholderImage({
-  src,
-  alt,
-  fallbackText,
-  width,
-  height,
-  className,
-  fill = false,
-  sizes,
-  priority = false,
-  quality = 75,
-  onError,
+	src,
+	alt,
+	fallbackText,
+	width,
+	height,
+	className,
+	fill = false,
+	sizes,
+	priority = false,
+	quality = 75,
+	onError,
 }: PlaceholderImageProps) {
-  const [hasError, setHasError] = useState(false);
+	const [hasError, setHasError] = useState(false);
 
-  // Determine if the source is a placeholder (SVG)
-  const isPlaceholder = !src || src.includes("placeholdit.com") || hasError;
-  
-  // Get the final image source
-  const imageSrc = hasError 
-    ? getErrorPlaceholder(fallbackText || alt, width, height)
-    : src || getErrorPlaceholder(fallbackText || alt, width, height);
+	// Determine if the source is a placeholder (SVG)
+	const isPlaceholder = !src || src.includes("placeholdit.com") || hasError;
 
-  const handleError = () => {
-    setHasError(true);
-    onError?.();
-  };
+	// Get the final image source
+	const imageSrc = hasError
+		? getErrorPlaceholder(fallbackText || alt, width, height)
+		: src || getErrorPlaceholder(fallbackText || alt, width, height);
 
-  if (fill) {
-    return (
-      <Image
-        src={imageSrc}
-        alt={alt}
-        fill
-        className={cn("object-cover", className)}
-        sizes={sizes || "100vw"}
-        priority={priority}
-        quality={quality}
-        onError={handleError}
-        unoptimized={isPlaceholder}
-      />
-    );
-  }
+	const handleError = () => {
+		setHasError(true);
+		onError?.();
+	};
 
-  return (
-    <Image
-      src={imageSrc}
-      alt={alt}
-      width={width || 800}
-      height={height || 800}
-      className={cn("object-cover", className)}
-      priority={priority}
-      quality={quality}
-      onError={handleError}
-      unoptimized={isPlaceholder}
-    />
-  );
+	if (fill) {
+		return (
+			<Image
+				src={imageSrc}
+				alt={alt}
+				fill
+				className={cn("object-cover", className)}
+				sizes={sizes || "100vw"}
+				priority={priority}
+				quality={quality}
+				onError={handleError}
+				unoptimized={isPlaceholder}
+			/>
+		);
+	}
+
+	return (
+		<Image
+			src={imageSrc}
+			alt={alt}
+			width={width || 800}
+			height={height || 800}
+			className={cn("object-cover", className)}
+			priority={priority}
+			quality={quality}
+			onError={handleError}
+			unoptimized={isPlaceholder}
+		/>
+	);
 }

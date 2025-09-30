@@ -6,17 +6,17 @@ import { cn } from "@/lib/utils";
 import { getErrorPlaceholder } from "@/lib/placeholder";
 
 interface SmartImageProps {
-  src?: string | null;
-  alt: string;
-  fallbackText?: string;
-  width?: number;
-  height?: number;
-  className?: string;
-  fill?: boolean;
-  sizes?: string;
-  priority?: boolean;
-  quality?: number;
-  onError?: () => void;
+	src?: string | null;
+	alt: string;
+	fallbackText?: string;
+	width?: number;
+	height?: number;
+	className?: string;
+	fill?: boolean;
+	sizes?: string;
+	priority?: boolean;
+	quality?: number;
+	onError?: () => void;
 }
 
 /**
@@ -26,111 +26,105 @@ interface SmartImageProps {
  * - Automatic placeholder detection
  */
 export function SmartImage({
-  src,
-  alt,
-  fallbackText,
-  width,
-  height,
-  className,
-  fill = false,
-  sizes,
-  priority = false,
-  quality = 75,
-  onError,
+	src,
+	alt,
+	fallbackText,
+	width,
+	height,
+	className,
+	fill = false,
+	sizes,
+	priority = false,
+	quality = 75,
+	onError,
 }: SmartImageProps) {
-  const [hasError, setHasError] = useState(false);
+	const [hasError, setHasError] = useState(false);
 
-  // Determine if the source is a placeholder or SVG that needs unoptimized flag
-  const needsUnoptimized = !src || 
-    hasError || 
-    src.includes("placeholdit.com") || 
-    src.includes(".svg") ||
-    src.includes("placeholder");
-  
-  // Get the final image source
-  const imageSrc = hasError 
-    ? getErrorPlaceholder(fallbackText || alt, width, height)
-    : src || getErrorPlaceholder(fallbackText || alt, width, height);
+	// Determine if the source is a placeholder or SVG that needs unoptimized flag
+	const needsUnoptimized =
+		!src ||
+		hasError ||
+		src.includes("placeholdit.com") ||
+		src.includes(".svg") ||
+		src.includes("placeholder");
 
-  const handleError = () => {
-    setHasError(true);
-    onError?.();
-  };
+	// Get the final image source
+	const imageSrc = hasError
+		? getErrorPlaceholder(fallbackText || alt, width, height)
+		: src || getErrorPlaceholder(fallbackText || alt, width, height);
 
-  const commonProps = {
-    src: imageSrc,
-    alt,
-    className: cn("object-cover", className),
-    priority,
-    quality,
-    onError: handleError,
-    unoptimized: needsUnoptimized,
-  };
+	const handleError = () => {
+		setHasError(true);
+		onError?.();
+	};
 
-  if (fill) {
-    return (
-      <Image
-        {...commonProps}
-        alt={alt}
-        fill
-        sizes={sizes || "100vw"}
-      />
-    );
-  }
+	const commonProps = {
+		src: imageSrc,
+		alt,
+		className: cn("object-cover", className),
+		priority,
+		quality,
+		onError: handleError,
+		unoptimized: needsUnoptimized,
+	};
 
-  return (
-    <Image
-      {...commonProps}
-      alt={alt}
-      width={width || 800}
-      height={height || 800}
-    />
-  );
+	if (fill) {
+		return <Image {...commonProps} alt={alt} fill sizes={sizes || "100vw"} />;
+	}
+
+	return (
+		<Image
+			{...commonProps}
+			alt={alt}
+			width={width || 800}
+			height={height || 800}
+		/>
+	);
 }
 
 /**
  * Product-specific smart image with product dimensions
  */
 export function ProductImage({
-  src,
-  alt,
-  size = 300,
-  className,
-  ...props
-}: Omit<SmartImageProps, 'width' | 'height'> & { size?: number }) {
-  return (
-    <SmartImage
-      src={src}
-      alt={alt}
-      width={size}
-      height={size}
-      className={cn("rounded-lg", className)}
-      fallbackText="Product"
-      {...props}
-    />
-  );
+	src,
+	alt,
+	size = 300,
+	className,
+	...props
+}: Omit<SmartImageProps, "width" | "height"> & { size?: number }) {
+	return (
+		<SmartImage
+			src={src}
+			alt={alt}
+			width={size}
+			height={size}
+			className={cn("rounded-lg", className)}
+			fallbackText="Product"
+			{...props}
+		/>
+	);
 }
 
 /**
  * Logo-specific smart image with logo dimensions
  */
 export function LogoImage({
-  src,
-  alt,
-  width = 200,
-  height = 100,
-  className,
-  ...props
+	src,
+	alt,
+	width = 200,
+	height = 100,
+	className,
+	...props
 }: SmartImageProps) {
-  return (
-    <SmartImage
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      className={cn("object-contain", className)}
-      fallbackText="Logo"
-      {...props}
-    />
-  );
+	return (
+		<SmartImage
+			src={src}
+			alt={alt}
+			width={width}
+			height={height}
+			className={cn("object-contain", className)}
+			fallbackText="Logo"
+			{...props}
+		/>
+	);
 }

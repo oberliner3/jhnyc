@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export async function GET() {
-  const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
+	const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>${SITE_CONFIG.url}/sitemap.xml</loc>
@@ -22,10 +22,10 @@ export async function GET() {
   </sitemap>
 </sitemapindex>`;
 
-  return new NextResponse(sitemapIndex, {
-    headers: {
-      "Content-Type": "application/xml",
-      "Cache-Control": "public, max-age=3600, s-maxage=3600",
-    },
-  });
+	return new NextResponse(sitemapIndex, {
+		headers: {
+			"Content-Type": "application/xml",
+			"Cache-Control": "public, max-age=3600, s-maxage=3600",
+		},
+	});
 }
