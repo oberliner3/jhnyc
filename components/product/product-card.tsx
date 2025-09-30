@@ -66,7 +66,11 @@ export function ProductCard({ product }: ProductCardProps) {
     try {
       await buyNowAction(formData);
     } catch (error) {
-      toast.error("Failed to process order");
+      const errorMessage = error instanceof Error ? error.message : "Failed to process order";
+      toast.error("Failed to process order", {
+        description: errorMessage
+      });
+      console.error("Buy now error:", error);
       setIsLoading(false);
     }
   };
