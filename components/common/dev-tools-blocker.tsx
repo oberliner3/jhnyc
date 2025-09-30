@@ -10,7 +10,7 @@ const DevToolsBlocker = () => {
       return;
     }
 
-    let devtools = { open: false, orientation: '' };
+    const devtools = { open: false, orientation: '' };
     const threshold = 160;
     let warned = false;
 
@@ -106,8 +106,13 @@ const DevToolsBlocker = () => {
     // Disable console methods
     const disableConsole = () => {
       const noop = () => {};
-      ['log', 'debug', 'info', 'warn', 'error', 'trace', 'table'].forEach(method => {
-        (console as any)[method] = noop;
+      type ConsoleMethod = 'log' | 'debug' | 'info' | 'warn' | 'error' | 'trace' | 'table';
+      const methods: ConsoleMethod[] = ['log', 'debug', 'info', 'warn', 'error', 'trace', 'table'];
+      methods.forEach((method) => {
+        const originalMethod = console[method];
+        if (typeof originalMethod === 'function') {
+          console[method] = noop as typeof originalMethod;
+        }
       });
     };
 
