@@ -5,9 +5,9 @@ import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const ANNOUNCEMENTS = [
-	"🎉 Free shipping on orders over $50 - Limited time offer!",
-	"💰 Save 20% with code SAVE2025 - Valid until midnight",
-	"✨ New arrivals now available - Shop the latest trends",
+  "🎉 Free shipping on orders over $50 - Limited time offer!",
+  "💰 Save 20% with code SAVE2025 - Valid until December 31st 2025",
+  "✨ New arrivals now available - Shop the latest trends",
 ];
 
 export function AnnouncementBar() {

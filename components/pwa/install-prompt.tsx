@@ -123,7 +123,7 @@ export function InstallPrompt() {
   }
 
   return (
-    <div className="right-4 md:right-4 bottom-4 left-4 md:left-auto z-50 fixed md:max-w-sm">
+    <div className="left-4 bottom-4 z-50 fixed md:max-w-sm">
       <Card className="shadow-lg border-2 border-primary/20">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">

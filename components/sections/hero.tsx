@@ -88,7 +88,7 @@ export function Hero() {
                   <div className="aspect-video">
                     <iframe
                       className="rounded-lg w-full h-full"
-                      src="https://www.youtube.com/embed/x-vyU_MGg4M"
+                      src="https://www.youtube.com/embed/njVnaQmtfOE"
                       title="YouTube video player"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
