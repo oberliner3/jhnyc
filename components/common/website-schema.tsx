@@ -1,8 +1,11 @@
+/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: <explanation> */
+import Script from "next/script";
+import { useId } from "react";
 import type { Organization, WebSite } from "schema-dts";
 import { APP_CONTACTS, SITE_CONFIG } from "@/lib/constants";
-import Script from "next/script";
 
 export function WebsiteSchema() {
+  const scriptId = useId();
   const websiteSchema: WebSite = {
     "@type": "WebSite",
     "@id": `${SITE_CONFIG.url}/#website`,
@@ -47,7 +50,7 @@ export function WebsiteSchema() {
   };
   return (
     <Script
-      id="json-ld-website"
+      id={scriptId}
       type="application/ld+json"
       strategy="afterInteractive"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(graphSchema) }}

@@ -87,7 +87,6 @@ export function generateSEO({
       apple: "/apple-icon.png",
     },
 
-    manifest: "/manifest.webmanifest",
     alternates: {
       canonical: seoUrl,
     },

@@ -103,6 +103,71 @@ export interface DraftOrderInput {
   }>;
 }
 
+// Helpers to format Shopify GraphQL IDs
+function toGid(type: 'Product' | 'ProductVariant' | 'DraftOrder', id: string | number | undefined) {
+  if (!id) return undefined;
+  const str = String(id);
+  return str.startsWith('gid://') ? str : `gid://shopify/${type}/${str}`;
+}
+
+// Map our REST-like input to Shopify GraphQL DraftOrderInput
+function toGraphqlDraftOrderInput(input: DraftOrderInput) {
+  const lineItems = (input.line_items || []).map((li) => ({
+    ...(li.variant_id ? { variantId: toGid('ProductVariant', li.variant_id) } : {}),
+    quantity: li.quantity,
+    ...(li.title ? { title: li.title } : {}),
+    // originalUnitPrice lets us set a custom price per line item
+    ...(li.price !== undefined ? { originalUnitPrice: String(li.price) } : {}),
+  }));
+
+  const customer = input.customer
+    ? {
+        ...(input.customer.email ? { email: input.customer.email } : {}),
+        ...(input.customer.first_name ? { firstName: input.customer.first_name } : {}),
+        ...(input.customer.last_name ? { lastName: input.customer.last_name } : {}),
+        ...(input.customer.phone ? { phone: input.customer.phone } : {}),
+      }
+    : undefined;
+
+  const shippingAddress = input.shipping_address
+    ? {
+        address1: input.shipping_address.address1,
+        city: input.shipping_address.city,
+        zip: input.shipping_address.zip,
+        country: input.shipping_address.country,
+        ...(input.shipping_address.first_name ? { firstName: input.shipping_address.first_name } : {}),
+        ...(input.shipping_address.last_name ? { lastName: input.shipping_address.last_name } : {}),
+        ...(input.shipping_address.phone ? { phone: input.shipping_address.phone } : {}),
+        ...(input.shipping_address.province ? { province: input.shipping_address.province } : {}),
+      }
+    : undefined;
+
+  const billingAddress = input.billing_address
+    ? {
+        address1: input.billing_address.address1,
+        city: input.billing_address.city,
+        zip: input.billing_address.zip,
+        country: input.billing_address.country,
+        ...(input.billing_address.first_name ? { firstName: input.billing_address.first_name } : {}),
+        ...(input.billing_address.last_name ? { lastName: input.billing_address.last_name } : {}),
+        ...(input.billing_address.phone ? { phone: input.billing_address.phone } : {}),
+        ...(input.billing_address.province ? { province: input.billing_address.province } : {}),
+      }
+    : undefined;
+
+  return {
+    lineItems,
+    ...(customer ? { customer } : {}),
+    ...(shippingAddress ? { shippingAddress } : {}),
+    ...(billingAddress ? { billingAddress } : {}),
+    ...(input.email ? { email: input.email } : {}),
+    ...(input.note ? { note: input.note } : {}),
+    useCustomerDefaultAddress: Boolean(input.use_customer_default_address),
+    // tags: Shopify GraphQL expects [String], but we stored it as a single string
+    ...(input.tags ? { tags: input.tags.split(',').map((t) => t.trim()).filter(Boolean) } : {}),
+  };
+}
+
 // Draft order creation function using the modern API client
 export async function createDraftOrder(orderData: DraftOrderInput) {
   try {
@@ -113,15 +178,8 @@ export async function createDraftOrder(orderData: DraftOrderInput) {
             id
             name
             invoiceUrl
-            order {
-              id
-            }
-            customer {
-              id
-              email
-              firstName
-              lastName
-            }
+            order { id }
+            customer { id email firstName lastName }
             totalPrice
             subtotalPrice
             totalTax
@@ -131,26 +189,35 @@ export async function createDraftOrder(orderData: DraftOrderInput) {
             createdAt
             updatedAt
           }
-          userErrors {
-            field
-            message
-          }
+          userErrors { field message }
         }
       }
     `;
 
-    const response = await shopifyAdmin.request(query, {
-      variables: {
-        input: orderData
-      }
-    });
+    const variables = { input: toGraphqlDraftOrderInput(orderData) } as const;
 
-    const { draftOrderCreate } = response.data as {
-      draftOrderCreate: {
+    const response = await shopifyAdmin.request(query, { variables });
+
+    type DraftOrderCreateResp = {
+      draftOrderCreate?: {
         draftOrder: ShopifyDraftOrder;
         userErrors?: Array<{ field?: string; message: string }>;
       };
+      errors?: unknown;
+      extensions?: unknown;
     };
+
+    const raw = (response as { data?: unknown } | unknown);
+    const data = (raw && typeof raw === 'object' && 'data' in (raw as Record<string, unknown>)
+      ? (raw as { data?: unknown }).data
+      : raw) as DraftOrderCreateResp | undefined;
+
+    const draftOrderCreate = data?.draftOrderCreate;
+
+    if (!draftOrderCreate) {
+      const errors = (data?.errors ?? (data as { extensions?: unknown } | undefined)?.extensions) ?? data;
+      throw new Error(`Shopify draftOrderCreate returned no data: ${JSON.stringify(errors)}`);
+    }
 
     if (draftOrderCreate.userErrors && draftOrderCreate.userErrors.length > 0) {
       throw new Error(`Shopify API errors: ${draftOrderCreate.userErrors.map((e) => e.message).join(', ')}`);
@@ -188,22 +255,38 @@ export async function sendDraftOrderInvoice(draftOrderId: string, invoiceData?: 
 
     const response = await shopifyAdmin.request(mutation, {
       variables: {
-        id: draftOrderId,
-        email: invoiceData ? {
-          to: invoiceData.to,
-          from: invoiceData.from,
-          subject: invoiceData.subject,
-          customMessage: invoiceData.customMessage,
-        } : undefined
-      }
+        id: toGid('DraftOrder', draftOrderId)!,
+        email: invoiceData
+          ? {
+              to: invoiceData.to,
+              from: invoiceData.from,
+              subject: invoiceData.subject,
+              customMessage: invoiceData.customMessage,
+            }
+          : undefined,
+      },
     });
 
-    const { draftOrderInvoiceSend } = response.data as {
-      draftOrderInvoiceSend: {
+    type DraftOrderInvoiceSendResp = {
+      draftOrderInvoiceSend?: {
         draftOrder: ShopifyDraftOrder;
         userErrors?: Array<{ field?: string; message: string }>;
       };
+      errors?: unknown;
+      extensions?: unknown;
     };
+
+    const raw = (response as { data?: unknown } | unknown);
+    const data = (raw && typeof raw === 'object' && 'data' in (raw as Record<string, unknown>)
+      ? (raw as { data?: unknown }).data
+      : raw) as DraftOrderInvoiceSendResp | undefined;
+
+    const draftOrderInvoiceSend = data?.draftOrderInvoiceSend;
+
+    if (!draftOrderInvoiceSend) {
+      const errors = (data?.errors ?? (data as { extensions?: unknown } | undefined)?.extensions) ?? data;
+      throw new Error(`Shopify draftOrderInvoiceSend returned no data: ${JSON.stringify(errors)}`);
+    }
 
     if (draftOrderInvoiceSend.userErrors && draftOrderInvoiceSend.userErrors.length > 0) {
       throw new Error(`Shopify API errors: ${draftOrderInvoiceSend.userErrors.map((e) => e.message).join(', ')}`);

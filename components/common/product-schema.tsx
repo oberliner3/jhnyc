@@ -1,10 +1,9 @@
+/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: <explanation> */
+
+import Script from "next/script";
+import type { Product, WithContext } from "schema-dts";
 import { SITE_CONFIG } from "@/lib/constants";
 import type { ApiProduct } from "@/lib/types";
-import {
-  Product,
-  WithContext,
-} from "schema-dts";
-import Script from "next/script";
 
 export function ProductSchema({ product }: { product: ApiProduct }) {
   if (!product) {

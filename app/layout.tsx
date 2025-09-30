@@ -1,19 +1,17 @@
 import "@/app/globals.css";
-import type { Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
 
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
+import type { Viewport } from "next";
+import ErrorBoundary from "@/components/common/error-boundary";
 import { WebsiteSchema } from "@/components/common/website-schema";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
-
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "./providers";
-import ErrorBoundary from "@/components/common/error-boundary";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -57,7 +55,7 @@ export default function RootLayout({
               <main className="flex-grow">{children}</main>
               <Footer />
             </div>
-           
+
             <Toaster />
           </Providers>
         </ErrorBoundary>

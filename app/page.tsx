@@ -1,3 +1,4 @@
+import { ShowNewsletterOnce } from "@/components/common/show-newsletter-once";
 import { FeaturedProducts } from "@/components/sections/featured-products";
 import { Hero } from "@/components/sections/hero";
 import { InfoSections } from "@/components/sections/info-sections";
@@ -12,8 +13,6 @@ export const metadata = generateSEO({
   description:
     "Discover premium products with exceptional quality and service. Shop our curated collection of the latest trends and timeless classics.",
 });
-
-import { ShowNewsletterOnce } from "@/components/common/show-newsletter-once";
 
 export default function HomePage() {
   return (
