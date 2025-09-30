@@ -1,8 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { createShopifyDraftOrder } from "@/lib/shopify";
 import { createClient } from "@/utils/supabase/server";
-import { createShopifyDraftOrder } from "@/lib/shopify-api";
 
 export interface CheckoutItem {
   productId: string;
@@ -122,7 +122,7 @@ export async function handleCheckout(data: CheckoutData) {
     }
 
     // If Shopify integration is enabled, create draft order
-    if (process.env.NEXT_PUBLIC_SHOPIFY_SHOP && process.env.NEXT_PUBLIC_SHOPIFY_TOKEN) {
+    if (process.env.SHOPIFY_SHOP && process.env.SHOPIFY_ACCESS_TOKEN) {
       try {
         const shopifyData = {
           draft_order: {
@@ -173,8 +173,8 @@ export async function handleCheckout(data: CheckoutData) {
 
         const draftOrder = await createShopifyDraftOrder(shopifyData);
 
-        if (draftOrder?.invoice_url) {
-          redirect(draftOrder.invoice_url);
+        if (draftOrder?.invoiceUrl) {
+          redirect(draftOrder.invoiceUrl);
         }
       } catch (shopifyError) {
         console.error("Shopify integration error:", shopifyError);

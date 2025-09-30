@@ -25,7 +25,7 @@ High-level architecture
   - Cross-cutting pages like sitemap-*.xml, manifest.ts, robots.ts are under app/ for SEO/crawling.
 
 - Data, domain, and integrations
-  - lib/shopify-api.ts encapsulates Shopify store interactions.
+  - lib/shopify-client.ts encapsulates secure Shopify GraphQL API interactions; lib/shopify/index.ts provides unified interface with backward compatibility.
   - utils/supabase/{client,server}.ts provides Supabase integration for auth/session handling.
   - lib/api.ts centralizes fetch/client helpers; lib/constants.ts holds app-wide constants.
   - Validation via Zod with schemas/utilities in lib/validations.ts.
