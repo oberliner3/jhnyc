@@ -23,7 +23,7 @@ export function generateSEO({
     metadataBase: new URL(SITE_CONFIG.url),
     title: seoTitle,
     description: seoDescription,
-    keywords: SITE_CONFIG.keywords,
+    keywords: [...SITE_CONFIG.keywords],
     authors: [{ name: SITE_CONFIG.author }],
     creator: SITE_CONFIG.author,
     publisher: SITE_CONFIG.name,

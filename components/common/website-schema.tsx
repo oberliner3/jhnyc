@@ -1,5 +1,6 @@
+import type { Organization, WebSite } from "schema-dts";
 import { APP_CONTACTS, SITE_CONFIG } from "@/lib/constants";
-import { WebSite, Organization } from "schema-dts";
+import Script from "next/script";
 
 export function WebsiteSchema() {
   const websiteSchema: WebSite = {
@@ -45,8 +46,10 @@ export function WebsiteSchema() {
     "@graph": [websiteSchema, organizationSchema] as const,
   };
   return (
-    <script
+    <Script
+      id="json-ld-website"
       type="application/ld+json"
+      strategy="afterInteractive"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(graphSchema) }}
     />
   );

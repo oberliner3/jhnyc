@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { getAllProducts } from "@/lib/api";
 import { SITE_CONFIG } from "@/lib/constants";
-import type { ApiProduct, ApiProductOption, ApiProductVariant } from "@/lib/types";
+import type {
+  ApiProduct,
+  ApiProductOption,
+  ApiProductVariant,
+} from "@/lib/types";
 
 type ApiProductWithRaw = ApiProduct & { raw_json?: string };
 
@@ -46,10 +50,12 @@ export async function GET() {
       try {
         // Parse raw_json to get actual product data with variants
         const raw = (product as ApiProductWithRaw).raw_json;
-        const productData: ApiProduct = raw ? (JSON.parse(raw) as ApiProduct) : (product as ApiProduct);
+        const productData: ApiProduct = raw
+          ? (JSON.parse(raw) as ApiProduct)
+          : (product as ApiProduct);
         const variants: ApiProductVariant[] = productData.variants || [];
         const options: ApiProductOption[] = productData.options || [];
-        
+
         if (!variants || variants.length === 0) {
           console.log("Product missing variants:", product.id);
           continue;
@@ -58,7 +64,8 @@ export async function GET() {
         for (const variant of variants) {
           try {
             const colorOption = options.find(
-              (option: ApiProductOption) => option.name.toLowerCase() === "color"
+              (option: ApiProductOption) =>
+                option.name.toLowerCase() === "color"
             );
             const sizeOption = options.find(
               (option: ApiProductOption) => option.name.toLowerCase() === "size"
@@ -228,7 +235,7 @@ function getGoogleCategory(category: string | undefined): string {
 
 function normalizeProductType(input?: string): string {
   if (!input) return "General";
-  const trimmed = input.trim().replace(/^([>\/\-\s])+/, "");
+  const trimmed = input.trim().replace(/^([>/\-\s])+/, "");
   const parts = trimmed
     .split(/>|\//)
     .map((p) => p.trim())

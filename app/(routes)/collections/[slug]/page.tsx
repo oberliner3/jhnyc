@@ -53,8 +53,7 @@ async function CollectionProducts({ slug }: { slug: string }) {
 	let products: ApiProduct[] = [];
 
 	try {
-		const apiProducts = await getAllProducts({ limit: 48 });
-		const allProducts = apiProducts;
+		const allProducts = await getAllProducts({ limit: 48 });
 
 		// Filter products based on collection type
 		switch (slug) {

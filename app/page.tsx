@@ -14,6 +14,8 @@ export const metadata = generateSEO({
     "Discover premium products with exceptional quality and service. Shop our curated collection of the latest trends and timeless classics.",
 });
 
+import { ShowNewsletterOnce } from "@/components/common/show-newsletter-once";
+
 export default function HomePage() {
   return (
     <div className="mx-auto container">
@@ -22,16 +24,7 @@ export default function HomePage() {
       <InfoSections />
       <Partners />
       <Reviews />
-      {typeof window !== "undefined" && !localStorage.getItem("visited") && (
-        <>
-          <Newsletter />
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `localStorage.setItem('visited','1')`,
-            }}
-          />
-        </>
-      )}
+      <ShowNewsletterOnce />
     </div>
   );
 }

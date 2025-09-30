@@ -12,6 +12,8 @@ interface BuyNowButtonProps {
   variant?: ApiProductVariant;
   quantity?: number;
   className?: string;
+  collectCustomerEmail?: boolean; // New: whether to collect customer email
+  customerEmail?: string; // New: pre-filled customer email
 }
 
 function createDefaultVariant(product: ApiProduct): ApiProductVariant {
@@ -48,8 +50,11 @@ export function BuyNowButton({
   variant,
   quantity = 1,
   className,
+  collectCustomerEmail = false,
+  customerEmail = "",
 }: BuyNowButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState(customerEmail);
 
   // UX guard: require explicit selection only when the product has multiple real variants
   if (hasMultipleRealVariants(product) && !variant) {
@@ -64,10 +69,33 @@ export function BuyNowButton({
 
   const selectedVariant = variant || product.variants?.[0] || createDefaultVariant(product);
 
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    toast.loading("Processing your order...", {
+      id: "buy-now-processing",
+      description: `Adding ${product.title} to checkout`
+    });
+  };
+
+  const handleError = (error?: unknown) => {
+    setIsLoading(false);
+    toast.dismiss("buy-now-processing");
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+    toast.error("Failed to process order", {
+      description: errorMessage
+    });
+  };
+
   return (
     <form
-      action={buyNowAction}
-      onSubmit={() => setIsLoading(true)}
+      action={async (formData) => {
+        try {
+          await buyNowAction(formData);
+        } catch (error) {
+          handleError(error);
+        }
+      }}
+      onSubmit={handleSubmit}
     >
       <input type="hidden" name="productId" value={selectedVariant.product_id} />
       <input type="hidden" name="variantId" value={selectedVariant.id} />
@@ -75,6 +103,27 @@ export function BuyNowButton({
       <input type="hidden" name="quantity" value={quantity} />
       <input type="hidden" name="productTitle" value={product.title} />
       <input type="hidden" name="productImage" value={product.images?.[0]?.src || ""} />
+      {collectCustomerEmail && (
+        <input type="hidden" name="customerEmail" value={email} />
+      )}
+      
+      {collectCustomerEmail && (
+        <div className="mb-4">
+          <label htmlFor="customer-email" className="block text-sm font-medium mb-2">
+            Email (for invoice)
+          </label>
+          <input
+            id="customer-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your@email.com"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required={collectCustomerEmail}
+          />
+        </div>
+      )}
+      
       <Button
         type="submit"
         disabled={isLoading || !product.in_stock}

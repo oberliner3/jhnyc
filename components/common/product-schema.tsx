@@ -4,6 +4,7 @@ import {
   Product,
   WithContext,
 } from "schema-dts";
+import Script from "next/script";
 
 export function ProductSchema({ product }: { product: ApiProduct }) {
   if (!product) {
@@ -50,8 +51,10 @@ export function ProductSchema({ product }: { product: ApiProduct }) {
   };
 
   return (
-    <script
+    <Script
+      id={`json-ld-product-${product.id ?? product.handle}`}
       type="application/ld+json"
+      strategy="afterInteractive"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
     />
   );

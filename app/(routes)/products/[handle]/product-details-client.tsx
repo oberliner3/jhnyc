@@ -3,9 +3,18 @@
 import { Minus, Plus, RefreshCw, Shield, Truck } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-
+import { toast } from "sonner";
+import { ProductSchema } from "@/components/common/product-schema";
+import { BuyNowButton } from "@/components/product/buy-now-button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -15,19 +24,8 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/cart-context";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
-import { ProductSchema } from "@/components/common/product-schema";
-import { BuyNowButton } from "@/components/product/buy-now-button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 
 interface ProductDetailsClientProps {
   product: ApiProduct;
