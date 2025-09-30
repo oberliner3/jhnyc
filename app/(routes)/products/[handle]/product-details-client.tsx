@@ -256,11 +256,11 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
           )}
         </div>
 
-        {/* Add to Cart & Buy Now */}
-        <div className="relative flex flex-col gap-2">
-          <div className="flex justify-around w-full">
+{/* Add to Cart & Buy Now */}
+        <div className="relative flex flex-col gap-3">
+          <div className="flex items-center gap-4 w-full">
             <div className="inline-flex">
-              <div className="flex">
+              <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="icon"
@@ -277,7 +277,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                   onChange={(e) =>
                     handleQuantityChange(parseInt(e.target.value) || 1)
                   }
-                  className="w-20 text-center"
+                  className="w-16 text-center"
                 />
                 <Button
                   variant="outline"
@@ -315,23 +315,25 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         </div>
 
         {/* Description */}
-        <Accordion type="single" collapsible className="w-full">
-          <AccordionItem value="details">
-            <AccordionTrigger>Details</AccordionTrigger>
-            <AccordionContent>
-              <SafeHtml html={product.body_html || ""} className="text-muted-foreground" />
-              {product.tags && product.tags.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2 mt-4">
-                  {product.tags.split(",").map((tag) => (
-                    <Badge key={tag} variant="outline">
-                      {tag.split("_").join(" ").toUpperCase()}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        <div className="bg-muted/40 rounded-lg p-4">
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="details">
+              <AccordionTrigger>Details</AccordionTrigger>
+              <AccordionContent>
+                <SafeHtml html={product.body_html || ""} className="text-muted-foreground" />
+                {product.tags && product.tags.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 mt-4">
+                    {product.tags.split(",").map((tag) => (
+                      <Badge key={tag} variant="outline">
+                        {tag.split("_").join(" ").toUpperCase()}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
 
         <Separator />
 

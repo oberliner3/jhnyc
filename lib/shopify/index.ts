@@ -3,7 +3,7 @@ export {
   createDraftOrder,
   sendDraftOrderInvoice,
   createSimpleDraftOrder,
-  shopifyAdmin,
+  getShopifyAdmin,
   getShopDomain,
   getAccessToken,
 } from '../shopify-client';

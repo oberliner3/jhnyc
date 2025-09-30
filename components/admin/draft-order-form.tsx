@@ -93,7 +93,7 @@ export function DraftOrderForm() {
           tags: formData.tags,
           sendInvoice: formData.sendInvoice,
           invoiceData: {
-            subject: `Invoice from OriGinZ`,
+            subject: `Invoice for ${formData.customerFirstName} ${formData.customerLastName}`,
             customMessage: "Thank you for your order!",
           },
         }),
@@ -140,7 +140,11 @@ export function DraftOrderForm() {
     }));
   };
 
-  const updateLineItem = (index: number, field: keyof LineItem, value: string | number | boolean) => {
+  const updateLineItem = (
+    index: number,
+    field: keyof LineItem,
+    value: string | number | boolean
+  ) => {
     const updatedItems = [...formData.lineItems];
     updatedItems[index] = {
       ...updatedItems[index],
@@ -195,9 +199,7 @@ export function DraftOrderForm() {
           <h2 className="text-xl font-semibold mb-4">Customer Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Email *
-              </label>
+              <label className="block text-sm font-medium mb-1">Email *</label>
               <input
                 type="email"
                 required
@@ -227,7 +229,10 @@ export function DraftOrderForm() {
                 type="text"
                 value={formData.customerFirstName}
                 onChange={(e) =>
-                  setFormData({ ...formData, customerFirstName: e.target.value })
+                  setFormData({
+                    ...formData,
+                    customerFirstName: e.target.value,
+                  })
                 }
                 className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />

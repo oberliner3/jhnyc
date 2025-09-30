@@ -62,7 +62,7 @@ export function generateSEO({
       title: seoTitle,
       description: seoDescription,
       images: [seoImage],
-      creator: "@OriGinz",
+      creator: "@" + SITE_CONFIG.author,
     },
     facebook: {
       appId: "",

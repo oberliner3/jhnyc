@@ -45,7 +45,11 @@ export async function GET(
       endpoint += `?${queryString}`;
     }
 
-    const product = await apiRequest(endpoint);
+const product = await apiRequest(endpoint);
+
+    if (product && typeof product === 'object' && 'in_stock' in (product as Record<string, unknown>)) {
+      (product as Record<string, unknown>)['in_stock'] = true;
+    }
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });

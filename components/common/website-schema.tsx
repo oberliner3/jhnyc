@@ -2,9 +2,9 @@
 import Script from "next/script";
 import { useId } from "react";
 import type { Organization, WebSite } from "schema-dts";
-import { APP_CONTACTS, SITE_CONFIG } from "@/lib/constants";
+import { APP_CONTACTS, publicEnv, SITE_CONFIG } from "@/lib/constants";
 
-export function WebsiteSchema({ nonce }: { nonce: string }) {
+export function WebsiteSchema() {
   const scriptId = useId();
   const websiteSchema: WebSite = {
     "@type": "WebSite",
@@ -26,7 +26,7 @@ export function WebsiteSchema({ nonce }: { nonce: string }) {
   const organizationSchema: Organization = {
     "@type": "Organization",
     "@id": `${SITE_CONFIG.url}/#organization`,
-    name: "OriGinz",
+    name: publicEnv.NEXT_PUBLIC_STORE_NAME,
     url: `${SITE_CONFIG.url}/`,
     logo: {
       "@type": "ImageObject",
@@ -38,9 +38,9 @@ export function WebsiteSchema({ nonce }: { nonce: string }) {
       contactType: "customer service",
     },
     sameAs: [
-      "https://facebook.com/OriGinz",
-      "https://twitter.com/OriGinz",
-      "https://instagram.com/OriGinz",
+      "https://facebook.com/" + publicEnv.NEXT_PUBLIC_STORE_NAME,
+      "https://x.com/" + publicEnv.NEXT_PUBLIC_STORE_NAME,
+      "https://instagram.com/" + publicEnv.NEXT_PUBLIC_STORE_NAME,
     ],
   };
 
@@ -54,7 +54,6 @@ export function WebsiteSchema({ nonce }: { nonce: string }) {
       type="application/ld+json"
       strategy="afterInteractive"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(graphSchema) }}
-      nonce={nonce}
     />
   );
 }

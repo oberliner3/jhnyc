@@ -13,7 +13,7 @@ import { Header } from "@/components/layout/header";
 import { Toaster } from "@/components/ui/sonner";
 import DevToolsBlocker from "@/components/common/dev-tools-blocker";
 import { Providers } from "./providers";
-import { headers } from "next/headers";
+import { publicEnv } from "@/lib/constants";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -32,8 +32,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const headersList = await headers();
-  const nonce = headersList.get("x-nonce") || "";
   return (
     <html
       lang="en"
@@ -41,14 +39,20 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <meta name="apple-mobile-web-app-title" content="Originz" />
+        <meta
+          name="apple-mobile-web-app-title"
+          content={publicEnv.NEXT_PUBLIC_STORE_NAME}
+        />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="application-name" content="Originz" />
+        <meta
+          name="application-name"
+          content={publicEnv.NEXT_PUBLIC_STORE_NAME}
+        />
         <meta name="msapplication-TileColor" content="#336571" />
 
-        <WebsiteSchema nonce={nonce} />
+        <WebsiteSchema />
       </head>
       <body className="will-change-scroll">
         <ErrorBoundary>

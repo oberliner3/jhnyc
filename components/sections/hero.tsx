@@ -55,12 +55,16 @@ export function Hero() {
                 Timeless essentials for everyday life.
               </h1>
               <p className="max-w-xl text-lg text-muted-foreground">
-                Considered design, premium materials, and meticulous attention to detail. Elevate your daily rituals with pieces that last.
+                Considered design, premium materials, and meticulous attention
+                to detail. Elevate your daily rituals with pieces that last.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <PrimaryCTA className="px-8 text-base lg:text-lg" asChild>
+              <PrimaryCTA
+                className="px-8 text-base lg:text-lg hover:text-primary"
+                asChild
+              >
                 <Link href="/products">
                   Shop Now
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -69,7 +73,10 @@ export function Hero() {
 
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <SecondaryCTA variant="outline" className="px-8 text-base lg:text-lg">
+                  <SecondaryCTA
+                    variant="outline"
+                    className="px-8 text-base lg:text-lg"
+                  >
                     <Play className="mr-2 w-5 h-5" />
                     Watch Story
                   </SecondaryCTA>
@@ -112,7 +119,10 @@ export function Hero() {
             >
               <motion.div
                 className="text-center"
-                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
               >
                 <motion.div
                   className="text-2xl font-semibold"
@@ -123,37 +133,55 @@ export function Hero() {
                 >
                   <CountUp end={10} suffix="K+" />
                 </motion.div>
-                <div className="text-sm text-muted-foreground">Happy Customers</div>
+                <div className="text-sm text-muted-foreground">
+                  Happy Customers
+                </div>
               </motion.div>
 
               <div className="h-8 w-px bg-border" />
 
               <motion.div
                 className="text-center"
-                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
               >
                 <motion.div
                   className="text-2xl font-semibold"
-                  variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1 } }}
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.95 },
+                    visible: { opacity: 1, scale: 1 },
+                  }}
                 >
                   <CountUp end={4.7} decimals={1} />
                 </motion.div>
-                <div className="text-sm text-muted-foreground">Average Rating</div>
+                <div className="text-sm text-muted-foreground">
+                  Average Rating
+                </div>
               </motion.div>
 
               <div className="h-8 w-px bg-border" />
 
               <motion.div
                 className="text-center"
-                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 },
+                }}
               >
                 <motion.div
                   className="text-2xl font-semibold"
-                  variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1 } }}
+                  variants={{
+                    hidden: { opacity: 0, scale: 0.95 },
+                    visible: { opacity: 1, scale: 1 },
+                  }}
                 >
                   <CountUp end={50} suffix="+" />
                 </motion.div>
-                <div className="text-sm text-muted-foreground">Premium Brands</div>
+                <div className="text-sm text-muted-foreground">
+                  Premium Brands
+                </div>
               </motion.div>
             </motion.div>
           </div>

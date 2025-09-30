@@ -1,13 +1,17 @@
 import { getPublicEnv } from './env-validation';
 
 // Public env only (safe for client-side import)
-const publicEnv = getPublicEnv();
+export const publicEnv = getPublicEnv();
 
-const siteDomain = publicEnv.NEXT_PUBLIC_SITE_URL || 'localhost:3000';
-const siteUrl = siteDomain.startsWith('http') ? siteDomain : (isLocalhost(siteDomain) ? `http://${siteDomain}` : `https://${siteDomain}`);
+export const siteDomain = publicEnv.NEXT_PUBLIC_SITE_URL || "localhost:3000";
+export const siteUrl = siteDomain.startsWith("http")
+  ? siteDomain
+  : isLocalhost(siteDomain)
+  ? `http://${siteDomain}`
+  : `https://${siteDomain}`;
 
-function isLocalhost(host: string) {
-  return host.includes('localhost') || /^(127\.0\.0\.1|0\.0\.0\.0)/.test(host);
+export function isLocalhost(host: string) {
+  return host.includes("localhost") || /^(127\.0\.0\.1|0\.0\.0\.0)/.test(host);
 }
 
 export const SITE_CONFIG = {
@@ -15,10 +19,12 @@ export const SITE_CONFIG = {
   description: "Premium e-commerce storefront built with Next.js",
   domain: siteDomain,
   url: siteUrl,
-  ogTitle: `${publicEnv.NEXT_PUBLIC_STORE_NAME || "OriGenZ"} - Your One-Stop Shop for Quality Products`,
+  ogTitle: `${
+    publicEnv.NEXT_PUBLIC_STORE_NAME || "OriGenZ"
+  } - Your One-Stop Shop for Quality Products`,
   ogImage: `${siteUrl}/og.png`,
   author: publicEnv.NEXT_PUBLIC_STORE_NAME || "OriGenZ",
-  lastUpdate: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD format
+  lastUpdate: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
   keywords: [
     "e-commerce",
     "online store",
@@ -28,13 +34,13 @@ export const SITE_CONFIG = {
     "storefront",
     "next.js",
     "react",
-    "typescript"
+    "typescript",
   ] as const,
   cookieConfig: {
     name: "originz-cookie-consent",
     expires: 180, // days
     sameSite: "Lax" as const,
-    secure: (publicEnv.NODE_ENV || 'development') === "production",
+    secure: (publicEnv.NODE_ENV || "development") === "production",
     httpOnly: false, // Allow client-side access for consent management
   },
 } as const;
@@ -119,20 +125,45 @@ export const SUCCESS_MESSAGES = {
 export const buildEmail = (handle: string, ltd: string = SITE_CONFIG.domain) =>
   `${handle}@${ltd}`;
 
-export const buildPhone = (ext: number, callSign: string, zone?: number) =>
-  `+${ext} ${zone ? `(${zone})` : ""} ${callSign}`;
+export const buildPhone = (ext: number, callSign: string, zone?: number) => {
+  // Normalize and format to "+<ext> (AAA) BBB-CCCC" when possible (NANP)
+  const digits = (callSign || '').replace(/\D/g, '');
+
+  let local = callSign;
+
+  if (digits.length >= 10) {
+    // Use last 10 digits in case a country code was included in callSign
+    const d = digits.slice(-10);
+    const area = d.slice(0, 3);
+    const exchange = d.slice(3, 6);
+    const line = d.slice(6);
+    local = `(${area}) ${exchange}-${line}`;
+  } else if (digits.length === 7) {
+    // Optionally apply provided zone (area code) if given
+    const exchange = digits.slice(0, 3);
+    const line = digits.slice(3);
+    local = zone ? `(${zone}) ${exchange}-${line}` : `${exchange}-${line}`;
+  } else if (digits.length > 0 && digits.length < 7) {
+    // Fallback: keep as-is for short numbers
+    local = digits;
+  }
+
+  return `+${ext} ${local}`.trim();
+};
 
 export const buildAddress = ({
   street,
   city,
   state,
   zipCode,
+  country,
 }: {
   street: string;
   city: string;
   state: string;
   zipCode: string;
-}): string => `${street}, ${city},<br/> ${state} ${zipCode}`;
+  country?: string;
+}): string => `${street}, ${city},<br/> ${state} ${zipCode}${country ? `, ${country}` : ""}`;
 
 export const APP_CONTACTS = {
   email: {
@@ -145,14 +176,15 @@ export const APP_CONTACTS = {
     dmca: buildEmail("dmca"),
   },
   phone: {
-    main: buildPhone(1, "123-4567", 555),
+    main: buildPhone(1, "9707106334"),
   },
   address: {
     office: buildAddress({
-      street: "123 Commerce St",
-      city: "Valhalla",
-      state: "Asgard",
-      zipCode: "1525-5VG",
+      street: "1308 E 41st Pl",
+      city: "Los Angeles",
+      state: "CA",
+      zipCode: "90011",
+      country: "USA",
     }),
   },
 };

@@ -1,14 +1,13 @@
 import type { MetadataRoute } from "next";
-import { SITE_CONFIG } from "@/lib/constants";
+import { publicEnv, SITE_CONFIG } from "@/lib/constants";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: SITE_CONFIG.name,
-    short_name: "Originz",
+    short_name: publicEnv.NEXT_PUBLIC_STORE_NAME,
     background_color: "#ffffff",
     theme_color: "#336571",
-    description:
-      "Premium e-commerce storefront delivering quality products with exceptional service. Shop the latest trends and exclusive deals.",
+    description: SITE_CONFIG.description,
     dir: "auto",
     display: "standalone",
     lang: "en",

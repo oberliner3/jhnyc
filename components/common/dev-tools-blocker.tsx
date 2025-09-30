@@ -21,12 +21,12 @@ const DevToolsBlocker = () => {
         window.outerWidth - window.innerWidth > threshold
       ) {
         if (!devtools.open && !warned) {
-          devtools.open = true;
-          warned = true;
-          toast.warning('Developer tools detected', {
-            description: 'Please close developer tools for security reasons.',
-            duration: 10000,
-          });
+          // devtools.open = true;
+          // warned = true;
+          // toast.warning('Developer tools detected', {
+          //   description: 'Please close developer tools for security reasons.',
+          //   duration: 10000,
+          // });
           console.clear();
           // Optionally redirect or take other action
           // window.location.href = '/blocked';
@@ -177,15 +177,18 @@ const DevToolsBlocker = () => {
 
   // Add a warning overlay when devtools are detected
   return (
-    <div 
-      id="devtools-warning" 
-      style={{ display: 'none' }}
+    <div
+      id="devtools-warning"
+      style={{ display: "none" }}
       className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center"
     >
       <div className="bg-white p-8 rounded-lg max-w-md text-center">
-        <h2 className="text-2xl font-bold text-red-600 mb-4">⚠️ Security Warning</h2>
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          ⚠️ Security Warning
+        </h2>
         <p className="text-gray-700 mb-4">
-          Developer tools have been detected. This action is not allowed for security reasons.
+          Developer tools have been detected. This action is not allowed for
+          security reasons.
         </p>
         <p className="text-gray-700">
           Please close developer tools to continue using the application.

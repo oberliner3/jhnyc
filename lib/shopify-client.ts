@@ -4,30 +4,44 @@ import { getServerEnv } from '@/lib/env-validation';
 // SECURITY: Only use server-side environment variables - NEVER expose tokens to client
 function getShopifyConfig() {
   const env = getServerEnv();
+  const tok = env.SHOPIFY_ACCESS_TOKEN ?? env.SHOPIFY_TOKEN;
+  if (!tok) {
+    throw new Error('Shopify access token is missing. Provide SHOPIFY_ACCESS_TOKEN or SHOPIFY_TOKEN.');
+  }
   return {
     shopDomain: env.SHOPIFY_SHOP,
-    accessToken: env.SHOPIFY_ACCESS_TOKEN || env.SHOPIFY_TOKEN,
+    accessToken: tok,
     shopName: env.SHOPIFY_SHOP_NAME,
   };
 }
 
-const { shopDomain, accessToken } = getShopifyConfig();
+// Lazily initialize the Shopify Admin API client to avoid import-time env validation
+let _shopifyAdmin: ReturnType<typeof createAdminApiClient> | null = null;
+let _shopDomain: string | null = null;
+let _accessToken: string | null = null;
 
-// Create the Shopify Admin API client
-export const shopifyAdmin = createAdminApiClient({
-  storeDomain: shopDomain,
-  accessToken: accessToken,
-  apiVersion: '2024-10', // Updated to a supported API version
-});
+export function getShopifyAdmin() {
+  if (_shopifyAdmin) return _shopifyAdmin;
+  const { shopDomain, accessToken } = getShopifyConfig();
+  _shopDomain = shopDomain;
+  _accessToken = accessToken;
+  _shopifyAdmin = createAdminApiClient({
+    storeDomain: shopDomain,
+    accessToken: accessToken,
+    apiVersion: '2024-10',
+  });
+  return _shopifyAdmin;
+}
 
 // Helper function to get shop domain without protocol
 export const getShopDomain = () => {
-  return shopDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  const domain = _shopDomain ?? getShopifyConfig().shopDomain;
+  return domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
 };
 
 // Helper function to get access token
 export const getAccessToken = () => {
-  return accessToken;
+  return _accessToken ?? getShopifyConfig().accessToken;
 };
 
 // Type definitions for our draft order creation
@@ -196,7 +210,7 @@ export async function createDraftOrder(orderData: DraftOrderInput) {
 
     const variables = { input: toGraphqlDraftOrderInput(orderData) } as const;
 
-    const response = await shopifyAdmin.request(query, { variables });
+const response = await getShopifyAdmin().request(query, { variables });
 
     type DraftOrderCreateResp = {
       draftOrderCreate?: {
@@ -253,7 +267,7 @@ export async function sendDraftOrderInvoice(draftOrderId: string, invoiceData?: 
       }
     `;
 
-    const response = await shopifyAdmin.request(mutation, {
+const response = await getShopifyAdmin().request(mutation, {
       variables: {
         id: toGid('DraftOrder', draftOrderId)!,
         email: invoiceData

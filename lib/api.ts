@@ -8,15 +8,14 @@ import { getServerEnv } from "./env-validation";
 import { ApiClientError, logError, createApiResponse, type ApiResponse } from "./errors";
 import type { ApiProduct } from "./types";
 
-// Get validated server environment (server-only)
-const serverEnv = getServerEnv();
-
 // Enhanced API request function with retry logic and proper error handling
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const base = serverEnv.PRODUCT_STREAM_API.replace(/\/$/, "");
+  // Resolve server env at call time to avoid import-time crashes
+  const { PRODUCT_STREAM_API, PRODUCT_STREAM_X_KEY } = getServerEnv();
+  const base = PRODUCT_STREAM_API.replace(/\/$/, "");
   const url = `${base}/cosmos${endpoint}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
@@ -31,7 +30,7 @@ async function apiRequest<T>(
         headers: {
           ...API_CONFIG.HEADERS,
           ...options.headers,
-          "X-API-KEY": serverEnv.PRODUCT_STREAM_X_KEY,
+          "X-API-KEY": PRODUCT_STREAM_X_KEY,
         },
         signal: controller.signal,
       });
@@ -99,7 +98,9 @@ export async function getAllProducts(options?: {
 
   try {
     const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
-    return Array.isArray(data.products) ? data.products : [];
+    const products = Array.isArray(data.products) ? data.products : [];
+    // Force all products to in_stock: true
+    return products.map((p) => ({ ...p, in_stock: true }));
   } catch (error) {
     logError(error instanceof Error ? error : new Error('Unknown error'), {
       endpoint,
@@ -155,7 +156,8 @@ export async function searchProducts(query: string): Promise<ApiProduct[]> {
     const data = await apiRequest<{ products: ApiProduct[] }>(
       `/products/search?q=${encodedQuery}`
     );
-    return Array.isArray(data.products) ? data.products : [];
+    const products = Array.isArray(data.products) ? data.products : [];
+    return products.map((p) => ({ ...p, in_stock: true }));
   } catch (error) {
     console.warn(`[API] Failed to search products for "${query}":`, error);
     return [];
@@ -168,7 +170,8 @@ export async function searchProducts(query: string): Promise<ApiProduct[]> {
 export async function getProductById(id: string): Promise<ApiProduct | null> {
   try {
     const data = await apiRequest<{ product: ApiProduct }>(`/products/${id}`);
-    return data.product || null;
+    const product = data.product || null;
+    return product ? { ...product, in_stock: true } : null;
   } catch (error) {
     console.warn(`[API] Failed to fetch product by ID "${id}":`, error);
     return null;
@@ -185,7 +188,8 @@ export async function getProductByHandle(
     const data = await apiRequest<{ product: ApiProduct }>(
       `/products/${handle}`
     );
-    return data.product || null;
+    const product = data.product || null;
+    return product ? { ...product, in_stock: true } : null;
   } catch (error) {
     console.warn(`[API] Failed to fetch product by handle "${handle}":`, error);
     return null;
@@ -203,7 +207,8 @@ export async function getProductsByVendor(
     const data = await apiRequest<{ products: ApiProduct[] }>(
       `/products?vendor=${encodedVendor}`
     );
-    return Array.isArray(data.products) ? data.products : [];
+    const products = Array.isArray(data.products) ? data.products : [];
+    return products.map((p) => ({ ...p, in_stock: true }));
   } catch (error) {
     console.warn(
       `[API] Failed to fetch products for vendor "${vendor}":`,
@@ -234,9 +239,10 @@ export async function getCollectionByHandle(
     queryString ? `?${queryString}` : ""
   }`;
 
-  try {
+try {
     const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
-    return Array.isArray(data.products) ? data.products : [];
+    const products = Array.isArray(data.products) ? data.products : [];
+    return products.map((p) => ({ ...p, in_stock: true }));
   } catch (error) {
     console.warn(
       `[API] Failed to fetch collection for handle "${handle}":`,
