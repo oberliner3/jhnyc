@@ -27,12 +27,13 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const nonce = headers().get("x-nonce") || "";
+  const headersList = await headers();
+  const nonce = headersList.get("x-nonce") || "";
   return (
     <html
       lang="en"
