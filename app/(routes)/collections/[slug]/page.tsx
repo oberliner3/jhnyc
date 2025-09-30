@@ -12,10 +12,10 @@ import Link from "next/link";
 export const revalidate = 60;
 
 interface CollectionPageProps {
-	params: { slug: string };
-	searchParams?: {
+	params: Promise<{ slug: string }>;
+	searchParams?: Promise<{
 		page?: string;
-	};
+	}>;
 }
 
 export async function generateStaticParams() {
@@ -34,7 +34,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({
 	params,
 }: CollectionPageProps): Promise<Metadata> {
-	const { slug } = params;
+	const { slug } = await params;
 
 	const collectionNames: Record<string, string> = {
 		all: "All Products",
@@ -155,9 +155,10 @@ async function CollectionProducts({ slug, page = 1 }: { slug: string; page: numb
 	);
 }
 
-export default function CollectionPage({ params, searchParams }: CollectionPageProps) {
-	const { slug } = params;
-	const page = Number(searchParams?.page) || 1;
+export default async function CollectionPage({ params, searchParams }: CollectionPageProps) {
+	const { slug } = await params;
+	const resolvedSearchParams = await searchParams;
+	const page = Number(resolvedSearchParams?.page) || 1;
 
 	const collectionNames: Record<string, string> = {
 		all: "All Products",

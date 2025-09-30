@@ -4,7 +4,7 @@ import { useId } from "react";
 import type { Organization, WebSite } from "schema-dts";
 import { APP_CONTACTS, SITE_CONFIG } from "@/lib/constants";
 
-export function WebsiteSchema() {
+export function WebsiteSchema({ nonce }: { nonce: string }) {
   const scriptId = useId();
   const websiteSchema: WebSite = {
     "@type": "WebSite",
@@ -54,6 +54,7 @@ export function WebsiteSchema() {
       type="application/ld+json"
       strategy="afterInteractive"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(graphSchema) }}
+      nonce={nonce}
     />
   );
 }

@@ -12,7 +12,7 @@ import notFound from "@/app/not-found";
 export const revalidate = 60;
 
 interface ProductPageProps {
-  params: { handle: string };
+  params: Promise<{ handle: string }>;
 }
 
 export async function generateStaticParams() {
@@ -28,7 +28,8 @@ export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
   try {
-    const product = await getProductByHandle(params.handle);
+    const { handle } = await params;
+    const product = await getProductByHandle(handle);
 
     if (!product) {
       return generateSEO({ title: "Product Not Found" });
@@ -39,7 +40,7 @@ export async function generateMetadata({
     return generateSEO({
       title: product.title || "",
       description: product.body_html || "",
-      path: `/products/${product.handle || params.handle}`,
+      path: `/products/${product.handle || handle}`,
       type: "product",
       image: seoImage,
     });
@@ -65,8 +66,8 @@ async function ProductPageContent({ handle }: { handle: string }) {
   );
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const { handle } = params;
+export default async function ProductPage({ params }: ProductPageProps) {
+  const { handle } = await params;
 
   return (
     <Suspense fallback={<ProductDetailsSkeleton />}>

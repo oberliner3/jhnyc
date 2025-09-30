@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint app components contexts hooks lib utils middleware.ts next.config.ts",
+    "lint": "next lint",
     "lint:fix": "eslint --fix app components contexts hooks lib utils middleware.ts next.config.ts"
   },
   "dependencies": {

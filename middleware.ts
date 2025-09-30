@@ -2,17 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  
+  const isDev = process.env.NODE_ENV === 'development';
+  
   const cspHeader = `
-    default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
-    style-src 'self' 'nonce-${nonce}';
-    img-src 'self' blob: data:;
-    font-src 'self';
+    default-src 'self' data:;
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${isDev ? "'unsafe-eval'" : ''} https://va.vercel-scripts.com;
+    style-src 'self' 'nonce-${nonce}' 'unsafe-inline';
+    img-src 'self' blob: data: https: http:;
+    font-src 'self' data:;
     object-src 'none';
     base-uri 'self';
-    form-action 'self';
+    form-action 'self' https://checkout.stripe.com https://checkout.shopify.com;
     frame-ancestors 'none';
-    upgrade-insecure-requests;
+    ${!isDev ? 'upgrade-insecure-requests;' : ''}
+    connect-src 'self' https: wss: ${isDev ? 'http: ws:' : ''} https://vitals.vercel-insights.com https://api.placeholder.com;
+    media-src 'self' blob: data: https: http:;
+    worker-src 'self' blob:;
+    child-src 'self' blob:;
   `;
 
   const requestHeaders = new Headers(request.headers);

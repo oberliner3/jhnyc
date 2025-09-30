@@ -13,6 +13,7 @@ import { Header } from "@/components/layout/header";
 import { Toaster } from "@/components/ui/sonner";
 import DevToolsBlocker from "@/components/common/dev-tools-blocker";
 import { Providers } from "./providers";
+import { headers } from "next/headers";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -31,6 +32,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const nonce = headers().get("x-nonce") || "";
   return (
     <html
       lang="en"
@@ -45,7 +47,7 @@ export default function RootLayout({
         <meta name="application-name" content="Originz" />
         <meta name="msapplication-TileColor" content="#336571" />
 
-        <WebsiteSchema />
+        <WebsiteSchema nonce={nonce} />
       </head>
       <body className="will-change-scroll">
         <ErrorBoundary>
