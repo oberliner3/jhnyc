@@ -7,9 +7,6 @@ import { GeistSans } from "geist/font/sans";
 import type { Viewport } from "next";
 import ErrorBoundary from "@/components/common/error-boundary";
 import { WebsiteSchema } from "@/components/common/website-schema";
-import { AnnouncementBar } from "@/components/layout/announcement-bar";
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
 import { Toaster } from "@/components/ui/sonner";
 import DevToolsBlocker from "@/components/common/dev-tools-blocker";
 import { Providers } from "./providers";
@@ -59,12 +56,8 @@ export default async function RootLayout({
           <DevToolsBlocker />
           <Providers>
             <div className="flex flex-col bg-background min-h-screen">
-              <AnnouncementBar />
-              <Header />
-              <main className="flex-grow">{children}</main>
-              <Footer />
+              {children}
             </div>
-
             <Toaster />
           </Providers>
         </ErrorBoundary>

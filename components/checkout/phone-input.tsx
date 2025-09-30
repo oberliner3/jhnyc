@@ -35,17 +35,24 @@ export function PhoneInput({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
+    
+    // Reset formatter for new input
+    formatter.reset();
     const formattedValue = formatter.input(inputValue);
+    
     let isValid = false;
 
-    try {
-      const phoneNumber = parsePhoneNumberWithError(
-        formattedValue,
-        countryCode
-      );
-      isValid = phoneNumber.isValid();
-    } catch {
-      isValid = false;
+    // Only validate if there's a value
+    if (formattedValue && formattedValue.length > 0) {
+      try {
+        const phoneNumber = parsePhoneNumberWithError(
+          formattedValue,
+          countryCode
+        );
+        isValid = phoneNumber.isValid();
+      } catch {
+        isValid = false;
+      }
     }
 
     onChange(formattedValue, isValid);

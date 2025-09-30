@@ -192,13 +192,13 @@ export const APP_CONTACTS = {
 export const NAVIGATION_ITEMS = [
   { name: "Home", href: "/" },
   { name: "Collections", href: "/collections/all" },
-  { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
+  { name: "About us", href: "/about" },
 ];
 
 export const FOOTER_LINKS = {
   company: [
-    { name: "About Us", href: "/about" },
+    { name: "About us", href: "/about" },
     { name: "Contact", href: "/contact" },
     { name: "Careers", href: "/careers" },
   ],

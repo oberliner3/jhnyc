@@ -48,17 +48,41 @@ export function useFormValidation({
   const validateField = React.useCallback((field: string, value: unknown) => {
     try {
       const fieldPath = field.split(".");
-      const schema: z.ZodTypeAny =
-        fieldPath.length > 1 && fieldPath[0] in checkoutSchema.shape
-          ? (checkoutSchema.shape[
-              fieldPath[0] as keyof typeof checkoutSchema.shape
-            ] as z.ZodTypeAny)
-          : checkoutSchema;
-
-      const toValidate =
-        fieldPath.length > 1 ? { [fieldPath[1]]: value } : { [field]: value };
-
-      schema.parse(toValidate);
+      
+      // Build the complete object structure for validation
+      const toValidate: Record<string, unknown> = {};
+      
+      if (fieldPath.length > 1) {
+        // For nested fields like "address.street"
+        toValidate[fieldPath[0]] = {};
+        let current = toValidate[fieldPath[0]] as Record<string, unknown>;
+        
+        for (let i = 1; i < fieldPath.length - 1; i++) {
+          current[fieldPath[i]] = {};
+          current = current[fieldPath[i]] as Record<string, unknown>;
+        }
+        
+        current[fieldPath[fieldPath.length - 1]] = value;
+        
+        // Get the nested schema for validation
+        const schema = checkoutSchema.shape[fieldPath[0] as keyof typeof checkoutSchema.shape];
+        
+        if (schema && 'shape' in schema) {
+          // Validate just the specific field within the nested schema
+          const nestedSchema = (schema as z.ZodObject<Record<string, z.ZodTypeAny>>).shape[fieldPath[1]];
+          if (nestedSchema) {
+            nestedSchema.parse(value);
+          }
+        }
+      } else {
+        // For top-level fields
+        toValidate[field] = value;
+        const fieldSchema = checkoutSchema.shape[field as keyof typeof checkoutSchema.shape];
+        if (fieldSchema) {
+          fieldSchema.parse(value);
+        }
+      }
+      
       return null;
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -71,23 +95,42 @@ export function useFormValidation({
   const setFieldValue = React.useCallback(
     (field: string, value: unknown) => {
       setFormData((prev) => {
+        const newData = { ...prev };
         const fieldPath = field.split(".");
+        
         if (fieldPath.length > 1) {
-          return {
-            ...prev,
-            [fieldPath[0]]: {
-              ...((prev[fieldPath[0] as keyof typeof prev] as object) || {}),
-              [fieldPath[1]]: value,
-            },
-          };
+          // Handle nested fields
+          let current: Record<string, unknown> = newData;
+          
+          // Navigate to the parent of the field to update
+          for (let i = 0; i < fieldPath.length - 1; i++) {
+            const key = fieldPath[i];
+            if (!current[key] || typeof current[key] !== 'object') {
+              current[key] = {};
+            } else {
+              // Clone the object to maintain immutability
+              current[key] = { ...(current[key] as Record<string, unknown>) };
+            }
+            current = current[key] as Record<string, unknown>;
+          }
+          
+          // Set the final value
+          current[fieldPath[fieldPath.length - 1]] = value;
+        } else {
+          // Handle top-level fields
+          (newData as Record<string, unknown>)[field] = value;
         }
-        return { ...prev, [field]: value };
+        
+        return newData;
       });
 
+      // Validate the field
+      const error = validateField(field, value);
+      
       setValidationState((prev) => ({
         ...prev,
         [field]: {
-          error: validateField(field, value),
+          error,
           dirty: true,
         },
       }));
