@@ -1,151 +1,146 @@
 "use client";
 
 import { useState } from "react";
-import { ShoppingBag } from "lucide-react";
+import { Loader2, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 import { toast } from "sonner";
 import { buyNowAction } from "@/lib/actions";
+import { cn } from "@/lib/utils";
 
 interface BuyNowButtonProps {
-	product: ApiProduct;
-	variant?: ApiProductVariant;
-	quantity?: number;
-	className?: string;
-	collectCustomerEmail?: boolean; // New: whether to collect customer email
-	customerEmail?: string; // New: pre-filled customer email
-}
-
-function createDefaultVariant(product: ApiProduct): ApiProductVariant {
-	const firstVariant = product.variants?.[0];
-	return {
-		id: firstVariant?.id || product.id,
-		product_id: product.id,
-		title: firstVariant?.title || "Default Title",
-		price: product.price,
-		sku: firstVariant?.sku || "",
-		grams: firstVariant?.grams || 0,
-		featured_image: product.images?.[0]?.src,
-		available: product.in_stock,
-		requires_shipping: firstVariant?.requires_shipping ?? true,
-		taxable: firstVariant?.taxable ?? true,
-		compare_at_price: product.compare_at_price,
-		position: 1,
-		created_at: product.created_at,
-		updated_at: product.updated_at,
-	};
-}
-
-function hasMultipleRealVariants(product: ApiProduct): boolean {
-	const variants = product.variants || [];
-	// Treat multiple variants with non-default titles as "real" variants
-	const nonDefault = variants.filter(
-		(v) => (v.title || "").toLowerCase() !== "default title",
-	);
-	return nonDefault.length > 1;
+  product: ApiProduct;
+  variant?: ApiProductVariant;
+  quantity?: number;
+  className?: string;
+  style?: 'default' | 'minimal' | 'full-width';
+  size?: 'sm' | 'lg';
+  utmParams?: {
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+  };
 }
 
 export function BuyNowButton({
-	product,
-	variant,
-	quantity = 1,
-	className,
-	collectCustomerEmail = false,
-	customerEmail = "",
+  product,
+  variant,
+  quantity = 1,
+  className,
+  style = 'default',
+  size = 'lg',
+  utmParams = {
+    utm_source: 'google',
+    utm_medium: 'cpc',
+    utm_campaign: 'buy-now'
+  },
 }: BuyNowButtonProps) {
-	const [isLoading, setIsLoading] = useState(false);
-	const [email, setEmail] = useState(customerEmail);
+  const [isLoading, setIsLoading] = useState(false);
 
-	// UX guard: require explicit selection only when the product has multiple real variants
-	if (hasMultipleRealVariants(product) && !variant) {
-		// Show a disabled button with guidance if no variant selected
-		return (
-			<Button disabled className={className} size="lg">
-				<ShoppingBag className="mr-2 w-4 h-4" />
-				Select a variant
-			</Button>
-		);
-	}
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    toast.loading("Processing your order...", {
+      id: "buy-now-processing",
+      description: `Adding ${product.title} to checkout`,
+    });
+  };
 
-	const selectedVariant =
-		variant || product.variants?.[0] || createDefaultVariant(product);
+  const handleError = (error?: unknown) => {
+    setIsLoading(false);
+    toast.dismiss("buy-now-processing");
+    const errorMessage =
+      error instanceof Error ? error.message : "An unexpected error occurred";
+    toast.error("Failed to process order", {
+      description: errorMessage,
+      classNames: {
+        description: "!text-red-500",
+      },
+    });
+  };
 
-	const handleSubmit = async () => {
-		setIsLoading(true);
-		toast.loading("Processing your order...", {
-			id: "buy-now-processing",
-			description: `Adding ${product.title} to checkout`,
-		});
-	};
+  // Style variations inspired by the PHP implementation
+  const getButtonStyles = () => {
+    const baseStyles = "transition-all duration-300 ease-in-out font-semibold text-white border-none cursor-pointer";
+    
+    switch (style) {
+      case 'minimal':
+        return cn(
+          baseStyles,
+          "bg-[#212121] hover:bg-[#757575] text-white",
+          "rounded-sm px-5 py-3",
+          size === 'sm' && "px-4 py-2 text-sm",
+          size === 'lg' && "px-7 py-4 text-base"
+        );
+      case 'full-width':
+        return cn(
+          baseStyles,
+          "bg-[#212121] hover:bg-[#757575] text-white w-full",
+          "rounded-sm px-7 py-4 text-center",
+          "md:px-7 md:py-4 md:text-base",
+          "sm:px-5 sm:py-[18px] sm:text-[15px]", // tablet
+          "max-sm:px-[18px] max-sm:py-[18px] max-sm:text-sm" // mobile
+        );
+      default:
+        return cn(
+          "bg-orange-500 hover:bg-orange-600 text-white",
+          baseStyles
+        );
+    }
+  };
 
-	const handleError = (error?: unknown) => {
-		setIsLoading(false);
-		toast.dismiss("buy-now-processing");
-		const errorMessage =
-			error instanceof Error ? error.message : "An unexpected error occurred";
-		toast.error("Failed to process order", {
-			description: errorMessage,
-		});
-	};
+  return (
+    <form
+      action={async (formData) => {
+        try {
+          await buyNowAction(formData);
+        } catch (error) {
+          handleError(error);
+        }
+      }}
+      onSubmit={handleSubmit}
+      className={style === 'full-width' ? 'w-full' : ''}
+    >
+      <input
+        type="hidden"
+        name="productId"
+        value={variant?.product_id || product.id}
+      />
+      <input type="hidden" name="variantId" value={variant?.id || ""} />
+      <input
+        type="hidden"
+        name="price"
+        value={variant?.price || product.price}
+      />
+      <input type="hidden" name="quantity" value={quantity} />
+      <input type="hidden" name="productTitle" value={product.title} />
+      <input
+        type="hidden"
+        name="productImage"
+        value={variant?.featured_image || product.images?.[0]?.src || ""}
+      />
+      
+      {/* UTM Parameters */}
+      <input type="hidden" name="utm_source" value={utmParams.utm_source} />
+      <input type="hidden" name="utm_medium" value={utmParams.utm_medium} />
+      <input type="hidden" name="utm_campaign" value={utmParams.utm_campaign} />
 
-	return (
-		<form
-			action={async (formData) => {
-				try {
-					await buyNowAction(formData);
-				} catch (error) {
-					handleError(error);
-				}
-			}}
-			onSubmit={handleSubmit}
-		>
-			<input
-				type="hidden"
-				name="productId"
-				value={selectedVariant.product_id}
-			/>
-			<input type="hidden" name="variantId" value={selectedVariant.id} />
-			<input type="hidden" name="price" value={selectedVariant.price} />
-			<input type="hidden" name="quantity" value={quantity} />
-			<input type="hidden" name="productTitle" value={product.title} />
-			<input
-				type="hidden"
-				name="productImage"
-				value={product.images?.[0]?.src || ""}
-			/>
-			{collectCustomerEmail && (
-				<input type="hidden" name="customerEmail" value={email} />
-			)}
-
-			{collectCustomerEmail && (
-				<div className="mb-4">
-					<label
-						htmlFor="customer-email"
-						className="block text-sm font-medium mb-2"
-					>
-						Email (for invoice)
-					</label>
-					<input
-						id="customer-email"
-						type="email"
-						value={email}
-						onChange={(e) => setEmail(e.target.value)}
-						placeholder="your@email.com"
-						className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-						required={collectCustomerEmail}
-					/>
-				</div>
-			)}
-
-			<Button
-				type="submit"
-				disabled={isLoading || !product.in_stock}
-				className={className}
-				size="lg"
-			>
-				<ShoppingBag className="mr-2 w-4 h-4" />
-				{isLoading ? "Processing..." : "Buy Now"}
-			</Button>
-		</form>
-	);
+      <Button
+        type="submit"
+        disabled={isLoading || !product.in_stock}
+        className={cn(
+          getButtonStyles(),
+          style === 'full-width' && 'w-full',
+          className
+        )}
+        size={size}
+      >
+        {isLoading ? (
+          <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+        ) : (
+          <ShoppingBag className="mr-2 w-4 h-4" />
+        )}
+        {isLoading ? "Processing..." : "Buy Now"}
+      </Button>
+    </form>
+  );
 }

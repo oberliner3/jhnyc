@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { CollectionSkeleton } from "@/components/skeletons/collection-skeleton";
-import { getAllProducts } from "@/lib/api";
+import { loadProducts, loadDataOptimized } from "@/lib/msgpack-loader";
 import { generateSEO } from "@/lib/seo";
 import type { ApiProduct } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -68,54 +68,114 @@ async function CollectionProducts({
 	let totalProducts = 0;
 
 	try {
-		// For "all" collection, use pagination directly
+		console.log(`🔍 Loading collection "${slug}" with ${productsPerPage} products per page, page ${page}`);
+		
+		// Check if this is a special collection that should use the external API collections endpoint
+		const apiCollections = ["featured", "sale", "new", "bestsellers", "trending"];
+		
 		if (slug === "all") {
-			products = await getAllProducts({ limit: productsPerPage, page });
+			// Use the regular products endpoint with pagination
+			products = await loadProducts({ 
+				limit: productsPerPage, 
+				page,
+				context: 'ssr'
+			});
 			// Fetch one more product to check if there's a next page
-			const nextPageProducts = await getAllProducts({
+			const nextPageProducts = await loadProducts({
 				limit: 1,
 				page: page + 1,
+				context: 'ssr'
 			});
 			hasNextPage = nextPageProducts.length > 0;
-		} else {
-			// For other collections, fetch all and filter (can be optimized with backend support)
-			const allProducts = await getAllProducts({ limit: 100 });
-			let filteredProducts = allProducts;
-
-			// Filter products based on collection type
-			switch (slug) {
-				case "sale":
-					filteredProducts = allProducts.filter(
-						(p) => p.compare_at_price && p.compare_at_price > p.price,
-					);
-					break;
-				case "new":
-					// Filter products created in the last 30 days (mock logic)
-					filteredProducts = allProducts.slice(0, 24);
-					break;
-				case "featured":
-					// Filter products with high ratings
-					filteredProducts = allProducts.filter(
-						(p) => p.rating && p.rating >= 4,
-					);
-					break;
-				case "bestsellers":
-					// Filter products with high review counts
-					filteredProducts = allProducts.filter(
-						(p) => p.review_count && p.review_count >= 10,
-					);
-					break;
-				case "trending":
-					// Mock trending products (could be based on views, sales, etc.)
-					filteredProducts = allProducts.slice(0, 20);
-					break;
+			totalProducts = products.length; // We don't have exact total, use products length
+		} else if (apiCollections.includes(slug)) {
+			// Use the external API collections endpoint directly
+			try {
+				const collectionData = await loadDataOptimized<{
+					products: ApiProduct[];
+					meta?: {
+						total: number;
+						page: number;
+						limit: number;
+						total_pages: number;
+					};
+				}>(`/collections/${slug}?page=${page}&limit=${productsPerPage}`, {
+					context: 'ssr'
+				});
+				
+				products = Array.isArray(collectionData.products) ? collectionData.products : [];
+				// Force all products to in_stock: true (as per your existing logic)
+				products = products.map(p => ({ ...p, in_stock: true }));
+				
+				// Handle pagination from API meta data
+				if (collectionData.meta) {
+					totalProducts = collectionData.meta.total;
+					hasNextPage = page < collectionData.meta.total_pages;
+				} else {
+					// Fallback: assume there might be more if we got a full page
+					totalProducts = products.length;
+					hasNextPage = products.length === productsPerPage;
+				}
+				
+				console.log(`🎆 Collection "${slug}" from API: ${products.length} products, total: ${totalProducts}, hasNext: ${hasNextPage}`);
+			} catch (collectionError) {
+				console.warn(`⚠️ Collection API failed for "${slug}", falling back to product filtering:`, collectionError);
+				
+				// Fallback to the old filtering method if collection API fails
+				const allProducts = await loadProducts({ 
+					limit: 200,
+					context: 'ssr'
+				});
+				
+				let filteredProducts = allProducts;
+				
+				// Apply fallback filtering
+				switch (slug) {
+					case "sale":
+						filteredProducts = allProducts.filter(
+							(p) => p.compare_at_price && p.compare_at_price > p.price,
+						);
+						break;
+					case "new":
+						filteredProducts = allProducts.slice(0, 24);
+						break;
+					case "featured":
+						const highRatedProducts = allProducts.filter(
+							(p) => p.rating && p.rating >= 4,
+						);
+						filteredProducts = highRatedProducts.length > 0 
+							? highRatedProducts 
+							: allProducts.slice(0, 24);
+						break;
+					case "bestsellers":
+						const highReviewProducts = allProducts.filter(
+							(p) => p.review_count && p.review_count >= 10,
+						);
+						filteredProducts = highReviewProducts.length > 0 
+							? highReviewProducts 
+							: allProducts.filter(p => p.review_count && p.review_count > 0).slice(0, 20)
+								|| allProducts.slice(0, 20);
+						break;
+					case "trending":
+						filteredProducts = allProducts.slice(0, 20);
+						break;
+				}
+				
+				totalProducts = filteredProducts.length;
+				const startIndex = (page - 1) * productsPerPage;
+				const endIndex = startIndex + productsPerPage;
+				products = filteredProducts.slice(startIndex, endIndex);
+				hasNextPage = endIndex < totalProducts;
 			}
-
-			totalProducts = filteredProducts.length;
-			const startIndex = (page - 1) * productsPerPage;
-			const endIndex = startIndex + productsPerPage;
-			products = filteredProducts.slice(startIndex, endIndex);
-			hasNextPage = endIndex < totalProducts;
+		} else {
+			// Unknown collection, try to load as regular products
+			products = await loadProducts({ 
+				limit: productsPerPage, 
+				page,
+				context: 'ssr'
+			});
+			totalProducts = products.length;
+			hasNextPage = products.length === productsPerPage;
 		}
 	} catch (error) {
 		console.error("Error fetching collection products:", error);

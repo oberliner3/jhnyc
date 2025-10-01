@@ -114,7 +114,7 @@
 	}
 
 	a {
-		@apply text-foreground hover:underline underline-offset-4 hover:text-primary-hover;
+		@apply text-foreground hover:text-primary-hover;
 	}
 
 	body {

@@ -1,0 +1,3 @@
+- Cloudflare worker with puppeteer to handle page customizations https://developers.cloudflare.com/browser-rendering/platform/puppeteer/
+- shopify draft order creation https://shopify.dev/docs/api/admin-graphql/latest/objects/draftorder
+- Upgrade styles to tailwindcss v4.1 https://tailwindcss.com/docs/upgrade-guide

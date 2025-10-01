@@ -1,47 +1,90 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { encode } from "msgpack-javascript";
+import { loadProducts } from "@/lib/msgpack-loader";
 
-export async function GET(request: Request) {
-	const supabase = await createClient();
-	const { searchParams } = new URL(request.url);
-	const search = searchParams.get("search");
-	const vendor = searchParams.get("vendor");
-	const limit = Number(searchParams.get("limit")) || 10;
-	const page = Number(searchParams.get("page")) || 1;
-	const fields = searchParams.get("fields");
+export async function GET(request: NextRequest) {
+	try {
+		const { searchParams } = new URL(request.url);
+		const search = searchParams.get("search") || undefined;
+		const vendor = searchParams.get("vendor") || undefined; // Note: may not be supported by external API
+		const limit = Number(searchParams.get("limit")) || 20;
+		const page = Number(searchParams.get("page")) || 1;
+		// Note: fields parameter may not be supported by external API
 
-	let query = supabase.from("products").select(fields || "*");
+		console.log(`🔍 Loading products from external API: limit=${limit}, page=${page}, search=${search || 'none'}`);
 
-	if (search) {
-		query = query.ilike("title", `%${search}%`);
-	}
+		// Use optimized MessagePack loader with SSR context
+		const products = await loadProducts({
+			limit,
+			page,
+			search,
+			context: 'ssr'
+		});
 
-	if (vendor) {
-		query = query.eq("vendor", vendor);
-	}
+		// TODO: Handle vendor filtering client-side if external API doesn't support it
+		let filteredProducts = products;
+		if (vendor) {
+			filteredProducts = products.filter(p => 
+				p.vendor?.toLowerCase() === vendor.toLowerCase()
+			);
+		}
 
-	const startIndex = (page - 1) * limit;
-	const endIndex = startIndex + limit - 1;
-	query = query.range(startIndex, endIndex);
+		const responseData = {
+			products: filteredProducts,
+			page,
+			limit,
+			total: filteredProducts.length,
+			hasMore: products.length === limit, // Simple heuristic
+		};
 
-	const { data: products, error } = await query;
+		// Check if client accepts MessagePack response
+		const acceptHeader = request.headers.get("Accept");
+		if (acceptHeader?.includes("application/x-msgpack")) {
+			const encodedData = encode(responseData);
+			const jsonSize = new TextEncoder().encode(JSON.stringify(responseData)).length;
+			const compressionRatio = jsonSize / encodedData.length;
+			const savings = ((1 - encodedData.length / jsonSize) * 100).toFixed(1);
+			
+			console.log(`📦 Sending MessagePack products response - Compression: ${savings}% (${jsonSize}B → ${encodedData.length}B)`);
+			
+			const response = new NextResponse(encodedData, {
+				headers: { 
+					"Content-Type": "application/x-msgpack",
+					"X-Compression-Ratio": compressionRatio.toFixed(2),
+					"X-Compression-Savings": `${savings}%`,
+					"X-Original-Size": jsonSize.toString(),
+					"Cache-Control": "public, s-maxage=300, stale-while-revalidate=600", // 5 min cache, 10 min stale
+				},
+			});
+			return response;
+		}
 
-	if (error) {
-		console.error("[API] Failed to fetch products from Supabase:", error);
+		// Standard JSON response with caching
+		const response = NextResponse.json(responseData);
+		response.headers.set(
+			"Cache-Control",
+			"public, s-maxage=300, stale-while-revalidate=600"
+		);
+
+		console.log(`📄 Sending JSON products response: ${filteredProducts.length} products`);
+		return response;
+	} catch (error) {
+		console.error(
+			"[API] Failed to fetch products from external API:",
+			error
+		);
 		return NextResponse.json(
-			{ error: "Failed to fetch products" },
-			{ status: 500 },
+			{ 
+				error: "Failed to fetch products",
+				products: [],
+				page: 1,
+				limit: 20,
+				total: 0,
+				hasMore: false,
+			},
+			{ status: 500 }
 		);
 	}
-
-	// For pagination metadata, we'd ideally get the total count without the limit/range
-	// Supabase has a .count() method, but it requires a separate query or a specific header.
-	// For simplicity, we'll omit totalPages/totalProducts for now or assume a max limit.
-	return NextResponse.json({
-		products,
-		page,
-		limit,
-	});
 }
 
 export async function POST() {

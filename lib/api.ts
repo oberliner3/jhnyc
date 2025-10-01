@@ -3,6 +3,7 @@
  * Includes comprehensive error handling, retry logic, and type safety
  */
 
+import { decode } from "msgpack-javascript";
 import { API_CONFIG, LIMITS } from "./constants";
 import { getServerEnv } from "./env-validation";
 import {
@@ -36,6 +37,7 @@ async function apiRequest<T>(
 					...API_CONFIG.HEADERS,
 					...options.headers,
 					"X-API-KEY": PRODUCT_STREAM_X_KEY,
+					Accept: "application/x-msgpack, application/json",
 				},
 				signal: controller.signal,
 			});
@@ -50,6 +52,12 @@ async function apiRequest<T>(
 					response.statusText,
 					endpoint,
 				);
+			}
+
+			const contentType = response.headers.get("Content-Type");
+			if (contentType && contentType.includes("application/x-msgpack")) {
+				const arrayBuffer = await response.arrayBuffer();
+				return decode(arrayBuffer) as T;
 			}
 
 			return await response.json();

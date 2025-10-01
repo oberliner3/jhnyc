@@ -9,6 +9,7 @@ import DevToolsBlocker from "@/components/common/dev-tools-blocker";
 import ErrorBoundary from "@/components/common/error-boundary";
 import { WebsiteSchema } from "@/components/common/website-schema";
 import { Toaster } from "@/components/ui/sonner";
+import { MessagePackMonitor } from "@/components/admin/msgpack-monitor";
 import { publicEnv } from "@/lib/constants";
 import { Providers } from "./providers";
 
@@ -59,6 +60,7 @@ export default async function RootLayout({
 							{children}
 						</div>
 						<Toaster />
+						<MessagePackMonitor />
 					</Providers>
 				</ErrorBoundary>
 				<Analytics />

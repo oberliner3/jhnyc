@@ -8,17 +8,22 @@ import type { ApiProduct } from "@/lib/types";
  * Attaches a click handler to a "buy now" button to include quantity
  * and variation ID in the navigation URL.
  *
- * This is designed for use in client-side components. For React, consider
- * wrapping this logic in a `useEffect` hook.
+ * Enhanced version that matches PHP implementation behavior.
  *
  * @param buttonSelector - CSS selector for the buy now button.
  * @param qtySelector - CSS selector for the quantity input.
  * @param variationSelector - CSS selector for the variation ID input.
+ * @param utmParams - UTM parameters for tracking
  */
 export function initializeCampaignButton(
 	buttonSelector: string,
 	qtySelector: string,
 	variationSelector: string,
+	utmParams?: {
+		utm_source?: string;
+		utm_medium?: string;
+		utm_campaign?: string;
+	}
 ) {
 	if (typeof window === "undefined") return; // Only run on the client
 
@@ -40,16 +45,88 @@ export function initializeCampaignButton(
 				if (!href) return;
 
 				const url = new URL(href, window.location.origin);
+				
+				// Set quantity (matching PHP logic)
 				url.searchParams.set("quantity", String(qty));
 
+				// Set variation if available (matching PHP logic)
 				if (variationInput?.value) {
 					url.searchParams.set("variation_id", variationInput.value);
 				}
+				
+				// Add UTM parameters (matching PHP defaults)
+				const defaultUtmParams = {
+					utm_source: 'google',
+					utm_medium: 'cpc',
+					utm_campaign: 'buy-now',
+					...utmParams
+				};
+				
+				Object.entries(defaultUtmParams).forEach(([key, value]) => {
+					if (value) {
+						url.searchParams.set(key, value);
+					}
+				});
 
 				window.location.href = url.toString();
 			});
 		}
 	});
+}
+
+/**
+ * Enhanced buy now handler for React components
+ * Handles form submission with proper data extraction
+ */
+export function handleBuyNowClick(
+	productData: {
+		productId: string;
+		variantId?: string;
+		price: number;
+		productTitle: string;
+		productImage?: string;
+	},
+	quantity: number = 1,
+	utmParams?: {
+		utm_source?: string;
+		utm_medium?: string;
+		utm_campaign?: string;
+	}
+): { url: string; formData: FormData } {
+	// Build URL like PHP implementation
+	const baseUrl = new URL('/api/buy-now', window.location.origin);
+	
+	// Create form data for submission
+	const formData = new FormData();
+	formData.append('productId', productData.productId);
+	if (productData.variantId) {
+		formData.append('variantId', productData.variantId);
+	}
+	formData.append('price', productData.price.toString());
+	formData.append('quantity', quantity.toString());
+	formData.append('productTitle', productData.productTitle);
+	if (productData.productImage) {
+		formData.append('productImage', productData.productImage);
+	}
+	
+	// Add UTM parameters (matching PHP defaults)
+	const finalUtmParams = {
+		utm_source: 'google',
+		utm_medium: 'cpc',
+		utm_campaign: 'buy-now',
+		...utmParams
+	};
+	
+	Object.entries(finalUtmParams).forEach(([key, value]) => {
+		if (value) {
+			formData.append(key, value);
+		}
+	});
+	
+	return {
+		url: baseUrl.toString(),
+		formData
+	};
 }
 
 /**

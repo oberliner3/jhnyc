@@ -1,14 +1,13 @@
 "use client";
 
-import { ShoppingCart, ShoppingBag } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { BuyNowButton } from "@/components/product/buy-now-button";
 import { useCart } from "@/contexts/cart-context";
-import { buyNowAction } from "@/lib/actions";
-import { toast } from "sonner";
 
 import type {
 	ApiProduct,
@@ -26,7 +25,6 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
 	const { addItem } = useCart();
-	const [isLoading, setIsLoading] = useState(false);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
 	const discountPercentage = product.compare_at_price
@@ -37,7 +35,7 @@ export function ProductCard({ product }: ProductCardProps) {
 			)
 		: 0;
 
-	const hasVariants = product.variants && product.variants.length > 1;
+	// const hasVariants = product.variants && product.variants.length > 0;
 	const hasMultipleImages = product.images && product.images.length > 1;
 
 	const handleAddToCart = (e: React.MouseEvent) => {
@@ -46,38 +44,6 @@ export function ProductCard({ product }: ProductCardProps) {
 		addItem(product, product.variants?.[0], 1);
 	};
 
-	const handleBuyNow = async (e: React.MouseEvent) => {
-		e.preventDefault();
-		if (hasVariants) {
-			// Redirect to product page for variant selection
-			window.location.href = `/products/${product.handle}`;
-			return;
-		}
-
-		setIsLoading(true);
-		const formData = new FormData();
-		formData.append("productId", product.id.toString());
-		formData.append(
-			"variantId",
-			product.variants?.[0]?.id?.toString() || product.id.toString(),
-		);
-		formData.append("price", product.price.toString());
-		formData.append("quantity", "1");
-		formData.append("productTitle", product.title);
-		formData.append("productImage", product.images?.[0]?.src || "");
-
-		try {
-			await buyNowAction(formData);
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : "Failed to process order";
-			toast.error("Failed to process order", {
-				description: errorMessage,
-			});
-			console.error("Buy now error:", error);
-			setIsLoading(false);
-		}
-	};
 
 	const currentImage =
 		product.images && product.images.length > 0
@@ -118,16 +84,14 @@ export function ProductCard({ product }: ProductCardProps) {
 					{/* Quick Actions Overlay */}
 					<div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 						<div className="flex gap-2">
-							<Button
+							<BuyNowButton
+								product={product}
+								variant={product.variants?.[0]}
+								quantity={1}
+								style="minimal"
 								size="sm"
-								variant="secondary"
-								className="flex-1"
-								onClick={handleBuyNow}
-								disabled={!product.in_stock || isLoading}
-							>
-								<ShoppingBag className="w-4 h-4 mr-1" />
-								Buy Now
-							</Button>
+								className="flex-1 bg-white/90 hover:bg-white text-black border-none"
+							/>
 							<Button
 								size="sm"
 								variant="secondary"
@@ -169,16 +133,14 @@ export function ProductCard({ product }: ProductCardProps) {
 
 					{/* Desktop: Hidden buttons that appear on hover */}
 					<div className="hidden md:flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-						<Button
+						<BuyNowButton
+							product={product}
+							variant={product.variants?.[0]}
+							quantity={1}
+							style="minimal"
 							size="sm"
-							variant="default"
 							className="flex-1"
-							onClick={handleBuyNow}
-							disabled={!product.in_stock || isLoading}
-						>
-							<ShoppingBag className="w-4 h-4 mr-1" />
-							Buy Now
-						</Button>
+						/>
 						<Button
 							size="sm"
 							variant="outline"

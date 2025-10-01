@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { createDraftOrderWithMessagePack, benchmarkSerialization } from "@/lib/msgpack-checkout";
 
 interface LineItem {
 	variantId: string;
@@ -79,29 +80,46 @@ export function DraftOrderForm() {
 		});
 
 		try {
-			const response = await fetch("/api/draft-orders", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					lineItems: formData.lineItems,
-					customerEmail: formData.customerEmail,
-					customerFirstName: formData.customerFirstName,
-					customerLastName: formData.customerLastName,
-					customerPhone: formData.customerPhone,
-					shippingAddress: formData.shippingAddress,
-					note: formData.note,
-					tags: formData.tags,
-					sendInvoice: formData.sendInvoice,
-					invoiceData: {
-						subject: `Invoice for ${formData.customerFirstName} ${formData.customerLastName}`,
-						customMessage: "Thank you for your order!",
-					},
-				}),
-			});
+			const orderData = {
+				lineItems: formData.lineItems,
+				customerEmail: formData.customerEmail,
+				customerFirstName: formData.customerFirstName,
+				customerLastName: formData.customerLastName,
+				customerPhone: formData.customerPhone,
+				shippingAddress: formData.shippingAddress,
+				note: formData.note,
+				tags: formData.tags,
+				sendInvoice: formData.sendInvoice,
+				invoiceData: {
+					subject: `Invoice for ${formData.customerFirstName} ${formData.customerLastName}`,
+					customMessage: "Thank you for your order!",
+				},
+			};
 
-			const data = await response.json();
+			// Benchmark the serialization to see the benefits
+			const benchmark = benchmarkSerialization(orderData);
+			console.log(`📊 Draft Order Serialization Benchmark:`, benchmark);
+			
+			// Show benchmark info in development
+			if (process.env.NODE_ENV === "development") {
+				toast.info(`Using ${benchmark.winner.toUpperCase()} - ${benchmark.improvement}`, {
+					id: "benchmark-info",
+					duration: 2000,
+				});
+			}
 
-			if (!response.ok) {
+			// Use MessagePack-optimized request
+			const data = await createDraftOrderWithMessagePack(orderData) as {
+				success: boolean;
+				error?: string;
+				draftOrder?: {
+					invoiceUrl?: string;
+					[key: string]: unknown;
+				};
+				invoiceSent?: boolean;
+			};
+
+			if (!data.success) {
 				throw new Error(data.error || "Failed to create draft order");
 			}
 
@@ -115,7 +133,7 @@ export function DraftOrderForm() {
 			setStatus({
 				loading: false,
 				success: true,
-				invoiceUrl: data.draftOrder.invoiceUrl,
+				invoiceUrl: data.draftOrder?.invoiceUrl || null,
 				error: null,
 			});
 		} catch (error) {

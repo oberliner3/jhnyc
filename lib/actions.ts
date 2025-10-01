@@ -46,7 +46,6 @@ export async function handleCampaignRedirect(
 			productTitle: tracking.product_title || invoiceNumber,
 			price: product.price,
 			quantity: quantity,
-			note: `Campaign order - UTM Source: ${tracking.utm_source || "direct"}, UTM Medium: ${tracking.utm_medium || "none"}, UTM Campaign: ${tracking.utm_campaign || "none"}`,
 		});
 
 		if (!draftOrder?.invoiceUrl) {
@@ -85,6 +84,7 @@ export async function handleCampaignRedirect(
  * Server Action suitable for use as a <form action={buyNowAction}> handler.
  * Expects FormData fields matching the Buy Now button's hidden inputs.
  * Enhanced with comprehensive validation and error handling.
+ * Now supports UTM parameters and generates invoice numbers like the PHP implementation.
  */
 export async function buyNowAction(formData: FormData): Promise<never> {
 	try {
@@ -96,6 +96,11 @@ export async function buyNowAction(formData: FormData): Promise<never> {
 		const productTitle = String(formData.get("productTitle") || "").trim();
 		const productImage = String(formData.get("productImage") || "").trim();
 		const customerEmail = String(formData.get("customerEmail") || "").trim();
+		
+		// Extract UTM parameters (matching PHP implementation)
+		const utmSource = String(formData.get("utm_source") || "google").trim();
+		const utmMedium = String(formData.get("utm_medium") || "cpc").trim();
+		const utmCampaign = String(formData.get("utm_campaign") || "buy-now").trim();
 
 		// Enhanced validation
 		if (!productId) {
@@ -120,23 +125,32 @@ export async function buyNowAction(formData: FormData): Promise<never> {
 			throw new Error(ERROR_MESSAGES.INVALID_EMAIL);
 		}
 
+		// Generate invoice number like PHP implementation: 'Invoice' + random 7-digit number
+		const invoiceNumber = `Invoice${Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000}`;
+
 		// Create draft order using the modern Shopify client
 		const draftOrder = await createSimpleDraftOrder({
-			productTitle: productTitle || `Product ${productId}`,
+			productTitle: invoiceNumber, // Use generated invoice number as title (matching PHP)
 			variantId: variantId,
 			productId: productId,
 			price: price,
 			quantity: quantity,
 			customerEmail: customerEmail || undefined,
-			note: `Product: ${productTitle || "Unknown"}, Variant: ${variantId}`,
 		});
 
 		if (!draftOrder?.invoiceUrl) {
 			throw new ShopifyApiError("No invoice URL returned from Shopify");
 		}
 
-		// Append tracking parameters to the invoice URL
+		// Append all tracking parameters to the invoice URL (matching PHP implementation)
 		const finalUrl = new URL(draftOrder.invoiceUrl);
+		
+		// UTM parameters
+		finalUrl.searchParams.set("utm_source", utmSource);
+		finalUrl.searchParams.set("utm_medium", utmMedium);
+		finalUrl.searchParams.set("utm_campaign", utmCampaign);
+		
+		// Product data for Cloudflare Worker
 		if (productTitle) {
 			finalUrl.searchParams.set("product_title", productTitle);
 		}

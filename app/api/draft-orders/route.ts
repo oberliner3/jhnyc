@@ -1,10 +1,72 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createDraftOrder, sendDraftOrderInvoice } from "@/lib/shopify-client";
-import type { DraftOrderInput, DraftOrderLineItem } from "@/lib/shopify-client";
+import type { DraftOrderInput, DraftOrderLineItem, DraftOrderShippingAddress } from "@/lib/shopify-client";
+import { 
+	decodeShopifyDraftOrder, 
+	encodeShopifyData,
+	calculateCompressionRatio 
+} from "@/lib/msgpack-shopify";
+
+interface RequestLineItem {
+  title?: string;
+  variantId?: string;
+  productId?: string;
+  quantity: number;
+  price?: string;
+  sku?: string;
+  grams?: number;
+  taxable?: boolean;
+  requiresShipping?: boolean;
+}
+
+interface DraftOrderRequestBody {
+  lineItems: RequestLineItem[];
+  customerEmail?: string;
+  customerFirstName?: string;
+  customerLastName?: string;
+  customerPhone?: string;
+  shippingAddress?: DraftOrderShippingAddress;
+  billingAddress?: DraftOrderShippingAddress;
+  note?: string;
+  tags?: string;
+  sendInvoice?: boolean;
+  invoiceData?: {
+    subject?: string;
+    customMessage?: string;
+    from?: string;
+  };
+}
 
 export async function POST(request: NextRequest) {
 	try {
-		const body = await request.json();
+		// Check if request is MessagePack or JSON
+		const contentType = request.headers.get("Content-Type");
+		let body: DraftOrderRequestBody;
+		
+		if (contentType?.includes("application/x-msgpack")) {
+			const arrayBuffer = await request.arrayBuffer();
+			const uint8Array = new Uint8Array(arrayBuffer);
+			// Decode MessagePack data - note this returns DraftOrderInput format
+			const decodedData = decodeShopifyDraftOrder(uint8Array);
+			// Transform to DraftOrderRequestBody format
+			body = {
+				lineItems: decodedData.line_items || [],
+				customerEmail: decodedData.customer?.email,
+				customerFirstName: decodedData.customer?.first_name,
+				customerLastName: decodedData.customer?.last_name,
+				customerPhone: decodedData.customer?.phone,
+				shippingAddress: decodedData.shipping_address,
+				billingAddress: decodedData.billing_address,
+				note: decodedData.note,
+				tags: decodedData.tags,
+				// Add default values for missing properties
+				sendInvoice: false,
+				invoiceData: undefined,
+			} as DraftOrderRequestBody;
+			console.log("📦 Received MessagePack draft order request");
+		} else {
+			body = await request.json();
+		}
 
 		const {
 			lineItems,
@@ -44,17 +106,7 @@ export async function POST(request: NextRequest) {
 		// Build draft order data
 		const draftOrderData: DraftOrderInput = {
 			line_items: lineItems.map(
-				(item: {
-					title?: string;
-					variantId?: string;
-					productId?: string;
-					quantity: number;
-					price?: string;
-					sku?: string;
-					grams?: number;
-					taxable?: boolean;
-					requiresShipping?: boolean;
-				}): DraftOrderLineItem => ({
+				(item): DraftOrderLineItem => ({
 					title: item.title,
 					variant_id: item.variantId,
 					product_id: item.productId,
@@ -107,7 +159,7 @@ export async function POST(request: NextRequest) {
 			}
 		}
 
-		return NextResponse.json({
+		const responseData = {
 			success: true,
 			draftOrder: {
 				id: draftOrder.id,
@@ -125,7 +177,27 @@ export async function POST(request: NextRequest) {
 			},
 			invoiceSent,
 			...(invoiceError && { invoiceError }),
-		});
+		};
+
+		// Check if client accepts MessagePack response
+		const acceptHeader = request.headers.get("Accept");
+		if (acceptHeader?.includes("application/x-msgpack")) {
+			const encodedResponse = encodeShopifyData(responseData);
+			const compressionStats = calculateCompressionRatio(responseData);
+			
+			console.log(`📦 Sending MessagePack response - Compression: ${compressionStats.savings} (${compressionStats.originalSize}B → ${compressionStats.compressedSize}B)`);
+			
+			const response = new NextResponse(Buffer.from(encodedResponse), {
+				headers: { 
+					"Content-Type": "application/x-msgpack",
+					"X-Compression-Ratio": compressionStats.compressionRatio.toString(),
+					"X-Compression-Savings": compressionStats.savings,
+				},
+			});
+			return response;
+		}
+
+		return NextResponse.json(responseData);
 	} catch (error) {
 		console.error("Draft order creation error:", error);
 		return NextResponse.json(
