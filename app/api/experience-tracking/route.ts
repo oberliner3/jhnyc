@@ -77,7 +77,6 @@ export async function POST(request: NextRequest) {
  * Extract client information from request headers
  */
 function getClientInfo(request: NextRequest) {
-  const headersList = headers();
   
   return {
     userAgent: request.headers.get('user-agent') || 'Unknown',

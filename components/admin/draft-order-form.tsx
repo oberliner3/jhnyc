@@ -45,7 +45,7 @@ interface DraftOrderFormState {
 
 export function DraftOrderForm() {
 	// Experience tracking hooks
-	const { trackFormStart, trackFormSubmit, trackFieldInteraction } = useFormTracking('draft-order-form');
+	const { trackFormSubmit } = useFormTracking('draft-order-form');
 	const { startStep, completeStep } = useJourneyTracking('custom');
 	
 	const [formData, setFormData] = useState<DraftOrderFormState>({

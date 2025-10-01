@@ -7,8 +7,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { experienceTracker } from './index';
 import type { 
   JourneyType, 
-  ExperienceTrackingEvent,
-  TrackingConfig 
+  ExperienceTrackingEvent
 } from './types';
 
 /**

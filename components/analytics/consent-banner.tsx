@@ -20,7 +20,7 @@ export function ConsentBanner({
   position = 'bottom',
   theme = 'light' 
 }: ConsentBannerProps) {
-  const { consentGiven, hasInitialized } = useAnalyticsContext();
+  const { consentGiven, setConsent } = useAnalyticsContext();
   const { grantAllConsent, denyAllConsent, setAnalyticsOnly } = useConsentManagement();
   const [showBanner, setShowBanner] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -84,7 +84,7 @@ export function ConsentBanner({
               </h3>
               <p className="text-sm opacity-90">
                 We use cookies and similar technologies to analyze traffic, personalize content, 
-                and serve targeted advertisements. By clicking "Accept All", you consent to our 
+                and serve targeted advertisements. By clicking &quot;Accept All&quot;, you consent to our 
                 use of cookies.
               </p>
             </div>
@@ -268,7 +268,7 @@ export function ConsentBanner({
                   };
 
                   // Use the analytics context to set consent
-                  useAnalyticsContext().setConsent(customConsent);
+                  setConsent(customConsent);
                   
                   setShowBanner(false);
                   if (typeof window !== 'undefined') {
