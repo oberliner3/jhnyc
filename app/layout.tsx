@@ -10,6 +10,7 @@ import ErrorBoundary from "@/components/common/error-boundary";
 import { WebsiteSchema } from "@/components/common/website-schema";
 import { Toaster } from "@/components/ui/sonner";
 import { MessagePackMonitor } from "@/components/admin/msgpack-monitor";
+import { ChatWidgetProvider } from "@/components/chat/chat-widget-provider";
 import { publicEnv } from "@/lib/constants";
 import { Providers } from "./providers";
 
@@ -63,6 +64,7 @@ export default async function RootLayout({
 						<MessagePackMonitor />
 					</Providers>
 				</ErrorBoundary>
+				<ChatWidgetProvider />
 				<Analytics />
 				<SpeedInsights />
 			</body>

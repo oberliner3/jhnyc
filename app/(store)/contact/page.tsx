@@ -1,8 +1,9 @@
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, MapPin, Phone, MessageCircle } from "lucide-react";
 import type { Metadata } from "next";
 import { useId } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { InlineChat } from "@/components/chat/inline-chat";
 import { APP_CONTACTS } from "@/lib/constants";
 import { generateSEO } from "@/lib/seo";
 import { SafeHtml } from "@/components/common/safe-html";
@@ -147,6 +148,60 @@ export default function ContactPage() {
 										Sat - Sun: 10:00 AM - 4:00 PM
 									</p>
 								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{/* Live Chat Section */}
+				<div className="mt-12">
+					<div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-8">
+						<div className="text-center mb-8">
+							<div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+								<MessageCircle className="w-8 h-8 text-blue-600" />
+							</div>
+							<h2 className="text-3xl font-bold text-gray-900 mb-2">
+								Need Immediate Help?
+							</h2>
+							<p className="text-lg text-gray-600 max-w-2xl mx-auto">
+								Chat with our support team right now! Get instant answers to your questions.
+							</p>
+						</div>
+
+						<div className="max-w-4xl mx-auto">
+							<InlineChat 
+								height={500}
+								title="Live Support Chat"
+								showHeader={true}
+								showRefresh={true}
+								className="border-2 border-blue-200 shadow-lg"
+							/>
+						</div>
+
+						{/* Chat Benefits */}
+						<div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+							<div className="text-center p-4 bg-white/50 rounded-lg">
+								<div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+									<Clock className="w-5 h-5 text-green-600" />
+								</div>
+								<h3 className="font-semibold text-gray-900 mb-1">Instant Response</h3>
+								<p className="text-sm text-gray-600">Get immediate answers to your questions</p>
+							</div>
+							
+							<div className="text-center p-4 bg-white/50 rounded-lg">
+								<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+									<Phone className="w-5 h-5 text-blue-600" />
+								</div>
+								<h3 className="font-semibold text-gray-900 mb-1">Expert Help</h3>
+								<p className="text-sm text-gray-600">Connect with knowledgeable support agents</p>
+							</div>
+							
+							<div className="text-center p-4 bg-white/50 rounded-lg">
+								<div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+									<Mail className="w-5 h-5 text-purple-600" />
+								</div>
+								<h3 className="font-semibold text-gray-900 mb-1">Follow-up</h3>
+								<p className="text-sm text-gray-600">Receive email transcripts for your records</p>
 							</div>
 						</div>
 					</div>

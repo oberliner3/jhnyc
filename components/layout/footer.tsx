@@ -83,7 +83,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/policies/privacy"
+                  href="/privacy-policy"
                   className="text-gray-600 hover:text-gray-900 text-sm transition-colors"
                 >
                   Privacy Policy
@@ -91,7 +91,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/policies/return-refund"
+                  href="/refund-policy"
                   className="text-gray-600 hover:text-gray-900 text-sm transition-colors"
                 >
                   Return and Refund Policy
@@ -99,7 +99,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/policies/shipping"
+                  href="/shipping-delivery"
                   className="text-gray-600 hover:text-gray-900 text-sm transition-colors"
                 >
                   Shipping Policy
@@ -107,7 +107,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/policies/terms"
+                  href="/terms-of-service"
                   className="text-gray-600 hover:text-gray-900 text-sm transition-colors"
                 >
                   Terms of Service
@@ -218,34 +218,34 @@ function FooterBottomLinks() {
   return (
     <div className="flex flex-wrap gap-2 text-gray-600 text-xs">
       <Link
-        href="/policies/privacy"
+        href="/privacy-policy"
         className="hover:text-gray-900 transition-colors"
       >
         Privacy Policy
       </Link>
       <Link
-        href="/policies/terms"
+        href="/terms-of-service"
         className="hover:text-gray-900 transition-colors"
       >
         Terms of Service
       </Link>
       <Link
-        href="/policies/return-refund"
+        href="/refund-policy"
         className="hover:text-gray-900 transition-colors"
       >
         Return and Refund Policy
       </Link>
       <Link
-        href="/policies/shipping"
+        href="/shipping-delivery"
         className="hover:text-gray-900 transition-colors"
       >
         Shipping Policy
       </Link>
       <Link
-        href="/policies/cookie"
+        href="/returns-exchange"
         className="hover:text-gray-900 transition-colors"
       >
-        Cookie Policy
+        Returns & Exchanges
       </Link>
       <Link href="/contact" className="hover:text-gray-900 transition-colors">
         Contact
