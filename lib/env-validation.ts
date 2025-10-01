@@ -13,6 +13,9 @@ const serverEnvSchemaBase = z.object({
 	SHOPIFY_TOKEN: z.string().min(1).optional(),
 	SHOPIFY_SHOP_NAME: z.string().min(1, "SHOPIFY_SHOP_NAME is required").optional(),
 
+	// Experience tracking configuration (server-only)
+	SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, "SUPABASE_SERVICE_ROLE_KEY is required for experience tracking").optional(),
+
 	NODE_ENV: z
 		.enum(["development", "production", "test"])
 		.default("development"),
@@ -32,6 +35,24 @@ const publicEnvSchema = z.object({
 		.optional(),
 	NEXT_PUBLIC_SITE_URL: z.string().optional(),
 	NEXT_PUBLIC_STORE_NAME: z.string().optional(),
+	
+	// Experience tracking configuration (public)
+	NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED: z
+		.string()
+		.transform((val) => val === "true")
+		.default("true")
+		.optional(),
+	NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE: z
+		.string()
+		.transform((val) => parseFloat(val) || 1.0)
+		.default("1.0")
+		.optional(),
+	NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG: z
+		.string()
+		.transform((val) => val === "true")
+		.default("false")
+		.optional(),
+	
 	NODE_ENV: z
 		.enum(["development", "production", "test"])
 		.default("development")
@@ -79,6 +100,9 @@ export function getPublicEnv(): PublicEnv {
 			NEXT_PUBLIC_STORE_NAME: process.env.NEXT_PUBLIC_STORE_NAME,
 			NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
 			NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+			NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED: process.env.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED === "true",
+			NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE: parseFloat(process.env.NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE || "1.0"),
+			NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG: process.env.NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG === "true",
 			NODE_ENV: process.env.NODE_ENV as
 				| "development"
 				| "production"

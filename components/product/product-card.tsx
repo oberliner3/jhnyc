@@ -3,11 +3,12 @@
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BuyNowButton } from "@/components/product/buy-now-button";
 import { useCart } from "@/contexts/cart-context";
+import { useProductTracking, useClickTracking } from "@/lib/experience-tracking/hooks";
 
 import type {
 	ApiProduct,
@@ -26,6 +27,20 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
 	const { addItem } = useCart();
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
+	
+	// Experience tracking hooks
+	const { trackProductView, trackProductClick, trackAddToCart } = useProductTracking();
+	const trackAddToCartClick = useClickTracking('product-add-to-cart', {
+		productId: product.id,
+		productTitle: product.title,
+		price: product.price,
+		inStock: product.in_stock
+	});
+	const trackBuyNowClick = useClickTracking('product-buy-now', {
+		productId: product.id,
+		productTitle: product.title,
+		price: product.price
+	});
 
 	const discountPercentage = product.compare_at_price
 		? Math.round(
@@ -35,13 +50,50 @@ export function ProductCard({ product }: ProductCardProps) {
 			)
 		: 0;
 
+	// Track product view on component mount
+	useEffect(() => {
+		trackProductView(product.id.toString(), {
+			name: product.title,
+			price: product.price,
+			compareAtPrice: product.compare_at_price,
+			inStock: product.in_stock,
+			vendor: product.vendor,
+			productType: product.product_type,
+			tags: product.tags,
+			hasDiscount: discountPercentage > 0,
+			discountPercentage
+		});
+	}, [product.id, product.title, product.price, product.compare_at_price, product.in_stock, product.vendor, product.product_type, product.tags, discountPercentage, trackProductView]);
+
 	// const hasVariants = product.variants && product.variants.length > 0;
 	const hasMultipleImages = product.images && product.images.length > 1;
 
 	const handleAddToCart = (e: React.MouseEvent) => {
 		e.preventDefault();
+		
+		// Track add to cart event
+		trackAddToCart(product.id.toString(), 1, product.price, {
+			name: product.title,
+			vendor: product.vendor,
+			productType: product.product_type,
+			inStock: product.in_stock,
+			variantId: product.variants?.[0]?.id
+		});
+		
+		// Track click event
+		trackAddToCartClick(e);
+		
 		// Allow adding out-of-stock items and handle variants in cart-context
 		addItem(product, product.variants?.[0], 1);
+	};
+	
+	const handleProductClick = () => {
+		// Track product click
+		trackProductClick(product.id.toString(), {
+			name: product.title,
+			price: product.price,
+			clickLocation: 'product-card'
+		});
 	};
 
 
@@ -59,7 +111,11 @@ export function ProductCard({ product }: ProductCardProps) {
 			onMouseLeave={() => hasMultipleImages && setCurrentImageIndex(0)}
 		>
 			{/* Product Image */}
-			<Link href={`/products/${product.handle}`} className="block">
+			<Link 
+				href={`/products/${product.handle}`} 
+				className="block"
+				onClick={handleProductClick}
+			>
 				<div className="relative aspect-square overflow-hidden bg-gray-100">
 					<Image
 						src={currentImage}
@@ -86,14 +142,16 @@ export function ProductCard({ product }: ProductCardProps) {
 					{/* Quick Actions Overlay */}
 					<div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 						<div className="flex gap-2">
-							<BuyNowButton
-								product={product}
-								variant={product.variants?.[0]}
-								quantity={1}
-								style="minimal"
-								size="sm"
-								className="flex-1 bg-white/90 hover:bg-white text-black border-none"
-							/>
+							<div onClick={() => trackBuyNowClick()}>
+								<BuyNowButton
+									product={product}
+									variant={product.variants?.[0]}
+									quantity={1}
+									style="minimal"
+									size="sm"
+									className="flex-1 bg-white/90 hover:bg-white text-black border-none"
+								/>
+							</div>
 							<Button
 								size="sm"
 								variant="secondary"
@@ -111,7 +169,12 @@ export function ProductCard({ product }: ProductCardProps) {
 			<div className="space-y-3 p-4">
 				<div className="space-y-1">
 					<h3 className="font-semibold group-hover:text-primary line-clamp-1 transition-colors">
-						<Link href={`/products/${product.handle}`}>{product.title}</Link>
+						<Link 
+							href={`/products/${product.handle}`}
+							onClick={handleProductClick}
+						>
+							{product.title}
+						</Link>
 					</h3>
 					{shortDescription && (
 						<p className="text-muted-foreground text-sm line-clamp-2">
@@ -135,14 +198,16 @@ export function ProductCard({ product }: ProductCardProps) {
 
 					{/* Desktop: Hidden buttons that appear on hover */}
 					<div className="hidden md:flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-						<BuyNowButton
-							product={product}
-							variant={product.variants?.[0]}
-							quantity={1}
-							style="minimal"
-							size="sm"
-							className="flex-1"
-						/>
+						<div onClick={() => trackBuyNowClick()} className="flex-1">
+							<BuyNowButton
+								product={product}
+								variant={product.variants?.[0]}
+								quantity={1}
+								style="minimal"
+								size="sm"
+								className="w-full"
+							/>
+						</div>
 						<Button
 							size="sm"
 							variant="outline"
@@ -156,7 +221,12 @@ export function ProductCard({ product }: ProductCardProps) {
 					{/* Mobile: Always visible buttons */}
 					<div className="flex md:hidden gap-2">
 						<Button size="sm" variant="default" className="flex-1" asChild>
-							<Link href={`/products/${product.handle}`}>View Details</Link>
+							<Link 
+								href={`/products/${product.handle}`}
+								onClick={handleProductClick}
+							>
+								View Details
+							</Link>
 						</Button>
 						<Button
 							size="sm"
