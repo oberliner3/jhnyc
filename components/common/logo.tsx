@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SITE_CONFIG } from "@/lib/constants";
 
 export function Logo({ className = "" }: { className?: string }) {
 	return (

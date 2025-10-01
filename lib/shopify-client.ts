@@ -5,9 +5,9 @@ import { getServerEnv } from "@/lib/env-validation";
 function getShopifyConfig() {
 	const env = getServerEnv();
 	const tok = env.SHOPIFY_ACCESS_TOKEN ?? env.SHOPIFY_TOKEN;
-	if (!tok) {
+	if (!tok || !env.SHOPIFY_SHOP || !env.SHOPIFY_SHOP_NAME) {
 		throw new Error(
-			"Shopify access token is missing. Provide SHOPIFY_ACCESS_TOKEN or SHOPIFY_TOKEN.",
+			"Shopify configuration is missing. Provide SHOPIFY_ACCESS_TOKEN (or SHOPIFY_TOKEN), SHOPIFY_SHOP, and SHOPIFY_SHOP_NAME.",
 		);
 	}
 	return {
@@ -38,6 +38,9 @@ export function getShopifyAdmin() {
 // Helper function to get shop domain without protocol
 export const getShopDomain = () => {
 	const domain = _shopDomain ?? getShopifyConfig().shopDomain;
+	if (!domain) {
+		throw new Error("Shop domain not configured");
+	}
 	return domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
 };
 

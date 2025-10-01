@@ -2,31 +2,23 @@ import { z } from "zod";
 
 // Separate schemas for server-only and public envs
 const serverEnvSchemaBase = z.object({
-	// Required API configuration (server-only)
-	PRODUCT_STREAM_API: z.string().url("PRODUCT_STREAM_API must be a valid URL"),
-	PRODUCT_STREAM_X_KEY: z.string().min(1, "PRODUCT_STREAM_X_KEY is required"),
+	// Optional API configuration (server-only) - not required if using fallback data
+	PRODUCT_STREAM_API: z.string().url("PRODUCT_STREAM_API must be a valid URL").optional(),
+	PRODUCT_STREAM_X_KEY: z.string().min(1, "PRODUCT_STREAM_X_KEY is required").optional(),
 
-	// Required Shopify configuration - SERVER-SIDE ONLY
-	SHOPIFY_SHOP: z.string().min(1, "SHOPIFY_SHOP is required"),
+	// Optional Shopify configuration - SERVER-SIDE ONLY - not required if using fallback data
+	SHOPIFY_SHOP: z.string().min(1, "SHOPIFY_SHOP is required").optional(),
 	// Accept either SHOPIFY_ACCESS_TOKEN or SHOPIFY_TOKEN; enforce with superRefine below
 	SHOPIFY_ACCESS_TOKEN: z.string().min(1).optional(),
 	SHOPIFY_TOKEN: z.string().min(1).optional(),
-	SHOPIFY_SHOP_NAME: z.string().min(1, "SHOPIFY_SHOP_NAME is required"),
+	SHOPIFY_SHOP_NAME: z.string().min(1, "SHOPIFY_SHOP_NAME is required").optional(),
 
 	NODE_ENV: z
 		.enum(["development", "production", "test"])
 		.default("development"),
 });
 
-const serverEnvSchema = serverEnvSchemaBase.superRefine((env, ctx) => {
-	if (!env.SHOPIFY_ACCESS_TOKEN && !env.SHOPIFY_TOKEN) {
-		ctx.addIssue({
-			code: z.ZodIssueCode.custom,
-			message: "Either SHOPIFY_ACCESS_TOKEN or SHOPIFY_TOKEN must be provided",
-			path: ["SHOPIFY_ACCESS_TOKEN"],
-		});
-	}
-});
+const serverEnvSchema = serverEnvSchemaBase;
 
 const publicEnvSchema = z.object({
 	// Public (client) configuration
