@@ -12,9 +12,6 @@ import type {
   DeviceInfo,
   AttributionData,
   ElementPosition,
-  PerformanceMetrics,
-  UserSession,
-  TrackingEvent,
   PageViewEvent,
   ClickEvent,
   ScrollEvent,
@@ -194,7 +191,7 @@ class ExperienceTracker {
     journeyType: JourneyType,
     step: string,
     stepOrder: number,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ): void {
     const journey: UserJourney = {
       userId: this.userId,
@@ -483,16 +480,18 @@ class ExperienceTracker {
         // FID (First Input Delay)
         const fidObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries();
-          entries.forEach((entry: any) => {
-            this.track({
-              eventType: 'performance',
-              eventName: 'fid',
-              sessionId: this.sessionId,
-              pageUrl: window.location.href,
-              performanceMetrics: {
-                fid: entry.processingStart - entry.startTime,
-              },
-            });
+          entries.forEach((entry: PerformanceEntry & { processingStart?: number }) => {
+            if (entry.processingStart) {
+              this.track({
+                eventType: 'performance',
+                eventName: 'fid',
+                sessionId: this.sessionId,
+                pageUrl: window.location.href,
+                performanceMetrics: {
+                  fid: entry.processingStart - entry.startTime,
+                },
+              });
+            }
           });
         });
         fidObserver.observe({ entryTypes: ['first-input'] });
@@ -501,8 +500,8 @@ class ExperienceTracker {
         let clsValue = 0;
         const clsObserver = new PerformanceObserver((list) => {
           const entries = list.getEntries();
-          entries.forEach((entry: any) => {
-            if (!entry.hadRecentInput) {
+          entries.forEach((entry: PerformanceEntry & { value?: number; hadRecentInput?: boolean }) => {
+            if (!entry.hadRecentInput && entry.value) {
               clsValue += entry.value;
             }
           });
@@ -860,7 +859,7 @@ class ExperienceTracker {
   /**
    * Debounce utility
    */
-  private debounce<T extends (...args: any[]) => any>(
+  private debounce<T extends (...args: unknown[]) => unknown>(
     func: T,
     wait: number
   ): (...args: Parameters<T>) => void {

@@ -27,7 +27,11 @@ export type EventType =
   | 'image_interaction'
   | 'checkout_step'
   | 'error'
-  | 'performance';
+  | 'performance'
+  | 'engagement'
+  | 'product'
+  | 'ecommerce'
+  | 'api';
 
 // Element position information
 export interface ElementPosition {
@@ -93,15 +97,39 @@ export interface ExperienceTrackingEvent extends BaseTrackingEvent {
   // Page context
   pageUrl: string;
   pageTitle?: string;
+  previousUrl?: string;
+  referrer?: string;
   
   // Element context (for clicks, hovers, etc.)
   elementSelector?: string;
   elementText?: string;
   elementPosition?: ElementPosition;
+  clickCoordinates?: { x: number; y: number };
+  buttonType?: 'left' | 'right' | 'middle';
+  scrollDepth?: number;
+  scrollTop?: number;
+  scrollLeft?: number;
+    maxScrollDepth?: number;
+    formName?: string;
+    formSelector?: string;
+  fieldName?: string;
+  fieldType?: string;
+  action?: 'focus' | 'blur' | 'change' | 'submit' | 'error';
+  errorType?: 'javascript' | 'network' | 'validation' | '404' | '500' | 'other' | 'api';
+  errorMessage?: string;
+  errorUrl?: string;
+  errorLine?: number;
+  errorColumn?: number;
+  errorStack?: string;
+  productId?: string;
+  contentId?: string;
+  contentType?: string;
+  searchQuery?: string;
+  orderId?: string;
+  properties?: Record<string, unknown>;
   
-  // Event-specific data
-  interactionData?: Record<string, any>;
-  customProperties?: Record<string, any>;
+    // Event-specific data  interactionData?: Record<string, unknown>;
+  customProperties?: Record<string, unknown>;
   
   // Device and performance info
   deviceInfo?: DeviceInfo;
@@ -113,6 +141,8 @@ export interface ExperienceTrackingEvent extends BaseTrackingEvent {
   
   // Client timestamp
   clientTimestamp?: Date;
+  serverTimestamp?: Date;
+  ipAddress?: string;
 }
 
 // Page view specific event
@@ -183,14 +213,14 @@ export interface SearchEvent extends Omit<ExperienceTrackingEvent, 'eventType'> 
   searchQuery: string;
   searchType?: 'site_search' | 'product_search';
   resultsCount?: number;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   sortBy?: string;
 }
 
 // Error event
 export interface ErrorEvent extends Omit<ExperienceTrackingEvent, 'eventType'> {
   eventType: 'error';
-  errorType: 'javascript' | 'network' | 'validation' | '404' | '500' | 'other';
+  errorType: 'javascript' | 'network' | 'validation' | '404' | '500' | 'other' | 'api';
   errorMessage: string;
   errorStack?: string;
   errorUrl?: string;
@@ -208,6 +238,7 @@ export interface UserSession {
   // Session timing
   startedAt: Date;
   endedAt?: Date;
+  lastActivityAt?: Date;
   duration?: number; // in seconds
   
   // Page and interaction stats
@@ -223,10 +254,14 @@ export interface UserSession {
   // Device and attribution
   deviceInfo?: DeviceInfo;
   attribution?: AttributionData;
-  geoData?: GeoData;
+    geoData?: GeoData;
+  ipAddress?: string;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+
   
-  // Quality metrics
-  bounce: boolean;
+    bounce: boolean;
   converted: boolean;
   conversionValue?: number;
 }
@@ -237,7 +272,8 @@ export type JourneyType =
   | 'purchase_funnel'
   | 'onboarding'
   | 'support'
-  | 'content_engagement';
+  | 'content_engagement'
+  | 'custom';
 
 export interface UserJourney {
   id?: string;
@@ -261,7 +297,7 @@ export interface UserJourney {
   conversionValue?: number;
   
   // Additional context
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
   
   createdAt: Date;
 }

@@ -5,7 +5,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { headers } from 'next/headers';
 import type { 
   TrackingBatch, 
   TrackingResponse,
@@ -58,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     const response: TrackingResponse = {
       success: true,
-      eventsProcessed: processedEvents.length,
+      processedEvents: processedEvents.length,
       batchId: batch.batchId,
     };
 
@@ -81,9 +80,8 @@ function getClientInfo(request: NextRequest) {
   return {
     userAgent: request.headers.get('user-agent') || 'Unknown',
     ipAddress: getClientIP(request),
-    country: request.geo?.country || 'Unknown',
-    region: request.geo?.region || 'Unknown',
-    city: request.geo?.city || 'Unknown',
+    countryCode: 'Unknown',
+    city: 'Unknown',
     timestamp: new Date(),
   };
 }
@@ -102,7 +100,6 @@ function getClientIP(request: NextRequest): string {
     request.headers.get('x-real-ip') ||
     request.headers.get('x-client-ip') ||
     request.headers.get('cf-connecting-ip') ||
-    request.ip ||
     'Unknown'
   );
 }
@@ -119,15 +116,15 @@ function enrichEventWithServerData(
     serverTimestamp: clientInfo.timestamp,
     ipAddress: clientInfo.ipAddress,
     geoData: {
-      country: clientInfo.country,
-      region: clientInfo.region,
+      ipAddress: clientInfo.ipAddress,
+      countryCode: clientInfo.countryCode,
       city: clientInfo.city,
     },
     // Override user agent from server if not provided
-    deviceInfo: {
+    deviceInfo: event.deviceInfo ? {
       ...event.deviceInfo,
       userAgent: event.deviceInfo?.userAgent || clientInfo.userAgent,
-    },
+    } : undefined,
   };
 }
 
@@ -234,7 +231,7 @@ async function updateUserSession(
       // Create new session
       const sessionData: Partial<UserSession> = {
         sessionId: sessionInfo.sessionId,
-        userId: sessionInfo.userId || null,
+        userId: sessionInfo.userId || undefined,
         anonymousId: sessionInfo.anonymousId,
         startedAt: now,
         lastActivityAt: now,
@@ -243,10 +240,15 @@ async function updateUserSession(
           deviceType: 'unknown', // Will be updated by client-side data
           browserName: 'unknown',
           osName: 'unknown',
+          viewportWidth: 0,
+          viewportHeight: 0,
+          screenWidth: 0,
+          screenHeight: 0,
+          browserVersion: 'unknown',
+          osVersion: 'unknown',
         },
         geoData: {
-          country: clientInfo.country,
-          region: clientInfo.region,
+          countryCode: clientInfo.countryCode,
           city: clientInfo.city,
         },
         ipAddress: clientInfo.ipAddress,

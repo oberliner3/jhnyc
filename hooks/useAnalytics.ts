@@ -11,6 +11,7 @@ import type {
   ConsentSettings, 
   EcommerceItem 
 } from '@/lib/analytics/types';
+import type { ApiProduct, ApiProductVariant } from '@/lib/types';
 
 // Hook for initializing analytics
 export function useAnalyticsInit(consent?: ConsentSettings) {
@@ -215,30 +216,30 @@ export function useEcommerceTracking() {
   const { trackAddToCart, trackViewItem, trackBeginCheckout, trackPurchase } = useAnalytics();
 
   // Convert Shopify product to EcommerceItem
-  const convertShopifyProduct = useCallback((product: any, variant?: any, quantity = 1): EcommerceItem => {
+  const convertShopifyProduct = useCallback((product: ApiProduct, variant?: ApiProductVariant, quantity = 1): EcommerceItem => {
     return {
       item_id: variant?.id || product.id,
       item_name: product.title,
       category: product.product_type,
       brand: product.vendor,
       variant: variant?.title,
-      price: parseFloat(variant?.price || product.price),
+      price: variant?.price || product.price,
       quantity,
       currency: 'USD', // You might want to make this dynamic
     };
   }, []);
 
-  const trackShopifyProductView = useCallback((product: any, variant?: any) => {
+  const trackShopifyProductView = useCallback((product: ApiProduct, variant?: ApiProductVariant) => {
     const item = convertShopifyProduct(product, variant, 1);
     trackViewItem([item]);
   }, [convertShopifyProduct, trackViewItem]);
 
-  const trackShopifyAddToCart = useCallback((product: any, variant?: any, quantity = 1) => {
+  const trackShopifyAddToCart = useCallback((product: ApiProduct, variant?: ApiProductVariant, quantity = 1) => {
     const item = convertShopifyProduct(product, variant, quantity);
     trackAddToCart([item]);
   }, [convertShopifyProduct, trackAddToCart]);
 
-  const trackShopifyCheckout = useCallback((items: Array<{ product: any; variant?: any; quantity: number }>, coupon?: string) => {
+  const trackShopifyCheckout = useCallback((items: Array<{ product: ApiProduct; variant?: ApiProductVariant; quantity: number }>, coupon?: string) => {
     const ecommerceItems = items.map(({ product, variant, quantity }) => 
       convertShopifyProduct(product, variant, quantity)
     );
@@ -247,7 +248,7 @@ export function useEcommerceTracking() {
 
   const trackShopifyPurchase = useCallback((
     orderId: string,
-    items: Array<{ product: any; variant?: any; quantity: number }>,
+    items: Array<{ product: ApiProduct; variant?: ApiProductVariant; quantity: number }>,
     total: number,
     tax?: number,
     shipping?: number,

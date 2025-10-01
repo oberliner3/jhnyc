@@ -35,7 +35,7 @@ export function detectMessagePackSupport(): boolean {
     // Check if we can use MessagePack (basic capability test)
     const testData = { test: "data" };
     const testArray = new Uint8Array([0x81, 0xa4, 0x74, 0x65, 0x73, 0x74, 0xa4, 0x64, 0x61, 0x74, 0x61]);
-    const decoded = decode(testArray);
+    const decoded = decode(testArray) as unknown;
     
     // Store support in sessionStorage for performance
     sessionStorage.setItem("msgpack_support", "true");
@@ -77,8 +77,8 @@ export async function loadDataOptimized<T>(
   
   try {
     // Resolve environment (only on server-side)
-    const baseUrl = isSSR 
-      ? getServerEnv().PRODUCT_STREAM_API.replace(/\/$/, "")
+    const baseUrl = isSSR
+      ? (getServerEnv().PRODUCT_STREAM_API ?? "").replace(/\/$/, "")
       : "";
     
     const url = isSSR 
@@ -98,7 +98,10 @@ export async function loadDataOptimized<T>(
         
         // Add API key for direct external calls (SSR only)
         if (isSSR) {
-          headers["X-API-KEY"] = getServerEnv().PRODUCT_STREAM_X_KEY;
+          const apiKey = getServerEnv().PRODUCT_STREAM_X_KEY;
+          if (apiKey) {
+            headers["X-API-KEY"] = apiKey;
+          }
         }
         
         // Request MessagePack if supported
@@ -130,6 +133,9 @@ export async function loadDataOptimized<T>(
         
         if (contentType?.includes("application/x-msgpack")) {
           const arrayBuffer = await response.arrayBuffer();
+          if (!arrayBuffer) {
+            throw new Error("Failed to get array buffer from response");
+          }
           metric.size = arrayBuffer.byteLength;
           metric.format = 'msgpack';
           
@@ -295,11 +301,11 @@ export async function loadDataForClient<T>(
   if (cache && !forceRefresh && typeof window !== "undefined") {
     try {
       const cached = sessionStorage.getItem(cacheKey);
-      if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < cacheTTL) {
+      if (cached !== null) {
+        const { data, timestamp } = JSON.parse(cached) as { data: T; timestamp: number };
+        if (data !== undefined && timestamp !== undefined && Date.now() - timestamp < cacheTTL) {
           console.log(`📋 Using cached data for ${endpoint}`);
-          return data;
+          return data as T;
         }
       }
     } catch {

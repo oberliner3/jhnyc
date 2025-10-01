@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
+    "check-types": "tsc --noemit",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint --fix app components contexts hooks lib utils middleware.ts next.config.ts"

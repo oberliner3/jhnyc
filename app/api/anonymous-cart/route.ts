@@ -4,7 +4,6 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { 
   getOrCreateAnonymousCart,
   addToAnonymousCart,
@@ -13,7 +12,6 @@ import {
   updateAnonymousCartCustomer,
   markCartAsAbandoned,
   type AnonymousCart,
-  type AnonymousCartItem,
   type CartContext 
 } from "@/lib/anonymous-cart";
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";

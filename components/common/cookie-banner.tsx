@@ -5,7 +5,7 @@ import CookieConsent, { Cookies } from "react-cookie-consent";
 
 declare global {
 	interface Window {
-		gtag?: (...args: any[]) => void;
+		gtag?: (...args: unknown[]) => void;
 	}
 }
 

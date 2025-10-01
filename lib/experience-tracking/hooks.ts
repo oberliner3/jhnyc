@@ -30,7 +30,7 @@ export function useExperienceTracker() {
     journeyType: JourneyType,
     step: string,
     stepOrder: number,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ) => {
     experienceTracker.trackJourneyStep(journeyType, step, stepOrder, properties);
   }, []);
@@ -73,11 +73,11 @@ export function usePageViewTracking(url?: string, title?: string) {
  */
 export function useClickTracking(
   elementName: string,
-  properties?: Record<string, any>
+  properties?: Record<string, unknown>
 ) {
   const { track } = useExperienceTracker();
 
-  const trackClick = useCallback((event?: React.MouseEvent) => {
+  const trackClick = useCallback((event?: React.MouseEvent, additionalProperties?: Record<string, unknown>) => {
     track({
       eventType: 'click',
       eventName: `click_${elementName}`,
@@ -86,7 +86,7 @@ export function useClickTracking(
         x: event.clientX, 
         y: event.clientY 
       } : undefined,
-      properties,
+      properties: { ...properties, ...additionalProperties },
     });
   }, [track, elementName, properties]);
 
@@ -194,7 +194,7 @@ export function useScrollTracking(
  */
 export function useTimeTracking(
   eventName: string,
-  properties?: Record<string, any>
+  properties?: Record<string, unknown>
 ) {
   const { track } = useExperienceTracker();
   const startTime = useRef<number>(Date.now());
@@ -239,7 +239,7 @@ export function useTimeTracking(
 export function useProductTracking() {
   const { track } = useExperienceTracker();
 
-  const trackProductView = useCallback((productId: string, productData?: Record<string, any>) => {
+  const trackProductView = useCallback((productId: string, productData?: Record<string, unknown>) => {
     track({
       eventType: 'product',
       eventName: 'product_view',
@@ -248,7 +248,7 @@ export function useProductTracking() {
     });
   }, [track]);
 
-  const trackProductClick = useCallback((productId: string, productData?: Record<string, any>) => {
+  const trackProductClick = useCallback((productId: string, productData?: Record<string, unknown>) => {
     track({
       eventType: 'product',
       eventName: 'product_click',
@@ -261,7 +261,7 @@ export function useProductTracking() {
     productId: string, 
     quantity: number = 1, 
     price?: number,
-    productData?: Record<string, any>
+    productData?: Record<string, unknown>
   ) => {
     track({
       eventType: 'ecommerce',
@@ -279,7 +279,7 @@ export function useProductTracking() {
   const trackRemoveFromCart = useCallback((
     productId: string, 
     quantity: number = 1,
-    productData?: Record<string, any>
+    productData?: Record<string, unknown>
   ) => {
     track({
       eventType: 'ecommerce',
@@ -300,7 +300,7 @@ export function useProductTracking() {
       quantity: number;
       price: number;
     }>,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ) => {
     track({
       eventType: 'ecommerce',
@@ -333,7 +333,7 @@ export function useSearchTracking() {
   const trackSearch = useCallback((
     query: string, 
     resultCount?: number, 
-    filters?: Record<string, any>
+    filters?: Record<string, unknown>
   ) => {
     track({
       eventType: 'search',
@@ -394,10 +394,10 @@ export function useErrorTracking() {
   const { track } = useExperienceTracker();
 
   const trackError = useCallback((
-    errorType: string,
+    errorType: 'javascript' | 'network' | 'validation' | '404' | '500' | 'other',
     errorMessage: string,
     errorStack?: string,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ) => {
     track({
       eventType: 'error',
@@ -413,7 +413,7 @@ export function useErrorTracking() {
     endpoint: string,
     status: number,
     errorMessage: string,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ) => {
     track({
       eventType: 'error',
@@ -459,7 +459,7 @@ export function useJourneyTracking(journeyType: JourneyType) {
   const startStep = useCallback((
     step: string,
     stepOrder: number,
-    properties?: Record<string, any>
+    properties?: Record<string, unknown>
   ) => {
     trackJourneyStep(journeyType, step, stepOrder, properties);
   }, [journeyType, trackJourneyStep]);
@@ -500,8 +500,9 @@ export function useEngagementTracking(contentId: string, contentType: string = '
 
   // Track engagement time on unmount
   useEffect(() => {
+    const currentStartTime = startTime.current;
     return () => {
-      const engagementTime = Math.round((Date.now() - startTime.current) / 1000);
+      const engagementTime = Math.round((Date.now() - currentStartTime) / 1000);
       
       if (engagementTime > 5) { // Only track if user spent more than 5 seconds
         track({
@@ -517,7 +518,7 @@ export function useEngagementTracking(contentId: string, contentType: string = '
     };
   }, [track, contentId, contentType]);
 
-  const trackInteraction = useCallback((interactionType: string, properties?: Record<string, any>) => {
+  const trackInteraction = useCallback((interactionType: string, properties?: Record<string, unknown>) => {
     track({
       eventType: 'engagement',
       eventName: `content_interaction_${interactionType}`,

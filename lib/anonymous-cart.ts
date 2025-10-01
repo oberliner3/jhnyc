@@ -100,7 +100,7 @@ export async function getOrCreateAnonymousCart(
   const supabase = createClient();
 
   // Try to get existing active cart
-  let { data: cart, error } = await supabase
+  const { data: initialCart, error } = await supabase
     .from("anonymous_carts")
     .select(`
       *,
@@ -116,6 +116,7 @@ export async function getOrCreateAnonymousCart(
   }
 
   // Create new cart if none exists
+  let cart = initialCart;
   if (!cart) {
     const newCart = {
       session_id: sessionId,
@@ -367,8 +368,6 @@ export async function migrateAnonymousCartToUser(
   userId: string,
   sessionId: string = getSessionId()
 ): Promise<void> {
-  const supabase = createClient();
-
   // This would integrate with your existing authenticated cart system
   // For now, we'll just mark the anonymous cart as converted
   await markCartAsConverted(sessionId);

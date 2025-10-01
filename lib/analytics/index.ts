@@ -14,7 +14,7 @@ import type {
 // Global declarations for third-party scripts
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
+    gtag?: (...args: unknown[]) => void;
     dataLayer?: unknown[];
     fbq?: (...args: unknown[]) => void;
     ttq?: {
@@ -402,7 +402,7 @@ class AnalyticsManager {
     if (!analyticsConfig.googleAnalytics?.enabled || !window.gtag) return;
 
     // Map event to Google Analytics format
-    const { event_name, timestamp, user_id, session_id, page_url, referrer, user_agent, ...params } = event;
+    const { event_name, user_id, session_id, ...params } = event;
     
     window.gtag('event', event_name, {
       ...params,
@@ -429,7 +429,8 @@ class AnalyticsManager {
     };
 
     const fbEvent = eventMap[event.event_name] || event.event_name;
-    const { event_name, timestamp, user_id, session_id, page_url, referrer, user_agent, ...params } = event;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { event_name: _, ...params } = event;
 
     window.fbq('track', fbEvent, params);
   }
@@ -447,7 +448,8 @@ class AnalyticsManager {
 
     const ttEvent = eventMap[event.event_name];
     if (ttEvent) {
-      const { event_name, timestamp, user_id, session_id, page_url, referrer, user_agent, ...params } = event;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { event_name: _, ...params } = event;
       window.ttq.track(ttEvent, params);
     }
   }
@@ -466,7 +468,8 @@ class AnalyticsManager {
 
     const pinterestEvent = eventMap[event.event_name];
     if (pinterestEvent) {
-      const { event_name, timestamp, user_id, session_id, page_url, referrer, user_agent, ...params } = event;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { event_name: _, ...params } = event;
       window.pintrk('track', pinterestEvent, params);
     }
   }
@@ -485,7 +488,8 @@ class AnalyticsManager {
 
     const snapEvent = eventMap[event.event_name];
     if (snapEvent) {
-      const { event_name, timestamp, user_id, session_id, page_url, referrer, user_agent, ...params } = event;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { event_name: _, ...params } = event;
       window.snaptr('track', snapEvent, params);
     }
   }
@@ -495,9 +499,10 @@ class AnalyticsManager {
 
     // Microsoft Advertising events are more limited
     if (event.event_name === 'purchase') {
+      const eventData = event as { value?: number; currency?: string };
       window.uetq.push('event', 'conversion', {
-        revenue_value: (event as any).value,
-        currency: (event as any).currency,
+        revenue_value: eventData.value,
+        currency: eventData.currency,
       });
     }
   }
@@ -513,7 +518,8 @@ class AnalyticsManager {
 
     const twitterEvent = eventMap[event.event_name];
     if (twitterEvent) {
-      const { event_name, timestamp, user_id, session_id, page_url, referrer, user_agent, ...params } = event;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { event_name: _, ...params } = event;
       window.twq('track', twitterEvent, params);
     }
   }

@@ -21,7 +21,18 @@ const serverEnvSchemaBase = z.object({
 		.default("development"),
 });
 
-const serverEnvSchema = serverEnvSchemaBase;
+const serverEnvSchema = serverEnvSchemaBase.superRefine((data, ctx) => {
+  if (
+    (process.env.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED === 'true') &&
+    !data.SUPABASE_SERVICE_ROLE_KEY
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['SUPABASE_SERVICE_ROLE_KEY'],
+      message: 'SUPABASE_SERVICE_ROLE_KEY is required when experience tracking is enabled.',
+    });
+  }
+});
 
 const publicEnvSchema = z.object({
 	// Public (client) configuration
@@ -37,26 +48,41 @@ const publicEnvSchema = z.object({
 	NEXT_PUBLIC_STORE_NAME: z.string().optional(),
 	
 	// Experience tracking configuration (public)
-	NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED: z
+	  NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED: z
+			.string()
+			.default("true")
+			.transform((val) => val === "true")
+			.optional(),  NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE: z
 		.string()
-		.transform((val) => val === "true")
-		.default("true")
-		.optional(),
-	NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE: z
-		.string()
-		.transform((val) => parseFloat(val) || 1.0)
 		.default("1.0")
+		.transform((val) => parseFloat(val) || 1.0)
 		.optional(),
-	NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG: z
-		.string()
-		.transform((val) => val === "true")
-		.default("false")
-		.optional(),
-	
+	  NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG: z
+			.string()
+			.default("false")
+			.transform((val) => val === "true")
+			.optional(),	
 	NODE_ENV: z
 		.enum(["development", "production", "test"])
 		.default("development")
 		.optional(),
+}).superRefine((data, ctx) => {
+  if (data.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED) {
+    if (!data.NEXT_PUBLIC_SUPABASE_URL) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['NEXT_PUBLIC_SUPABASE_URL'],
+        message: 'NEXT_PUBLIC_SUPABASE_URL is required when experience tracking is enabled.',
+      });
+    }
+    if (!data.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['NEXT_PUBLIC_SUPABASE_ANON_KEY'],
+        message: 'NEXT_PUBLIC_SUPABASE_ANON_KEY is required when experience tracking is enabled.',
+      });
+    }
+  }
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

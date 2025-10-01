@@ -54,7 +54,7 @@ export function ExperienceTrackingProvider({
     return () => {
       trackerInstance.destroy();
     };
-  }, [config, disabled]);
+  }, [config, disabled, userId]);
 
   // Update user ID when it changes
   useEffect(() => {

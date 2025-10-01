@@ -15,7 +15,6 @@ import {
   markCartAsConverted,
   getSessionId,
   type AnonymousCart,
-  type AnonymousCartItem,
 } from "@/lib/anonymous-cart";
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 
@@ -53,28 +52,6 @@ export function useAnonymousCart(): UseAnonymousCartReturn {
   const [error, setError] = useState<string | null>(null);
   const [sessionId] = useState(() => getSessionId());
 
-  // Initialize cart on mount
-  useEffect(() => {
-    initializeCart();
-  }, []);
-
-  // Auto-save cart state on visibility change (for abandonment tracking)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden' && cart && cart.items && cart.items.length > 0) {
-        // User is leaving the page with items in cart - potential abandonment
-        setTimeout(() => {
-          if (document.visibilityState === 'hidden') {
-            markAbandoned().catch(console.error);
-          }
-        }, 30000); // Wait 30 seconds before marking as abandoned
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [cart]);
-
   const initializeCart = useCallback(async () => {
     try {
       setLoading(true);
@@ -88,6 +65,13 @@ export function useAnonymousCart(): UseAnonymousCartReturn {
       setLoading(false);
     }
   }, [sessionId]);
+
+  // Initialize cart on mount
+  useEffect(() => {
+    initializeCart();
+  }, [initializeCart]);
+
+
 
   const refreshCart = useCallback(async () => {
     try {
@@ -175,6 +159,23 @@ export function useAnonymousCart(): UseAnonymousCartReturn {
       throw err;
     }
   }, [sessionId, refreshCart]);
+
+  // Auto-save cart state on visibility change (for abandonment tracking)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && cart && cart.items && cart.items.length > 0) {
+        // User is leaving the page with items in cart - potential abandonment
+        setTimeout(() => {
+          if (document.visibilityState === 'hidden') {
+            markAbandoned().catch(console.error);
+          }
+        }, 30000); // Wait 30 seconds before marking as abandoned
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [cart, markAbandoned]);
 
   const markConverted = useCallback(async () => {
     try {
