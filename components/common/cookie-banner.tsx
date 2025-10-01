@@ -5,14 +5,7 @@ import CookieConsent, { Cookies } from "react-cookie-consent";
 
 declare global {
 	interface Window {
-		gtag: (
-			command: "consent",
-			action: "update",
-			params: {
-				ad_storage: "granted" | "denied";
-				analytics_storage: "granted" | "denied";
-			},
-		) => void;
+		gtag?: (...args: any[]) => void;
 	}
 }
 
