@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { getOrCreateAnonymousCart } from "@/lib/anonymous-cart";
 import { createDraftOrder } from "@/lib/shopify-client";
 import { createClient } from "@/utils/supabase/server";
 
@@ -38,24 +39,28 @@ export interface CheckoutData {
 	totals: CheckoutTotals;
 }
 
-export async function handleCheckout(data: CheckoutData) {
+export async function handleCheckout(data: CheckoutData, sessionId: string) {
 	try {
 		const supabase = await createClient();
 
 		const {
 			data: { user },
-			error: authError,
 		} = await supabase.auth.getUser();
 
-		if (authError || !user) {
-			return { success: false, error: "Authentication required" };
+		const userId = user?.id;
+		let anonymousCartId: string | undefined;
+
+		if (!user) {
+			const anonymousCart = await getOrCreateAnonymousCart(sessionId);
+			anonymousCartId = anonymousCart.id;
 		}
 
 		// Create order in database
 		const { data: order, error: orderError } = await supabase
 			.from("orders")
 			.insert({
-				user_id: user.id,
+				user_id: userId,
+				anonymous_cart_id: anonymousCartId,
 				status: "Pending",
 				total: data.totals.total,
 				shipping_address: {
@@ -104,20 +109,31 @@ export async function handleCheckout(data: CheckoutData) {
 		}
 
 		// Clear user's cart
-		const { data: cartData } = await supabase
-			.from("carts")
-			.select("id")
-			.eq("user_id", user.id)
-			.single();
+		if (userId) {
+			const { data: cartData } = await supabase
+				.from("carts")
+				.select("id")
+				.eq("user_id", userId)
+				.single();
 
-		if (cartData) {
+			if (cartData) {
+				const { error: cartError } = await supabase
+					.from("cart_items")
+					.delete()
+					.eq("cart_id", cartData.id);
+
+				if (cartError) {
+					console.error("Cart clearing error:", cartError);
+				}
+			}
+		} else if (anonymousCartId) {
 			const { error: cartError } = await supabase
-				.from("cart_items")
+				.from("anonymous_cart_items")
 				.delete()
-				.eq("cart_id", cartData.id);
+				.eq("cart_id", anonymousCartId);
 
 			if (cartError) {
-				console.error("Cart clearing error:", cartError);
+				console.error("Anonymous cart clearing error:", cartError);
 			}
 		}
 

@@ -28,17 +28,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
 	};
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<ExperienceTrackingProvider 
-				config={trackingConfig}
-				disabled={!publicEnv.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED}
-			>
-				<AuthProvider>
-					<CartProvider>
-						<PWAProvider>{children}</PWAProvider>
-					</CartProvider>
-				</AuthProvider>
-			</ExperienceTrackingProvider>
-		</QueryClientProvider>
-	);
+    <QueryClientProvider client={queryClient}>
+      <ExperienceTrackingProvider
+        config={trackingConfig}
+        disabled={!publicEnv.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED}
+      >
+        <AuthProvider>
+          <CartProvider>
+            <PWAProvider>{children}</PWAProvider>
+          </CartProvider>
+        </AuthProvider>
+      </ExperienceTrackingProvider>
+    </QueryClientProvider>
+  );
 }

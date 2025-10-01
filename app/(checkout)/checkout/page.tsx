@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useAnonymousCart } from "@/hooks/useAnonymousCart";
 import { useAuth } from "@/contexts/auth-context";
 import { useCart } from "@/contexts/cart-context";
 import { useFormValidation } from "@/hooks/use-form-validation";
@@ -37,6 +38,7 @@ export default function CheckoutPage() {
 	const router = useRouter();
 	const { items, getTotalPrice, clearCart } = useCart();
 	const { user } = useAuth();
+	const { sessionId } = useAnonymousCart();
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [phoneValid, setPhoneValid] = useState(false);
@@ -106,7 +108,7 @@ export default function CheckoutPage() {
 			};
 
 			// Process checkout
-			const result = await handleCheckout(orderData);
+			const result = await handleCheckout(orderData, sessionId);
 
 			if (result.success) {
 				// Clear cart and redirect to success page

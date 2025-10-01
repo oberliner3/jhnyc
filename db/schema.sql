@@ -42,7 +42,8 @@ SELECT USING (TRUE);
 -- Create the orders table
 CREATE TABLE orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NULL,
+  anonymous_cart_id UUID REFERENCES anonymous_carts(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   status TEXT NOT NULL DEFAULT 'Pending',
   total NUMERIC(10, 2) NOT NULL,
