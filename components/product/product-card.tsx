@@ -67,6 +67,8 @@ export function ProductCard({ product }: ProductCardProps) {
 						fill
 						className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
 						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+						priority={false}
+						loading="lazy"
 					/>
 					{discountPercentage > 0 && (
 						<Badge variant="destructive" className="top-2 left-2 z-10 absolute">

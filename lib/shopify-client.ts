@@ -3,18 +3,18 @@ import { getServerEnv } from "@/lib/env-validation";
 
 // SECURITY: Only use server-side environment variables - NEVER expose tokens to client
 function getShopifyConfig() {
-  const env = getServerEnv();
-  const tok = env.SHOPIFY_ACCESS_TOKEN ?? env.SHOPIFY_TOKEN;
-  if (!tok) {
-    throw new Error(
-      "Shopify access token is missing. Provide SHOPIFY_ACCESS_TOKEN or SHOPIFY_TOKEN."
-    );
-  }
-  return {
-    shopDomain: env.SHOPIFY_SHOP,
-    accessToken: tok,
-    shopName: env.SHOPIFY_SHOP_NAME,
-  };
+	const env = getServerEnv();
+	const tok = env.SHOPIFY_ACCESS_TOKEN ?? env.SHOPIFY_TOKEN;
+	if (!tok || !env.SHOPIFY_SHOP || !env.SHOPIFY_SHOP_NAME) {
+		throw new Error(
+			"Shopify configuration is missing. Provide SHOPIFY_ACCESS_TOKEN (or SHOPIFY_TOKEN), SHOPIFY_SHOP, and SHOPIFY_SHOP_NAME.",
+		);
+	}
+	return {
+		shopDomain: env.SHOPIFY_SHOP,
+		accessToken: tok,
+		shopName: env.SHOPIFY_SHOP_NAME,
+	};
 }
 
 // Lazily initialize the Shopify Admin API client to avoid import-time env validation
@@ -37,8 +37,11 @@ export function getShopifyAdmin() {
 
 // Helper function to get shop domain without protocol
 export const getShopDomain = () => {
-  const domain = _shopDomain ?? getShopifyConfig().shopDomain;
-  return domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+	const domain = _shopDomain ?? getShopifyConfig().shopDomain;
+	if (!domain) {
+		throw new Error("Shop domain not configured");
+	}
+	return domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
 };
 
 // Helper function to get access token

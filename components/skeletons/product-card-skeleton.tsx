@@ -22,7 +22,7 @@ export function ProductCardSkeleton() {
 					<div className="flex space-x-1">
 						{[...Array(5)].map((_, i) => (
 							<Skeleton
-								key={`${Date.now()}-${i}`}
+								key={`star-${i}`}
 								className="rounded-full w-3 h-3"
 							/>
 						))}
@@ -47,7 +47,7 @@ export function ProductGridSkeleton({ count = 8 }: { count?: number }) {
 	return (
 		<div className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 			{[...Array(count)].map((_, i) => (
-				<ProductCardSkeleton key={`${Date.now()}-${i}`} />
+				<ProductCardSkeleton key={`product-card-${i}`} />
 			))}
 		</div>
 	);

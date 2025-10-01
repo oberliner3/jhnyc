@@ -1,7 +1,6 @@
 "use client";
 
 import { Download, Shield, Smartphone, Wifi, X, Zap } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -174,15 +173,13 @@ export function InstallPrompt() {
 								</p>
 								<ol className="space-y-1 text-blue-700 text-xs">
 									<li>1. Tap the Share button in Safari</li>
-									<li>2. Scroll down and tap &quot;Add to Home Screen&quot;</li>
-									<li>3. Tap &quot;Add&quot; to confirm</li>
+									<li>2. Scroll down and tap &ldquo;Add to Home Screen&rdquo;</li>
+									<li>3. Tap &ldquo;Add&rdquo; to confirm</li>
 								</ol>
 							</div>
-							<Button asChild className="w-full">
-								<Link href="/" onClick={() => setShowInstallPrompt(false)}>
-									<Smartphone className="mr-2 w-4 h-4" />
-									Open in Safari
-								</Link>
+							<Button onClick={() => setShowInstallPrompt(false)} className="w-full">
+								<Smartphone className="mr-2 w-4 h-4" />
+								Got it
 							</Button>
 						</div>
 					) : (

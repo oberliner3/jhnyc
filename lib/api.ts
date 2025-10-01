@@ -21,6 +21,16 @@ async function apiRequest<T>(
 ): Promise<T> {
 	// Resolve server env at call time to avoid import-time crashes
 	const { PRODUCT_STREAM_API, PRODUCT_STREAM_X_KEY } = getServerEnv();
+
+	if (!PRODUCT_STREAM_API || !PRODUCT_STREAM_X_KEY) {
+		throw new ApiClientError(
+			"API configuration missing: PRODUCT_STREAM_API or PRODUCT_STREAM_X_KEY not configured",
+			500,
+			"Configuration Error",
+			endpoint,
+		);
+	}
+
 	const base = PRODUCT_STREAM_API.replace(/\/$/, "");
 	const url = `${base}/cosmos${endpoint}`;
 	const controller = new AbortController();
