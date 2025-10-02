@@ -1,19 +1,11 @@
 import "@/app/globals.css";
 
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Viewport } from "next";
-import DevToolsBlocker from "@/components/common/dev-tools-blocker";
-import ErrorBoundary from "@/components/common/error-boundary";
 import { WebsiteSchema } from "@/components/common/website-schema";
-import { Toaster } from "@/components/ui/sonner";
-
 import { env } from "@/lib/env-validation";
 import { Providers } from "./providers";
-import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
-import { ConsentBanner } from "@/components/analytics/consent-banner";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -49,22 +41,9 @@ export default async function RootLayout({
         <WebsiteSchema />
       </head>
       <body className="will-change-scroll">
-        <ErrorBoundary>
-          <DevToolsBlocker />
-          <Providers>
-            <AnalyticsProvider>
-              <div className="">
-                {children}
-              </div>
-              <Toaster />
-              {/* <MessagePackMonitor /> */}
-              <ConsentBanner />
-            </AnalyticsProvider>
-          </Providers>
-        </ErrorBoundary>
-        {/* <ChatWidgetProvider /> */}
-        <Analytics />
-        <SpeedInsights />
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

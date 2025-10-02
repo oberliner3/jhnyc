@@ -9,6 +9,13 @@ import { ExperienceTrackingProvider } from "@/lib/experience-tracking/provider";
 import { env } from "@/lib/env-validation";
 import { ComposeProvider } from "@/lib/compose-provider";
 import { trackingConfig, type ProviderConfig } from "@/lib/provider-config";
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
+import { ConsentBanner } from "@/components/analytics/consent-banner";
+import ErrorBoundary from "@/components/common/error-boundary";
+import DevToolsBlocker from "@/components/common/dev-tools-blocker";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = React.useState(() => new QueryClient());
@@ -16,6 +23,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // An array of providers and their props.
   // This makes it easy to add or remove providers without changing the nesting structure.
   const providers: ProviderConfig[] = [
+    [ErrorBoundary, {}],
+    [DevToolsBlocker, {}],
     [(props: { children: React.ReactNode }) => (
       <QueryClientProvider client={queryClient} {...props} />
     ), {}],
@@ -29,7 +38,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
     [AuthProvider, {}],
     [CartProvider, {}],
     [PWAProvider, {}],
+    [AnalyticsProvider, {}],
   ];
 
-  return <ComposeProvider providers={providers}>{children}</ComposeProvider>;
+  return (
+    <ComposeProvider providers={providers}>
+      {children}
+      <ConsentBanner />
+      <Toaster />
+      <Analytics />
+      <SpeedInsights />
+    </ComposeProvider>
+  );
 }
