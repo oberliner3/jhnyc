@@ -126,7 +126,7 @@ export function BuyNowButton({
 
       <Button
         type="submit"
-        disabled={isLoading || !product.in_stock}
+        disabled={isLoading || !product.in_stock || !variant}
         className={cn(
           getButtonStyles(),
           style === 'full-width' && 'w-full',

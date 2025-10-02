@@ -61,13 +61,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
       setSelectedOptions(initialOptions);
 
       if ((product.variants || []).length > 0) {
-        const variantName = (product.options || [])
-          .map((opt) => initialOptions[opt.name])
-          .join(" / ");
-        const variant = (product.variants || []).find(
-          (v) => v.title === variantName
-        );
-        setSelectedVariant(variant || (product.variants || [])[0]);
+        setSelectedVariant((product.variants || [])[0]);
       }
     }
   }, [product]);
