@@ -1,18 +1,13 @@
-import { PageLayout } from "@/components/layout/page-layout";
+import { ServerPageLayout } from "@/components/layout/page-layout-wrapper";
 
-/**
- * Checkout Layout
- * Minimal layout for checkout pages - no header or footer.
- * Provides a distraction-free checkout experience.
- */
 export default function CheckoutLayout({
-	children,
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	return (
-		<PageLayout showHeader={false} showFooter={false} showAnnouncement={false}>
-			<main className="flex-grow">{children}</main>
-		</PageLayout>
-	);
+  return (
+    <ServerPageLayout showHeader={false} showFooter={false} showAnnouncement={false}>
+      <main className="flex-grow">{children}</main>
+    </ServerPageLayout>
+  );
 }

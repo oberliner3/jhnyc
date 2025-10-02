@@ -17,32 +17,35 @@ import { env } from "@/lib/env-validation";
 import { ExperienceTrackingProvider } from "@/lib/experience-tracking/provider";
 import { type ProviderConfig, trackingConfig } from "@/lib/provider-config";
 
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = React.useState(() => new QueryClient());
 
   // An array of providers and their props.
   // This makes it easy to add or remove providers without changing the nesting structure.
-  const providers: ProviderConfig[] = [
-    [ErrorBoundary, {}],
-    [DevToolsBlocker, {}],
-    [
-      (props: { children: React.ReactNode }) => (
-        <QueryClientProvider client={queryClient} {...props} />
-      ),
-      {},
-    ],
-    [
-      ExperienceTrackingProvider,
-      {
-        config: trackingConfig,
-        disabled: !env.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED,
-      },
-    ],
-    [AuthProvider, {}],
-    [CartProvider, {}],
-    [PWAProvider, {}],
-    [AnalyticsProvider, {}],
-  ];
+   const providers: ProviderConfig[] = [
+     [ErrorBoundary, {}],
+     [DevToolsBlocker, {}],
+     [
+       (props: { children: React.ReactNode }) => (
+         <QueryClientProvider client={queryClient} {...props} />
+       ),
+       {},
+     ],
+
+     [
+       ExperienceTrackingProvider,
+       {
+         config: trackingConfig,
+         disabled: !env.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED,
+       },
+     ],
+     [AuthProvider, {}],
+     [CartProvider, {}],
+     [PWAProvider, {}],
+     [AnalyticsProvider, {}],
+
+   ];
 
   return (
     <ComposeProvider providers={providers}>

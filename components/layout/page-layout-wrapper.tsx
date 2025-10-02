@@ -1,41 +1,37 @@
-
+/**
+ * Server-compatible Page Layout
+ * Separates server and client boundaries properly
+ */
 
 import React from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 
-interface PageLayoutProps {
+interface ServerPageLayoutProps {
   children: React.ReactNode;
   showAnnouncement?: boolean;
   showHeader?: boolean;
   showFooter?: boolean;
   containerClassName?: string;
-  headerProps?: Record<string, unknown>;
-  footerProps?: Record<string, unknown>;
 }
 
 /**
- * Standard page layout component with header, footer, and optional announcement bar
- * Provides consistent structure across pages for better DX
+ * Server-safe page layout - no client-side hooks or state
  */
-export function PageLayout({
+export function ServerPageLayout({
   children,
   showAnnouncement = true,
   showHeader = true,
   showFooter = true,
   containerClassName = "",
-  headerProps = {},
-  footerProps = {},
-}: PageLayoutProps) {
+}: ServerPageLayoutProps) {
   return (
     <>
       {showAnnouncement && <AnnouncementBar />}
-      {showHeader && <Header {...headerProps} />}
-      <div className={containerClassName}>
-        {children}
-      </div>
-      {showFooter && <Footer {...footerProps} />}
+      {showHeader && <Header />}
+      <div className={containerClassName}>{children}</div>
+      {showFooter && <Footer />}
     </>
   );
 }
