@@ -21,5 +21,10 @@ export const trackingConfig = {
 
 /**
  * Helper type for provider configuration
+ * Matches the ProviderWithProps type from compose-provider
  */
-export type ProviderConfig = [React.ComponentType<any>, Record<string, any>];
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export type ProviderConfig<P = {}> = [
+  React.ComponentType<P & { children: React.ReactNode }>,
+  P
+];

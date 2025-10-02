@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { withErrorBoundary } from "@/components/common/with-error-boundary";
 import type { ApiProduct } from "@/lib/types";
-
+import Image from "next/image";
 /**
  * Example component demonstrating the useApi hook with error handling
  */
@@ -19,8 +19,7 @@ function ApiExampleComponent() {
     data: product,
     isLoading,
     error,
-    fetchData,
-    reset
+    fetchData
   } = useApi<ApiProduct>();
 
   // Fetch product on component mount or when productId changes
@@ -66,7 +65,7 @@ function ApiExampleComponent() {
           <div className="space-y-4">
             <div className="relative bg-gray-100 rounded-md aspect-square overflow-hidden">
               {product.images && product.images[0] && (
-                <img 
+                <Image 
                   src={product.images[0].src} 
                   alt={product.title || "Product"} 
                   className="w-full h-full object-cover"

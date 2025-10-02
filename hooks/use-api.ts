@@ -48,7 +48,7 @@ interface ApiState<T> {
  * };
  * ```
  */
-export function useApi<T = any>(options: UseApiOptions = {}) {
+export function useApi<T = unknown>(options: UseApiOptions = {}) {
   const {
     showErrorToasts = true,
     defaultErrorMessage = "An unexpected error occurred",
@@ -93,7 +93,7 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
       });
 
       const contentType = response.headers.get('Content-Type') || '';
-      let data: any;
+      let data: unknown;
       
       if (contentType.includes('application/json')) {
         data = await response.json();
@@ -103,7 +103,7 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
 
       if (!response.ok) {
         const apiError: ApiError = {
-          message: data?.message || `Error ${response.status}: ${response.statusText}`,
+          message: (data as { message?: string })?.message || `Error ${response.status}: ${response.statusText}`,
           status: response.status,
           endpoint: url,
           timestamp: new Date().toISOString()
@@ -120,18 +120,28 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
         return createApiResponse<T>(undefined, apiError);
       }
 
+      // Type guard for ApiResponse format
+      const isApiResponse = (obj: unknown): obj is ApiResponse<T> => {
+        return (
+          obj !== null &&
+          typeof obj === 'object' &&
+          'success' in obj &&
+          ('data' in obj || 'error' in obj)
+        );
+      };
+
       // Handle responses that are already in ApiResponse format
-      if (data && typeof data === 'object' && 'success' in data) {
+      if (isApiResponse(data)) {
         if (data.error) {
           setState(prev => ({ 
             ...prev, 
             isLoading: false, 
-            error: data.error,
+            error: data.error ?? null,
             isSuccess: false
           }));
           
           handleError(data.error);
-          return data as ApiResponse<T>;
+          return data;
         }
         
         setState(prev => ({ 
@@ -142,7 +152,7 @@ export function useApi<T = any>(options: UseApiOptions = {}) {
           isSuccess: true
         }));
         
-        return data as ApiResponse<T>;
+        return data;
       }
       
       // Handle regular JSON responses

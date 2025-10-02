@@ -21,7 +21,7 @@ export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
   options: WithErrorBoundaryProps = {}
 ): React.FC<P> {
-  const { fallback, id } = options;
+  const { fallback } = options;
   
   const displayName = Component.displayName || Component.name || "Component";
   
@@ -45,7 +45,7 @@ export function withErrorBoundary<P extends object>(
 export function ErrorBoundaryWrapper({
   children,
   fallback,
-  id = "error-boundary",
+
 }: {
   children: React.ReactNode;
 } & WithErrorBoundaryProps) {

@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { z } from "zod";
-import type { IValidationError } from "@/lib/errors";
 
 export interface FormState<T> {
   values: Partial<T>;
@@ -28,7 +27,7 @@ export interface UseFormOptions<T, S extends z.ZodType<T>> {
  * @param options - Configuration options for the form
  * @returns Form state and handlers
  */
-export function useForm<T extends Record<string, any>, S extends z.ZodType<T>>({
+export function useForm<T extends Record<string, unknown>, S extends z.ZodType<T>>({
   initialValues = {} as Partial<T>,
   schema,
   onSubmit,
@@ -74,22 +73,21 @@ export function useForm<T extends Record<string, any>, S extends z.ZodType<T>>({
   }, [schema, formState.values]);
 
   // Validate a single field
-  const validateField = useCallback((name: string, value: any) => {
+  const validateField = useCallback((name: string, value: unknown) => {
     try {
       // Get the nested value from formState for context
       const pathParts = name.split('.');
-      let currentValue = value;
       
       // For nested validation, we need the full object context
       if (pathParts.length > 1) {
-        const testValues = { ...formState.values };
-        let current: any = testValues;
+        const testValues = { ...formState.values } as Record<string, unknown>;
+        let current: Record<string, unknown> = testValues;
         
         for (let i = 0; i < pathParts.length - 1; i++) {
           if (!current[pathParts[i]]) {
             current[pathParts[i]] = {};
           }
-          current = current[pathParts[i]];
+          current = current[pathParts[i]] as Record<string, unknown>;
         }
         current[pathParts[pathParts.length - 1]] = value;
         
@@ -131,32 +129,32 @@ export function useForm<T extends Record<string, any>, S extends z.ZodType<T>>({
   }, [schema, formState.values]);
 
   // Handle field change
-  const handleChange = useCallback((name: string, value: any) => {
+  const handleChange = useCallback((name: string, value: unknown) => {
     setFormState(prev => {
-      let newValues = { ...prev.values };
+      const newValues = { ...prev.values } as Record<string, unknown>;
       
       // Handle nested fields (e.g., "address.street")
       if (name.includes('.')) {
         const pathParts = name.split('.');
-        let current: any = newValues;
+        let current: Record<string, unknown> = newValues;
         
         for (let i = 0; i < pathParts.length - 1; i++) {
           if (!current[pathParts[i]]) {
             current[pathParts[i]] = {};
           } else {
-            current[pathParts[i]] = { ...current[pathParts[i]] };
+            current[pathParts[i]] = { ...current[pathParts[i]] as Record<string, unknown> };
           }
-          current = current[pathParts[i]];
+          current = current[pathParts[i]] as Record<string, unknown>;
         }
         current[pathParts[pathParts.length - 1]] = value;
       } else {
         // Handle regular fields
-        newValues[name as keyof T] = value;
+        newValues[name] = value;
       }
       
       return {
         ...prev,
-        values: newValues,
+        values: newValues as Partial<T>,
         touched: {
           ...prev.touched,
           [name]: true
@@ -183,10 +181,10 @@ export function useForm<T extends Record<string, any>, S extends z.ZodType<T>>({
 
     if (validateOnBlur) {
       const pathParts = name.split('.');
-      let fieldValue: any = formState.values;
+      let fieldValue: unknown = formState.values;
       
       for (const part of pathParts) {
-        fieldValue = fieldValue?.[part];
+        fieldValue = (fieldValue as Record<string, unknown>)?.[part];
       }
       
       validateField(name, fieldValue);
@@ -202,17 +200,17 @@ export function useForm<T extends Record<string, any>, S extends z.ZodType<T>>({
     // Mark all fields as touched
     setFormState(prev => {
       const allTouched: Record<string, boolean> = {};
-      const markTouched = (obj: any, prefix = '') => {
+      const markTouched = (obj: Record<string, unknown>, prefix = '') => {
         Object.keys(obj).forEach(key => {
           const path = prefix ? `${prefix}.${key}` : key;
           if (obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-            markTouched(obj[key], path);
+            markTouched(obj[key] as Record<string, unknown>, path);
           } else {
             allTouched[path] = true;
           }
         });
       };
-      markTouched(prev.values);
+      markTouched(prev.values as Record<string, unknown>);
       
       return {
         ...prev,
@@ -250,7 +248,7 @@ export function useForm<T extends Record<string, any>, S extends z.ZodType<T>>({
   }, [initialValues]);
 
   // Set a specific field value
-  const setFieldValue = useCallback((name: string, value: any) => {
+  const setFieldValue = useCallback((name: string, value: unknown) => {
     handleChange(name, value);
   }, [handleChange]);
 

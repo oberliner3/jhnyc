@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { getErrorPlaceholder } from "@/lib/placeholder";
 
@@ -53,7 +53,7 @@ export function SmartImage({
 	placeholder,
 	aspectRatio = "auto",
 	customAspectRatio,
-	withErrorBoundary = false,
+
 }: SmartImageProps) {
 	const [hasError, setHasError] = useState(false);
 	const [isLoaded, setIsLoaded] = useState(false);
