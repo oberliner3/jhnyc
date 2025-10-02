@@ -1,10 +1,10 @@
-import { publicEnv } from "./env-validation";
+import { env } from "./env-validation";
 
-export { publicEnv };
+
 
 export const IS_DEV = process.env.NODE_ENV === "development";
 
-export const siteDomain = publicEnv.NEXT_PUBLIC_SITE_URL || "localhost:3000";
+export const siteDomain = env.NEXT_PUBLIC_SITE_URL || "localhost:3000";
 export const siteUrl = siteDomain.startsWith("http")
 	? siteDomain
 	: isLocalhost(siteDomain)
@@ -16,7 +16,7 @@ export function isLocalhost(host: string) {
 }
 
 export const SITE_CONFIG = {
-	name: publicEnv.NEXT_PUBLIC_STORE_NAME || "OriGenZ",
+	name: env.NEXT_PUBLIC_STORE_NAME || "OriGenZ",
 	description: "Premium e-commerce storefront built with Next.js",
 	domain: siteDomain,
 	url: siteUrl,

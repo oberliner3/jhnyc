@@ -2,7 +2,8 @@
 import Script from "next/script";
 import { useId } from "react";
 import type { Organization, WebSite } from "schema-dts";
-import { APP_CONTACTS, publicEnv, SITE_CONFIG } from "@/lib/constants";
+import { APP_CONTACTS, SITE_CONFIG } from "@/lib/constants";
+import { env } from "@/lib/env-validation";
 
 export function WebsiteSchema() {
 	const scriptId = useId();
@@ -26,7 +27,7 @@ export function WebsiteSchema() {
 	const organizationSchema: Organization = {
 		"@type": "Organization",
 		"@id": `${SITE_CONFIG.url}/#organization`,
-		name: publicEnv.NEXT_PUBLIC_STORE_NAME,
+		name: env.NEXT_PUBLIC_STORE_NAME,
 		url: `${SITE_CONFIG.url}/`,
 		logo: {
 			"@type": "ImageObject",
@@ -38,10 +39,9 @@ export function WebsiteSchema() {
 			contactType: "customer service",
 		},
 		sameAs: [
-			"https://facebook.com/" + publicEnv.NEXT_PUBLIC_STORE_NAME,
-			"https://x.com/" + publicEnv.NEXT_PUBLIC_STORE_NAME,
-			"https://instagram.com/" + publicEnv.NEXT_PUBLIC_STORE_NAME,
-		],
+			"https://facebook.com/" + env.NEXT_PUBLIC_STORE_NAME,
+			    "https://x.com/" + env.NEXT_PUBLIC_STORE_NAME,
+			    "https://instagram.com/" + env.NEXT_PUBLIC_STORE_NAME,		],
 	};
 
 	const graphSchema = {

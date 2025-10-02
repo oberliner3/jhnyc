@@ -1,4 +1,4 @@
-import { publicEnv } from "@/lib/env-validation";
+import { env } from "@/lib/env-validation";
 
 /**
  * Centralized configuration for experience tracking
@@ -11,10 +11,8 @@ export const trackingConfig = {
   enableFormTracking: true,
   enablePerformanceTracking: true,
   enableErrorTracking: true,
-  sampleRate: publicEnv.NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE || 1.0,
-  debug:
-    publicEnv.NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG ||
-    process.env.NODE_ENV === "development",
+sampleRate: env.NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE || 1.0,
+    debug: env.NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG || false,
   respectDNT: true,
   anonymizeIPs: true,
 };
