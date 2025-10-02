@@ -24,7 +24,7 @@ export function PageLayout({
   showAnnouncement = true,
   showHeader = true,
   showFooter = true,
-  containerClassName = "flex-grow mx-auto container",
+  containerClassName = "",
   headerProps = {},
   footerProps = {},
 }: PageLayoutProps) {

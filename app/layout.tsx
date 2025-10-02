@@ -54,16 +54,16 @@ export default async function RootLayout({
           <DevToolsBlocker />
           <Providers>
             <AnalyticsProvider>
-              <div className="flex flex-col bg-background min-h-screen">
+              <div className="">
                 {children}
               </div>
               <Toaster />
-              <MessagePackMonitor />
+              {/* <MessagePackMonitor /> */}
               <ConsentBanner />
             </AnalyticsProvider>
           </Providers>
         </ErrorBoundary>
-        <ChatWidgetProvider />
+        {/* <ChatWidgetProvider /> */}
         <Analytics />
         <SpeedInsights />
       </body>

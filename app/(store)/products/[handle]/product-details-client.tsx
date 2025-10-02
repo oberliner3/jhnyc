@@ -118,11 +118,11 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
   };
 
   return (
-    <div className="mx-auto p-4 sm:p-6 lg:p-8 container">
+    <div className="mx-auto p-0 sm:p-0 lg:p-8 overflow-hidden container">
       <div className="gap-8 lg:gap-12 grid grid-cols-1 md:grid-cols-2">
         <ProductSchema product={product} />
         {/* Product Images Gallery */}
-        <div className="space-y-2">
+        <div className="space-y-4">
           {/* Main Image with Navigation */}
           <div className="group relative flex bg-muted bg-white rounded-lg aspect-square overflow-hidden">
             <Image
@@ -172,7 +172,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 
           {/* Thumbnail Gallery */}
           {totalImages > 1 && (
-            <div className="flex gap-2 pb-2 overflow-x-auto">
+            <div className="flex gap-2 pb-2 overflow-x-auto scroll-smooth no-scrollbar">
               {product.images.map((image, index) => (
                 <button
                   type="button"
@@ -202,34 +202,35 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         <div className="space-y-6">
           <div>
             <Badge variant="outline" className="m-2 p-2">
-              {product.product_type}
+              {product.product_type.split('/')[0]}
             </Badge>
-            <h1 className="font-bold text-3xl lg:text-4xl tracking-tight">
-              {product.title}
+            <h1 className="font-bold text-xl lg:text-4xl tracking-tight">
+              {product.title.toWellFormed()}
             </h1>
           </div>
 
           {/* Options */}
-          {product.options &&
-            product.options.length > 0 &&
-            product.options[0].name !== "Title" && (
+          
+          {product.variants &&
+            product.variants.length > 0 &&
+            product.variants[0].title !== "Title" && (
               <div className="space-y-4">
-                {(product.options || []).map((option) => (
-                  <div key={option.id}>
-                    <h3 className="mb-2 font-medium text-sm">{option.name}</h3>
+                {(product.variants || []).map((variant) => (
+                  <div key={variant.id}>
+                    <h3 className="mb-2 font-medium text-sm">{variant.title}</h3>
                     <Select
                       onValueChange={(value) =>
-                        handleOptionChange(option.name, value)
+                        handleOptionChange(variant.title, value)
                       }
-                      defaultValue={selectedOptions[option.name]}
+                      defaultValue={selectedOptions[variant.title]}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={`Select ${option.name}`} />
+                        <SelectValue placeholder={`Select ${variant.title}`} />
                       </SelectTrigger>
                       <SelectContent>
-                        {option.values.map((value) => (
-                          <SelectItem key={value} value={value}>
-                            {value}
+                        {product.variants.map((variant) => (
+                          <SelectItem key={variant.id} value={variant.id}>
+                            {variant.title}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -245,25 +246,26 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
               <span className="font-bold text-3xl">
                 {formatPrice(currentPrice)}
               </span>
-              {product.compare_at_price &&
-                product.compare_at_price >= product.price && (
-                  <span className="text-muted-foreground text-lg line-through">
+             
+              {product.compare_at_price && product.compare_at_price > 0 ?
+                (product.compare_at_price >= product.price && (
+                  <span className="font-semibold text-red-500 text-lg line-through">
                     {formatPrice(product.compare_at_price)}
                   </span>
-                )}
+                )) : null}
             </div>
-            {product.compare_at_price && discountPercentage > 0 && (
+            {product.compare_at_price && discountPercentage > 0 ? (
               <p className="text-green-600 text-sm">
                 You save {formatPrice(product.compare_at_price - currentPrice)}{" "}
                 ({discountPercentage}%)
               </p>
-            )}
+            ) : null}
           </div>
 
           {/* Add to Cart & Buy Now */}
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-3 p-4 rounded-md">
+            <div className="flex justify-between items-center content-between gap-2 py-2">
+              <div className="flex justify-center items-center gap-2 w-1/2">
                 <Button
                   variant="outline"
                   size="icon"
@@ -280,7 +282,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                   onChange={(e) =>
                     handleQuantityChange(parseInt(e.target.value, 10) || 1)
                   }
-                  className="w-16 text-center"
+                  className="w-full text-center"
                 />
                 <Button
                   variant="outline"
@@ -294,7 +296,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
               <Button
                 size="lg"
                 variant="default"
-                className="max-w-4xl"
+                className="w-1/2"
                 onClick={() => {
                   if ((product.variants || []).length > 1 && !selectedVariant) {
                     toast.error("Please select a product variant");

@@ -197,26 +197,26 @@ async function CollectionProducts({
 						{page > 1 && (
 							<Link href={`/collections/${slug}?page=${page - 1}`}>
 								<Button variant="outline" size="sm">
-									<ChevronLeft className="w-4 h-4 mr-1" />
+									<ChevronLeft className="mr-1 w-4 h-4" />
 									Previous
 								</Button>
 							</Link>
 						)}
 
-						<span className="text-sm text-gray-600">Page {page}</span>
+						<span className="text-gray-600 text-sm">Page {page}</span>
 
 						{hasNextPage && (
 							<Link href={`/collections/${slug}?page=${page + 1}`}>
 								<Button variant="outline" size="sm">
 									Next
-									<ChevronRight className="w-4 h-4 ml-1" />
+									<ChevronRight className="ml-1 w-4 h-4" />
 								</Button>
 							</Link>
 						)}
 					</div>
 				</>
 			) : (
-				<div className="text-center py-12">
+				<div className="py-12 text-center">
 					<p className="text-gray-600">No products found in this collection.</p>
 				</div>
 			)}
@@ -246,10 +246,10 @@ export default async function CollectionPage({
 	const description = `Discover our curated collection of ${title.toLowerCase()}. Find the perfect items for your needs.`;
 
 	return (
-		<div className="bg-gray-50 min-h-screen">
+		<div className="bg-gray-50 pt-2 min-h-screen">
 			{/* Collection Header */}
 			<div className="bg-white border-b">
-				<div className="px-4 py-12 container">
+				<div className="container">
 					<div className="text-center">
 						<h1 className="mb-4 font-bold text-gray-900 text-4xl tracking-tight">
 							{title}
@@ -280,7 +280,7 @@ export default async function CollectionPage({
 							</div>
 						</div>
 
-						<div className="flex items-center gap-4">
+						<div className="flex items-center gap-1 md:gap-4">
 							<span className="text-gray-600 text-sm">Sort by:</span>
 							<select className="px-3 py-1 border border-gray-300 rounded-md text-sm">
 								<option>Featured</option>
@@ -295,7 +295,7 @@ export default async function CollectionPage({
 			</div>
 
 			{/* Products Grid */}
-			<div className="px-4 py-8 container">
+			<div className="mt-2 p-0 container">
 				<Suspense fallback={<CollectionSkeleton />}>
 					<CollectionProducts slug={slug} page={page} />
 				</Suspense>
