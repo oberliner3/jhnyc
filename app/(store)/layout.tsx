@@ -1,6 +1,4 @@
-import { AnnouncementBar } from "@/components/layout/announcement-bar";
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
+import { PageLayout } from "@/components/layout/page-layout";
 
 /**
  * Store Layout
@@ -13,11 +11,8 @@ export default function StoreLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<>
-			<AnnouncementBar />
-			<Header />
+		<PageLayout>
 			<main className="flex-grow">{children}</main>
-			<Footer />
-		</>
+		</PageLayout>
 	);
 }
