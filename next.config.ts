@@ -1,3 +1,4 @@
+import "./lib/load-env";
 import type { NextConfig } from "next";
 import createNextJsObfuscator from "nextjs-obfuscator";
 
