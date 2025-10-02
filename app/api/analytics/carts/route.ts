@@ -87,7 +87,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     let result;
     switch (action) {
       case "cleanup_expired":
-        const { data: cleanupData, error: cleanupError } = await supabase.rpc('cleanup_expired_anonymous_carts');
+                const { data: cleanupData, error: cleanupError } = await supabase.rpc('cleanup_expired_carts');
         if (cleanupError) throw cleanupError;
         result = { deleted_carts: cleanupData };
         break;
