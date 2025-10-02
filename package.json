@@ -1,14 +1,13 @@
 {
   "name": "originz",
-  "version": "0.1.0",
+  "version": "0.1.0a",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "check-types": "tsc --noemit",
     "start": "next start",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix app components contexts hooks lib utils middleware.ts next.config.ts"
+    "lint": "tsc --noemit && eslint ."
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -64,6 +63,7 @@
     "eslint": "^9.36.0",
     "eslint-config-next": "15.5.4",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^6.1.0",
     "javascript-obfuscator": "^4.1.1",
     "nextjs-obfuscator": "^3.1.0",
     "postcss": "^8.5.6",
