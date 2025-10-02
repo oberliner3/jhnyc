@@ -5,7 +5,10 @@ export default function robots(): MetadataRoute.Robots {
 	return {
 		rules: [
 			{
-				"/collections/all/",
+				userAgent: "*",
+				allow: [
+					"/",
+					"/collections/all/",
 					"/collections/",
 					"/search",
 					"/about",
@@ -89,7 +92,8 @@ export default function robots(): MetadataRoute.Robots {
 				crawlDelay: 1,
 			},
 			{
-				allow: ["/", "/collections/all/", "/collections/"],,
+				userAgent: "facebookexternalhit",
+				allow: ["/", "/collections/all/", "/collections/"],
 				disallow: ["/account/", "/cart", "/checkout/", "/admin/", "/api/"],
 			},
 			{
