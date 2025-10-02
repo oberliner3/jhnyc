@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@next/eslint-plugin-next": "^15.5.4",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.19.18",
     "@types/react": "^19.1.16",
