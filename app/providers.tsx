@@ -16,7 +16,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // An array of providers and their props.
   // This makes it easy to add or remove providers without changing the nesting structure.
   const providers: ProviderConfig[] = [
-    [QueryClientProvider, { client: queryClient }],
+    [(props: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient} {...props} />
+    ), {}],
     [
       ExperienceTrackingProvider,
       {
