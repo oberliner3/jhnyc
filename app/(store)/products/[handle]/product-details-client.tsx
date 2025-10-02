@@ -54,14 +54,24 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 
   useEffect(() => {
     if (product) {
-      const initialOptions: Record<string, string> = {};
-      (product.options || []).forEach((option) => {
-        initialOptions[option.name] = option.values[0];
-      });
-      setSelectedOptions(initialOptions);
-
-      if ((product.variants || []).length > 0) {
+      if ((product.variants || []).length === 1) {
         setSelectedVariant((product.variants || [])[0]);
+      } else {
+        const initialOptions: Record<string, string> = {};
+        (product.options || []).forEach((option) => {
+          initialOptions[option.name] = option.values[0];
+        });
+        setSelectedOptions(initialOptions);
+
+        if ((product.variants || []).length > 0) {
+          const variantName = (product.options || [])
+            .map((opt) => initialOptions[opt.name])
+            .join(" / ");
+          const variant = (product.variants || []).find(
+            (v) => v.title === variantName
+          );
+          setSelectedVariant(variant || (product.variants || [])[0]);
+        }
       }
     }
   }, [product]);
