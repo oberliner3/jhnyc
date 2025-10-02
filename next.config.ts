@@ -128,6 +128,21 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // REDIRECTS
+  async redirects() {
+    return [
+      {
+        source: '/products',
+        destination: '/collections/all',
+        permanent: true,
+      },
+      {
+        source: '/collections',
+        destination: '/collections/all',
+        permanent: true,
+      },
+    ]
+  },
   // HEADERS
   async headers() {
     return [

@@ -24,7 +24,7 @@ export function EmptyCart() {
 				Add some items to your cart to get started.
 			</p>
 			<Button asChild>
-				<Link href="/products">Continue Shopping</Link>
+				<Link href="/collections/all">Continue Shopping</Link>
 			</Button>
 
 			{featuredProducts.length > 0 && (

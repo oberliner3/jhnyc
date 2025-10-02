@@ -4,7 +4,7 @@ import { SITE_CONFIG } from "@/lib/constants";
 export async function GET() {
 	const staticPages = [
 		{ url: SITE_CONFIG.url, priority: 1.0, changefreq: "daily" },
-		{ url: `${SITE_CONFIG.url}/products`, priority: 0.9, changefreq: "daily" },
+		{ url: `${SITE_CONFIG.url}/collections/all`, priority: 0.9, changefreq: "daily" },
 		{ url: `${SITE_CONFIG.url}/search`, priority: 0.8, changefreq: "weekly" },
 		{ url: `${SITE_CONFIG.url}/about`, priority: 0.8, changefreq: "monthly" },
 		{ url: `${SITE_CONFIG.url}/contact`, priority: 0.7, changefreq: "monthly" },

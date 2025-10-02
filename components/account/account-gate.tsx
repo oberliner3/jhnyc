@@ -330,7 +330,7 @@ export function AccountGate() {
 									Start shopping to see your orders here
 								</p>
 								<PrimaryCTA asChild>
-									<Link href="/products">Start Shopping</Link>
+									<Link href="/collections/all">Start Shopping</Link>
 								</PrimaryCTA>
 							</div>
 						</CardContent>

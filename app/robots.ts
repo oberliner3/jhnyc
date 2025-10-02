@@ -5,10 +5,7 @@ export default function robots(): MetadataRoute.Robots {
 	return {
 		rules: [
 			{
-				userAgent: "*",
-				allow: [
-					"/",
-					"/products/",
+				"/collections/all/",
 					"/collections/",
 					"/search",
 					"/about",
@@ -52,7 +49,7 @@ export default function robots(): MetadataRoute.Robots {
 				userAgent: "Googlebot",
 				allow: [
 					"/",
-					"/products/",
+					"/collections/all/",
 					"/collections/",
 					"/search",
 					"/about",
@@ -74,7 +71,7 @@ export default function robots(): MetadataRoute.Robots {
 				userAgent: "Bingbot",
 				allow: [
 					"/",
-					"/products/",
+					"/collections/all/",
 					"/collections/",
 					"/search",
 					"/about",
@@ -92,13 +89,12 @@ export default function robots(): MetadataRoute.Robots {
 				crawlDelay: 1,
 			},
 			{
-				userAgent: "facebookexternalhit",
-				allow: ["/", "/products/", "/collections/"],
+				allow: ["/", "/collections/all/", "/collections/"],,
 				disallow: ["/account/", "/cart", "/checkout/", "/admin/", "/api/"],
 			},
 			{
 				userAgent: "Twitterbot",
-				allow: ["/", "/products/", "/collections/"],
+				allow: ["/", "/collections/all/", "/collections/"],
 				disallow: ["/account/", "/cart", "/checkout/", "/admin/", "/api/"],
 			},
 		],

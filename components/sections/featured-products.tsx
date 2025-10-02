@@ -35,7 +35,7 @@ export function FeaturedProducts() {
 						</p>
 					</div>
 					<Button variant="outline" asChild>
-						<Link href="/products">
+						<Link href="/collections/all">
 							View All
 							<ArrowRight className="ml-2 w-4 h-4" />
 						</Link>

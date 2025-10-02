@@ -59,7 +59,7 @@ export { Button, buttonVariants };
 
 // Preset button wrappers for consistent sizing/spacing across primary flows
 // Usage examples:
-//   <PrimaryCTA asChild><Link href="/products">Shop Now</Link></PrimaryCTA>
+//   <PrimaryCTA asChild><Link href="/collections/all">Shop Now</Link></PrimaryCTA>
 //   <SecondaryCTA onClick={...}>Learn More</SecondaryCTA>
 //   <DangerButton onClick={handleDelete}>Delete</DangerButton>
 //   <IconButton aria-label="Open cart"><ShoppingCart /></IconButton>

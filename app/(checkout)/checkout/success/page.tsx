@@ -143,7 +143,7 @@ export default function CheckoutSuccessPage() {
 					</Link>
 				</Button>
 				<Button variant="outline" asChild className="flex-1">
-					<Link href="/products">
+					<Link href="/collections/all">
 						<ShoppingBag className="mr-2 w-4 h-4" />
 						Continue Shopping
 					</Link>

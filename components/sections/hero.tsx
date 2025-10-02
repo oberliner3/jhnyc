@@ -65,7 +65,7 @@ export function Hero() {
 								className="px-8 text-base lg:text-lg hover:text-primary"
 								asChild
 							>
-								<Link href="/products">
+								<Link href="/collections/all">
 									Shop Now
 									<ArrowRight className="ml-2 w-5 h-5" />
 								</Link>

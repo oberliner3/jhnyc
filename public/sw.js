@@ -5,8 +5,7 @@ const DYNAMIC_CACHE = "originz-dynamic-v1";
 // Assets to cache on install
 const STATIC_ASSETS = [
 	"/",
-	"/products",
-	"/cart",
+	  "/collections/all",	"/cart",
 	"/account",
 	"/offline",
 	"/manifest.webmanifest",
