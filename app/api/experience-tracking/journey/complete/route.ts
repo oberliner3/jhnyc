@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import type { JourneyType } from '@/lib/experience-tracking/types';
-import { publicEnv, serverEnv } from '@/lib/env-validation';
+import { env } from '@/lib/env-validation';
 
 interface JourneyCompletionRequest {
   sessionId: string;
@@ -16,9 +16,7 @@ interface JourneyCompletionRequest {
 }
 
 export async function POST(request: NextRequest) {
-  const { NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED, NEXT_PUBLIC_SUPABASE_URL } = publicEnv;
-  const { SUPABASE_SERVICE_ROLE_KEY } = serverEnv;
-
+  const { NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED, NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = env;
   if (!NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED) {
     return NextResponse.json(
       { success: false, error: 'Experience tracking is disabled' },

@@ -11,7 +11,7 @@ import { WebsiteSchema } from "@/components/common/website-schema";
 import { Toaster } from "@/components/ui/sonner";
 import { MessagePackMonitor } from "@/components/admin/msgpack-monitor";
 import { ChatWidgetProvider } from "@/components/chat/chat-widget-provider";
-import { publicEnv } from "@/lib/constants";
+import { env } from "@/lib/env-validation";
 import { Providers } from "./providers";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { ConsentBanner } from "@/components/analytics/consent-banner";
@@ -40,17 +40,11 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <meta
-          name="apple-mobile-web-app-title"
-          content={publicEnv.NEXT_PUBLIC_STORE_NAME}
-        />
+<meta name="apple-mobile-web-app-title" content={env.NEXT_PUBLIC_STORE_NAME} />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta
-          name="application-name"
-          content={publicEnv.NEXT_PUBLIC_STORE_NAME}
-        />
+<meta name="application-name" content={env.NEXT_PUBLIC_STORE_NAME} />
         <meta name="msapplication-TileColor" content="hsl(var(--primary))" />
 
         <WebsiteSchema />

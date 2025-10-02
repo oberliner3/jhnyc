@@ -1,18 +1,17 @@
 import { createAdminApiClient } from "@shopify/admin-api-client";
-import { serverEnv } from "@/lib/env-validation";
+import { env } from "@/lib/env-validation";
 
 // SECURITY: Only use server-side environment variables - NEVER expose tokens to client
 function getShopifyConfig() {
-	const tok = serverEnv.SHOPIFY_ACCESS_TOKEN ?? serverEnv.SHOPIFY_TOKEN;
-	if (!tok || !serverEnv.SHOPIFY_SHOP || !serverEnv.SHOPIFY_SHOP_NAME) {
+	const tok = env.SHOPIFY_ACCESS_TOKEN ?? env.SHOPIFY_TOKEN;
+	if (!tok || !env.SHOPIFY_SHOP || !env.SHOPIFY_SHOP_NAME) {
 		throw new Error(
 			"Shopify configuration is missing. Provide SHOPIFY_ACCESS_TOKEN (or SHOPIFY_TOKEN), SHOPIFY_SHOP, and SHOPIFY_SHOP_NAME.",
 		);
 	}
 	return {
-		shopDomain: serverEnv.SHOPIFY_SHOP,
-		accessToken: tok,
-		shopName: serverEnv.SHOPIFY_SHOP_NAME,
+shopDomain: env.SHOPIFY_SHOP,
+    shopName: env.SHOPIFY_SHOP_NAME,
 	};
 }
 

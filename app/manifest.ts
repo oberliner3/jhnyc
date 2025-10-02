@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
-import { publicEnv, SITE_CONFIG } from "@/lib/constants";
+import { SITE_CONFIG } from "@/lib/constants";
+import { env } from "@/lib/env-validation";
 
 export default function manifest(): MetadataRoute.Manifest {
 	return {
 		name: SITE_CONFIG.name,
-		short_name: publicEnv.NEXT_PUBLIC_STORE_NAME,
+		short_name: env.NEXT_PUBLIC_STORE_NAME,
 		background_color: "#ffffff",
 		theme_color: "#336571",
 		description: SITE_CONFIG.description,

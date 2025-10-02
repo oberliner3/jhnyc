@@ -6,7 +6,7 @@ import { PWAProvider } from "@/components/pwa/pwa-provider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { CartProvider } from "@/contexts/cart-context";
 import { ExperienceTrackingProvider } from "@/lib/experience-tracking/provider";
-import { publicEnv } from "@/lib/env-validation";
+import { env } from "@/lib/env-validation";
 import { ComposeProvider } from "@/lib/compose-provider";
 import { trackingConfig, type ProviderConfig } from "@/lib/provider-config";
 
@@ -23,7 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       ExperienceTrackingProvider,
       {
         config: trackingConfig,
-        disabled: !publicEnv.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED,
+        disabled: !env.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED,
       },
     ],
     [AuthProvider, {}],

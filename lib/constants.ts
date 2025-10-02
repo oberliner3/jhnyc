@@ -1,7 +1,5 @@
 import { env } from "./env-validation";
 
-
-
 export const IS_DEV = process.env.NODE_ENV === "development";
 
 export const siteDomain = env.NEXT_PUBLIC_SITE_URL || "localhost:3000";
@@ -20,11 +18,9 @@ export const SITE_CONFIG = {
 	description: "Premium e-commerce storefront built with Next.js",
 	domain: siteDomain,
 	url: siteUrl,
-	ogTitle: `${
-		publicEnv.NEXT_PUBLIC_STORE_NAME || "OriGenZ"
-	} - Your One-Stop Shop for Quality Products`,
+	ogTitle: `${env.NEXT_PUBLIC_STORE_NAME || "OriGenZ"} - Your One-Stop Shop for Quality Products`,
 	ogImage: `${siteUrl}/og.png`,
-	author: publicEnv.NEXT_PUBLIC_STORE_NAME || "OriGenZ",
+	author: env.NEXT_PUBLIC_STORE_NAME || "OriGenZ",
 	lastUpdate: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
 	keywords: [
 		"e-commerce",
@@ -142,7 +138,7 @@ export const buildPhone = (ext: number, callSign: string, zone?: number) => {
 	} else if (digits.length === 7) {
 		// Optionally apply provided zone (area code) if given
 		const exchange = digits.slice(0, 3);
-		const line = digits.slice(3);
+		const line = d.slice(3);
 		local = zone ? `(${zone}) ${exchange}-${line}` : `${exchange}-${line}`;
 	} else if (digits.length > 0 && digits.length < 7) {
 		// Fallback: keep as-is for short numbers

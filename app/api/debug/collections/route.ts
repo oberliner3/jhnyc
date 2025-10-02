@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { loadDataOptimized } from "@/lib/msgpack-loader";
-import { serverEnv } from "@/lib/env-validation";
+import { env } from "@/lib/env-validation";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   
   try {
     // Test environment variables
-    const env = serverEnv;
+    
     const envInfo = {
       hasApiUrl: !!env.PRODUCT_STREAM_API,
       hasApiKey: !!env.PRODUCT_STREAM_X_KEY,

@@ -5,7 +5,7 @@
 
 import { decode } from "msgpack-javascript";
 import { API_CONFIG, LIMITS } from "./constants";
-import { serverEnv } from "./env-validation";
+import { env } from "./env-validation";
 import {
 	ApiClientError,
 	logError,
@@ -20,7 +20,7 @@ async function apiRequest<T>(
 	options: RequestInit = {},
 ): Promise<T> {
 	// Resolve server env at call time to avoid import-time crashes
-	const { PRODUCT_STREAM_API, PRODUCT_STREAM_X_KEY } = serverEnv;
+	const { PRODUCT_STREAM_API, PRODUCT_STREAM_X_KEY } = env;
 
 	if (!PRODUCT_STREAM_API || !PRODUCT_STREAM_X_KEY) {
 		throw new ApiClientError(
