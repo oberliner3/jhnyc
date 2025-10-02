@@ -30,12 +30,12 @@ export function Header() {
 
   return (
     <header className="top-0 z-50 sticky bg-white/55 supports-backdrop-filter:bg-white/60 shadow-sm backdrop-blur w-full">
-      <div className="flex justify-between items-center px-4 h-16 container">
+      <div className="flex justify-around items-center px-4 h-16 container">
         {/* Mobile menu */}
         <MobileNav />
 
         {/* Logo */}
-        <div className="flex-1 md:flex-none" onClick={() => trackLogoClick()}>
+        <div className="flex justify-center items-center w-full text-center" onClick={() => trackLogoClick()}>
           <Logo />
         </div>
 
