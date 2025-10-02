@@ -138,7 +138,7 @@ export const buildPhone = (ext: number, callSign: string, zone?: number) => {
 	} else if (digits.length === 7) {
 		// Optionally apply provided zone (area code) if given
 		const exchange = digits.slice(0, 3);
-		const line = d.slice(3);
+		const line = digits.slice(3);
 		local = zone ? `(${zone}) ${exchange}-${line}` : `${exchange}-${line}`;
 	} else if (digits.length > 0 && digits.length < 7) {
 		// Fallback: keep as-is for short numbers

@@ -10,8 +10,9 @@ function getShopifyConfig() {
 		);
 	}
 	return {
-shopDomain: env.SHOPIFY_SHOP,
+    shopDomain: env.SHOPIFY_SHOP,
     shopName: env.SHOPIFY_SHOP_NAME,
+    accessToken: tok,
 	};
 }
 
