@@ -6,11 +6,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import type { UserJourney } from '@/lib/experience-tracking/types';
-import { getPublicEnv, getServerEnv } from '@/lib/env-validation';
+import { publicEnv, serverEnv } from '@/lib/env-validation';
 
 export async function POST(request: NextRequest) {
-  const { NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED, NEXT_PUBLIC_SUPABASE_URL } = getPublicEnv();
-  const { SUPABASE_SERVICE_ROLE_KEY } = getServerEnv();
+  const { NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED, NEXT_PUBLIC_SUPABASE_URL } = publicEnv;
+  const { SUPABASE_SERVICE_ROLE_KEY } = serverEnv;
 
   if (!NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED) {
     return NextResponse.json(

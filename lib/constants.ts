@@ -1,7 +1,4 @@
-import { getPublicEnv } from "./env-validation";
-
-// Public env only (safe for client-side import)
-export const publicEnv = getPublicEnv();
+import { publicEnv } from "./env-validation";
 
 export const siteDomain = publicEnv.NEXT_PUBLIC_SITE_URL || "localhost:3000";
 export const siteUrl = siteDomain.startsWith("http")

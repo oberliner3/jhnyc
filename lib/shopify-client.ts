@@ -1,5 +1,10 @@
 import { createAdminApiClient } from "@shopify/admin-api-client";
-import { getServerEnv } from "@/lib/env-validation";
+import { serverEnv } from "@/lib/env-validation";
+
+const SHOPIFY_SHOP = serverEnv.NEXT_PUBLIC_SITE_URL.split(".")[0];
+const SHOPIFY_ACCESS_TOKEN = serverEnv.SHOPIFY_ACCESS_TOKEN;
+
+const SHOPIFY_API_URL = `https://${SHOPIFY_SHOP}.myshopify.com/api/2023-01/graphql.json`;
 
 // SECURITY: Only use server-side environment variables - NEVER expose tokens to client
 function getShopifyConfig() {

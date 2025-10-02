@@ -4,7 +4,7 @@
  */
 
 import { decode } from "msgpack-javascript";
-import { getServerEnv } from "./env-validation";
+import { serverEnv } from "./env-validation";
 import { ApiClientError, logError } from "./errors";
 import { API_CONFIG } from "./constants";
 import type { ApiProduct } from "./types";
@@ -78,7 +78,7 @@ export async function loadDataOptimized<T>(
   try {
     // Resolve environment (only on server-side)
     const baseUrl = isSSR
-      ? (getServerEnv().PRODUCT_STREAM_API ?? "").replace(/\/$/, "")
+      ? (serverEnv.PRODUCT_STREAM_API ?? "").replace(/\/$/, "")
       : "";
     
     const url = isSSR 
@@ -98,7 +98,7 @@ export async function loadDataOptimized<T>(
         
         // Add API key for direct external calls (SSR only)
         if (isSSR) {
-          const apiKey = getServerEnv().PRODUCT_STREAM_X_KEY;
+          const apiKey = serverEnv.PRODUCT_STREAM_X_KEY;
           if (apiKey) {
             headers["X-API-KEY"] = apiKey;
           }
