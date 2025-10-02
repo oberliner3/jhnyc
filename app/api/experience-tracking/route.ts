@@ -120,6 +120,7 @@ function enrichEventWithServerData(
       countryCode: clientInfo.countryCode,
       city: clientInfo.city,
     },
+    attribution: {},
     // Override user agent from server if not provided
     deviceInfo: event.deviceInfo ? {
       ...event.deviceInfo,

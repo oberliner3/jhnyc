@@ -116,6 +116,9 @@ export async function loadDataOptimized<T>(
           headers,
           signal: controller.signal,
         });
+
+        console.log("supportsMessagePack", supportsMessagePack);
+        console.log("Content-Type", response.headers.get("Content-Type"));
         
         clearTimeout(timeoutId);
         
