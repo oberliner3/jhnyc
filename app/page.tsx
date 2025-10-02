@@ -1,7 +1,5 @@
-import { Header } from "@/components/layout/header";
 import { ShowNewsletterOnce } from "@/components/common/show-newsletter-once";
-import { AnnouncementBar } from "@/components/layout/announcement-bar";
-import { Footer } from "@/components/layout/footer";
+import { PageLayout } from "@/components/layout/page-layout";
 import { FeaturedProducts } from "@/components/sections/featured-products";
 import { Hero } from "@/components/sections/hero";
 import { InfoSections } from "@/components/sections/info-sections";
@@ -19,18 +17,13 @@ export const metadata = generateSEO({
 
 export default function HomePage() {
 	return (
-		<>
-			<AnnouncementBar />
-			<Header />
-			<div className="flex-grow mx-auto container">
-				<Hero />
-				<FeaturedProducts />
-				<InfoSections />
-				<Partners />
-				<Reviews />
-				<ShowNewsletterOnce />
-			</div>
-			<Footer />
-		</>
+		<PageLayout>
+			<Hero />
+			<FeaturedProducts />
+			<InfoSections />
+			<Partners />
+			<Reviews />
+			<ShowNewsletterOnce />
+		</PageLayout>
 	);
 }

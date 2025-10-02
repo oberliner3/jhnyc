@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createSimpleDraftOrder } from "@/lib/shopify-client";
+import { generateInvoiceNumber } from "@/lib/utils/invoice";
 
 /**
  * Buy Now API Route - Handles direct purchase flow similar to WordPress PHP implementation
@@ -44,9 +45,9 @@ export async function POST(request: NextRequest) {
 				{ status: 400 },
 			);
 		}
-
-		// Generate invoice number like PHP: 'Invoice' + random 7-digit number
-		const invoiceNumber = `Invoice${Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000}`;
+		
+		// Generate invoice number using utility function
+		const invoiceNumber = generateInvoiceNumber();
 
 		// Create draft order using the modern Shopify client
 		const draftOrder = await createSimpleDraftOrder({

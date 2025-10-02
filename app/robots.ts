@@ -102,7 +102,7 @@ export default function robots(): MetadataRoute.Robots {
 				disallow: ["/account/", "/cart", "/checkout/", "/admin/", "/api/"],
 			},
 		],
-		sitemap: `${SITE_CONFIG.url}/sitemap.xml`,
+		sitemap: `${SITE_CONFIG.url}/sitemap-index.xml`,
 		host: SITE_CONFIG.url,
 	};
 }
