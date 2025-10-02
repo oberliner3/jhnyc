@@ -5,6 +5,10 @@ const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   PRODUCT_STREAM_API: z.string().url(),
   PRODUCT_STREAM_X_KEY: z.string().min(1),
+  SHOPIFY_ACCESS_TOKEN: z.string().min(1),
+  SHOPIFY_TOKEN: z.string().optional(),
+  SHOPIFY_SHOP: z.string().optional(),
+  SHOPIFY_SHOP_NAME: z.string().optional(),
   // Add other server-side variables here
 });
 

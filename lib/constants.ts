@@ -1,5 +1,9 @@
 import { publicEnv } from "./env-validation";
 
+export { publicEnv };
+
+export const IS_DEV = process.env.NODE_ENV === "development";
+
 export const siteDomain = publicEnv.NEXT_PUBLIC_SITE_URL || "localhost:3000";
 export const siteUrl = siteDomain.startsWith("http")
 	? siteDomain
@@ -37,7 +41,7 @@ export const SITE_CONFIG = {
 		name: "originz-cookie-consent",
 		expires: 180, // days
 		sameSite: "Lax" as const,
-		secure: (publicEnv.NODE_ENV || "development") === "production",
+		secure: process.env.NODE_ENV === "production",
 		httpOnly: false, // Allow client-side access for consent management
 	},
 } as const;

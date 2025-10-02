@@ -1,24 +1,18 @@
 import { createAdminApiClient } from "@shopify/admin-api-client";
 import { serverEnv } from "@/lib/env-validation";
 
-const SHOPIFY_SHOP = serverEnv.NEXT_PUBLIC_SITE_URL.split(".")[0];
-const SHOPIFY_ACCESS_TOKEN = serverEnv.SHOPIFY_ACCESS_TOKEN;
-
-const SHOPIFY_API_URL = `https://${SHOPIFY_SHOP}.myshopify.com/api/2023-01/graphql.json`;
-
 // SECURITY: Only use server-side environment variables - NEVER expose tokens to client
 function getShopifyConfig() {
-	const env = getServerEnv();
-	const tok = env.SHOPIFY_ACCESS_TOKEN ?? env.SHOPIFY_TOKEN;
-	if (!tok || !env.SHOPIFY_SHOP || !env.SHOPIFY_SHOP_NAME) {
+	const tok = serverEnv.SHOPIFY_ACCESS_TOKEN ?? serverEnv.SHOPIFY_TOKEN;
+	if (!tok || !serverEnv.SHOPIFY_SHOP || !serverEnv.SHOPIFY_SHOP_NAME) {
 		throw new Error(
 			"Shopify configuration is missing. Provide SHOPIFY_ACCESS_TOKEN (or SHOPIFY_TOKEN), SHOPIFY_SHOP, and SHOPIFY_SHOP_NAME.",
 		);
 	}
 	return {
-		shopDomain: env.SHOPIFY_SHOP,
+		shopDomain: serverEnv.SHOPIFY_SHOP,
 		accessToken: tok,
-		shopName: env.SHOPIFY_SHOP_NAME,
+		shopName: serverEnv.SHOPIFY_SHOP_NAME,
 	};
 }
 

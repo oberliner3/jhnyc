@@ -11,7 +11,6 @@ import { ComposeProvider } from "@/lib/compose-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = React.useState(() => new QueryClient());
-  
 
   const trackingConfig = {
     enablePageViews: true,
@@ -28,16 +27,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
     anonymizeIPs: true,
   };
 
-  const providers = [
-    <QueryClientProvider client={queryClient} key="query" />,
-    <ExperienceTrackingProvider
-      config={trackingConfig}
-      disabled={!publicEnv.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED}
-      key="experience"
-    />,
-    <AuthProvider key="auth" />,
-    <CartProvider key="cart" />,
-    <PWAProvider key="pwa" />,
+  // An array of providers and their props.
+  // This makes it easy to add or remove providers without changing the nesting structure.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const providers: [React.ComponentType<any>, Record<string, any>][] = [
+    [QueryClientProvider, { client: queryClient }],
+    [
+      ExperienceTrackingProvider,
+      {
+        config: trackingConfig,
+        disabled: !publicEnv.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED,
+      },
+    ],
+    [AuthProvider, {}],
+    [CartProvider, {}],
+    [PWAProvider, {}],
   ];
 
   return <ComposeProvider providers={providers}>{children}</ComposeProvider>;
