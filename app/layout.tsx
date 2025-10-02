@@ -9,8 +9,7 @@ import DevToolsBlocker from "@/components/common/dev-tools-blocker";
 import ErrorBoundary from "@/components/common/error-boundary";
 import { WebsiteSchema } from "@/components/common/website-schema";
 import { Toaster } from "@/components/ui/sonner";
-import { MessagePackMonitor } from "@/components/admin/msgpack-monitor";
-import { ChatWidgetProvider } from "@/components/chat/chat-widget-provider";
+
 import { env } from "@/lib/env-validation";
 import { Providers } from "./providers";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
