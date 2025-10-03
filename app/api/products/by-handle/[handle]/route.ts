@@ -8,7 +8,7 @@ export async function GET(
 	context: any,
 ) {
 	try {
-		const { handle } = context.params;
+		const { handle } = (await context.params);
 
 		// Use optimized MessagePack loader with SSR context
 		const product = await loadProductByHandle(handle, { context: 'ssr' });
@@ -39,7 +39,7 @@ export async function GET(
 		return response;
 	} catch (error) {
 		console.error(
-			`[API] Failed to fetch product with handle ${context.params.handle} from external API:`,
+			`[API] Failed to fetch product with handle ${(await context.params).handle} from external API:`,
 			error,
 		);
 		return NextResponse.json(

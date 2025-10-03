@@ -10,5 +10,6 @@
 	"Codegeex.CommitMessageStyle": "ConventionalCommits",
 	"Codegeex.CommitMessage.LanguagePreference": "English",
 	"Codegeex.GenerationPreference": "automatic",
-	"Codegeex.SidebarUI.LanguagePreference": "English"
+	"Codegeex.SidebarUI.LanguagePreference": "English",
+	"Codegeex.RepoIndex": true
 }
