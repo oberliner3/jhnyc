@@ -351,123 +351,140 @@ interface DraftOrderRequestBody {
 
 export async function POST(request: NextRequest) {
 	try {
-		const body: DraftOrderRequestBody = await request.json();
+    // Validate Shopify configuration first
+    try {
+      getShopifyConfig();
+    } catch (configError) {
+      console.error("Shopify configuration error:", configError);
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            configError instanceof Error
+              ? configError.message
+              : "Shopify configuration is missing or invalid",
+        },
+        { status: 500 }
+      );
+    }
 
-		const {
-			lineItems,
-			customerEmail,
-			customerFirstName,
-			customerLastName,
-			customerPhone,
-			shippingAddress,
-			billingAddress,
-			note,
-			tags,
-			sendInvoice = false,
-			invoiceData,
-		} = body;
+    const body: DraftOrderRequestBody = await request.json();
 
-		// Validation
-		if (!lineItems || !Array.isArray(lineItems) || lineItems.length === 0) {
-			return NextResponse.json(
-				{ success: false, error: "Line items are required" },
-				{ status: 400 },
-			);
-		}
+    const {
+      lineItems,
+      customerEmail,
+      customerFirstName,
+      customerLastName,
+      customerPhone,
+      shippingAddress,
+      billingAddress,
+      note,
+      tags,
+      sendInvoice = false,
+      invoiceData,
+    } = body;
 
-		// Validate line items
-		for (const item of lineItems) {
-			if (!item.quantity || item.quantity < 1) {
-				return NextResponse.json(
-					{
-						success: false,
-						error: "Each line item must have a valid quantity",
-					},
-					{ status: 400 },
-				);
-			}
-		}
+    // Validation
+    if (!lineItems || !Array.isArray(lineItems) || lineItems.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "Line items are required" },
+        { status: 400 }
+      );
+    }
 
-		// Build draft order data
-		const draftOrderData: DraftOrderInput = {
-			line_items: lineItems.map(
-				(item): DraftOrderLineItem => ({
-					title: item.title,
-					variant_id: item.variantId,
-					product_id: item.productId,
-					quantity: item.quantity,
-					price: item.price ? parseFloat(item.price) : undefined,
-					sku: item.sku,
-					grams: item.grams,
-					taxable: item.taxable,
-					requires_shipping: item.requiresShipping,
-				}),
-			),
-			...(customerEmail && {
-				customer: {
-					email: customerEmail,
-					first_name: customerFirstName,
-					last_name: customerLastName,
-					phone: customerPhone,
-				},
-				email: customerEmail,
-			}),
-			...(shippingAddress && { shipping_address: shippingAddress }),
-			...(billingAddress && { billing_address: billingAddress }),
-			...(note && { note }),
-			...(tags && { tags }),
-			use_customer_default_address: !shippingAddress,
-		};
+    // Validate line items
+    for (const item of lineItems) {
+      if (!item.quantity || item.quantity < 1) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Each line item must have a valid quantity",
+          },
+          { status: 400 }
+        );
+      }
+    }
 
-		// Create the draft order
-		const draftOrder = await createDraftOrder(draftOrderData);
+    // Build draft order data
+    const draftOrderData: DraftOrderInput = {
+      line_items: lineItems.map(
+        (item): DraftOrderLineItem => ({
+          title: item.title,
+          variant_id: item.variantId,
+          product_id: item.productId,
+          quantity: item.quantity,
+          price: item.price ? parseFloat(item.price) : undefined,
+          sku: item.sku,
+          grams: item.grams,
+          taxable: item.taxable,
+          requires_shipping: item.requiresShipping,
+        })
+      ),
+      ...(customerEmail && {
+        customer: {
+          email: customerEmail,
+          first_name: customerFirstName,
+          last_name: customerLastName,
+          phone: customerPhone,
+        },
+        email: customerEmail,
+      }),
+      ...(shippingAddress && { shipping_address: shippingAddress }),
+      ...(billingAddress && { billing_address: billingAddress }),
+      ...(note && { note }),
+      ...(tags && { tags }),
+      use_customer_default_address: !shippingAddress,
+    };
 
-		let invoiceSent = false;
-		let invoiceError = null;
+    // Create the draft order
+    const draftOrder = await createDraftOrder(draftOrderData);
 
-		// Send invoice if requested
-		if (sendInvoice && draftOrder.id && customerEmail) {
-			try {
-				await sendDraftOrderInvoice(draftOrder.id, {
-					to: customerEmail,
-					subject:
-						invoiceData?.subject ||
-						`Invoice #${draftOrder.name || draftOrder.id}`,
-					customMessage: invoiceData?.customMessage,
-					from: invoiceData?.from,
-				});
-				invoiceSent = true;
-			} catch (error) {
-				console.error("Failed to send invoice:", error);
-				invoiceError =
-					error instanceof Error ? error.message : "Failed to send invoice";
-			}
-		}
+    let invoiceSent = false;
+    let invoiceError = null;
 
-		const responseData = {
-			success: true,
-			draftOrder: {
-				id: draftOrder.id,
-				name: draftOrder.name,
-				invoiceUrl: draftOrder.invoiceUrl,
-				totalPrice: draftOrder.totalPrice,
-				subtotalPrice: draftOrder.subtotalPrice,
-				totalTax: draftOrder.totalTax,
-				currencyCode: draftOrder.currencyCode,
-				customer: draftOrder.customer,
-				note: draftOrder.note,
-				tags: draftOrder.tags,
-				createdAt: draftOrder.createdAt,
-				updatedAt: draftOrder.updatedAt,
-			},
-			invoiceSent,
-			...(invoiceError && { invoiceError }),
-		};
+    // Send invoice if requested
+    if (sendInvoice && draftOrder.id && customerEmail) {
+      try {
+        await sendDraftOrderInvoice(draftOrder.id, {
+          to: customerEmail,
+          subject:
+            invoiceData?.subject ||
+            `Invoice #${draftOrder.name || draftOrder.id}`,
+          customMessage: invoiceData?.customMessage,
+          from: invoiceData?.from,
+        });
+        invoiceSent = true;
+      } catch (error) {
+        console.error("Failed to send invoice:", error);
+        invoiceError =
+          error instanceof Error ? error.message : "Failed to send invoice";
+      }
+    }
 
-		// Removed MessagePack encoding for outgoing responses as per new architecture
-		// If MessagePack is still desired for generic API communication, it should be handled by a generic utility.
-		return NextResponse.json(responseData);
-	} catch (error) {
+    const responseData = {
+      success: true,
+      draftOrder: {
+        id: draftOrder.id,
+        name: draftOrder.name,
+        invoiceUrl: draftOrder.invoiceUrl,
+        totalPrice: draftOrder.totalPrice,
+        subtotalPrice: draftOrder.subtotalPrice,
+        totalTax: draftOrder.totalTax,
+        currencyCode: draftOrder.currencyCode,
+        customer: draftOrder.customer,
+        note: draftOrder.note,
+        tags: draftOrder.tags,
+        createdAt: draftOrder.createdAt,
+        updatedAt: draftOrder.updatedAt,
+      },
+      invoiceSent,
+      ...(invoiceError && { invoiceError }),
+    };
+
+    // Removed MessagePack encoding for outgoing responses as per new architecture
+    // If MessagePack is still desired for generic API communication, it should be handled by a generic utility.
+    return NextResponse.json(responseData);
+  } catch (error) {
 		console.error("Draft order creation error:", error);
 		return NextResponse.json(
 			{

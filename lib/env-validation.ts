@@ -4,7 +4,7 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-    PRODUCT_STREAM_API: z.string().url(),
+    PRODUCT_STREAM_API: z.url(),
     PRODUCT_STREAM_X_KEY: z.string().min(1),
     SHOPIFY_ACCESS_TOKEN: z.string().min(1),
     SHOPIFY_TOKEN: z.string().optional(),
@@ -12,9 +12,9 @@ export const env = createEnv({
     SHOPIFY_SHOP_NAME: z.string().optional(),
   },
   client: {
-    NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
+    NEXT_PUBLIC_SUPABASE_URL: z.url(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
-    NEXT_PUBLIC_SITE_URL: z.string().url(),
+    NEXT_PUBLIC_SITE_URL: z.url(),
     NEXT_PUBLIC_STORE_NAME: z.string().min(1),
     NEXT_PUBLIC_CHAT_WIDGET_ENABLED: z.preprocess(
       (str) => str === "true" || str === "1",

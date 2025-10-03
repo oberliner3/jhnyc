@@ -88,6 +88,7 @@ export function BuyNowButton({
 
   return (
     <form
+      action="/api/buy-now"
       action={async (formData) => {
         try {
           await buyNowAction(formData);
@@ -95,7 +96,6 @@ export function BuyNowButton({
           handleError(error);
         }
       }}
-      onSubmit={handleSubmit}
       className={style === 'full-width' ? 'w-full' : ''}
     >
       <input

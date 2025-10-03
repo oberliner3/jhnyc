@@ -82,14 +82,33 @@ export async function buyNowAction(formData: FormData): Promise<never> {
       }
     );
 
+    // Read response body as text first (can only read once)
+    const responseText = await response.text();
+
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorMessage = "Failed to create draft order via API.";
+      try {
+        const errorData = JSON.parse(responseText);
+        errorMessage = errorData.error || errorMessage;
+      } catch (parseError) {
+        // If response is not JSON, show the text
+        errorMessage = `API returned non-JSON response (${
+          response.status
+        }): ${responseText.substring(0, 200)}`;
+      }
+      throw new Error(errorMessage);
+    }
+
+    // Parse the successful response
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (parseError) {
       throw new Error(
-        errorData.error || "Failed to create draft order via API."
+        `API returned invalid JSON response: ${responseText.substring(0, 200)}`
       );
     }
 
-    const responseData = await response.json();
     const draftOrder = responseData.draftOrder;
 
     if (!draftOrder?.invoiceUrl) {
@@ -133,111 +152,130 @@ export async function buyNowAction(formData: FormData): Promise<never> {
  * Enhanced with comprehensive validation and error handling.
  */
 export async function checkoutCartAction(
-	cartItems: ClientCartItem[],
-	utmParams?: {
-		source?: string;
-		medium?: string;
-		campaign?: string;
-	}
+  cartItems: ClientCartItem[],
+  utmParams?: {
+    source?: string;
+    medium?: string;
+    campaign?: string;
+  }
 ): Promise<never> {
-	try {
-		// Validate cart items
-		if (!cartItems || cartItems.length === 0) {
-			throw new Error("Cart is empty. Please add items before checkout.");
-		}
+  try {
+    // Validate cart items
+    if (!cartItems || cartItems.length === 0) {
+      throw new Error("Cart is empty. Please add items before checkout.");
+    }
 
-		// Validate each cart item
-		for (const item of cartItems) {
-			if (!item.product?.id) {
-				throw new Error("Invalid product in cart");
-			}
-			if (!item.variant?.id) {
-				throw new Error("Invalid variant in cart");
-			}
-			if (!Number.isFinite(item.variant.price) || item.variant.price <= 0) {
-				throw new Error(`Invalid price for ${item.product.title}`);
-			}
-			if (
-				!Number.isFinite(item.quantity) ||
-				item.quantity < LIMITS.MIN_QUANTITY_PER_ITEM ||
-				item.quantity > LIMITS.MAX_QUANTITY_PER_ITEM
-			) {
-				throw new Error(
-					`Invalid quantity for ${item.product.title}. Must be between ${LIMITS.MIN_QUANTITY_PER_ITEM} and ${LIMITS.MAX_QUANTITY_PER_ITEM}`,
-				);
-			}
-		}
+    // Validate each cart item
+    for (const item of cartItems) {
+      if (!item.product?.id) {
+        throw new Error("Invalid product in cart");
+      }
+      if (!item.variant?.id) {
+        throw new Error("Invalid variant in cart");
+      }
+      if (!Number.isFinite(item.variant.price) || item.variant.price <= 0) {
+        throw new Error(`Invalid price for ${item.product.title}`);
+      }
+      if (
+        !Number.isFinite(item.quantity) ||
+        item.quantity < LIMITS.MIN_QUANTITY_PER_ITEM ||
+        item.quantity > LIMITS.MAX_QUANTITY_PER_ITEM
+      ) {
+        throw new Error(
+          `Invalid quantity for ${item.product.title}. Must be between ${LIMITS.MIN_QUANTITY_PER_ITEM} and ${LIMITS.MAX_QUANTITY_PER_ITEM}`
+        );
+      }
+    }
 
-		// Extract UTM parameters with defaults
-		const utmSource = utmParams?.source || "cart";
-		const utmMedium = utmParams?.medium || "checkout";
-		const utmCampaign = utmParams?.campaign || "cart-checkout";
+    // Extract UTM parameters with defaults
+    const utmSource = utmParams?.source || "cart";
+    const utmMedium = utmParams?.medium || "checkout";
+    const utmCampaign = utmParams?.campaign || "cart-checkout";
 
-		// Generate invoice number
-		const invoiceNumber = generateInvoiceNumber();
+    // Generate invoice number
+    const invoiceNumber = generateInvoiceNumber();
 
-		// Prepare line items for the draft order
-		const lineItems = cartItems.map((item) => ({
-			productTitle: item.product.title,
-			variantId: item.variant.id,
-			productId: item.product.id,
-			price: item.variant.price,
-			quantity: item.quantity,
-		}));
+    // Prepare line items for the draft order
+    const lineItems = cartItems.map((item) => ({
+      productTitle: item.product.title,
+      variantId: item.variant.id,
+      productId: item.product.id,
+      price: item.variant.price,
+      quantity: item.quantity,
+    }));
 
-		// Prepare the payload for the /api/draft-orders endpoint
-		const payload = {
-			lineItems,
-			tags: `${utmSource},${utmMedium},${utmCampaign},${invoiceNumber}`,
-		};
+    // Prepare the payload for the /api/draft-orders endpoint
+    const payload = {
+      lineItems,
+      tags: `${utmSource},${utmMedium},${utmCampaign},${invoiceNumber}`,
+    };
 
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_SITE_URL}/api/draft-orders`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(payload),
-			}
-		);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/draft-orders`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(
-				errorData.error || "Failed to create draft order via API."
-			);
-		}
+    // Read response body as text first (can only read once)
+    const responseText = await response.text();
 
-		const responseData = await response.json();
-		const draftOrder = responseData.draftOrder;
+    if (!response.ok) {
+      let errorMessage = "Failed to create draft order via API.";
+      try {
+        const errorData = JSON.parse(responseText);
+        errorMessage = errorData.error || errorMessage;
+      } catch (parseError) {
+        // If response is not JSON, show the text
+        errorMessage = `API returned non-JSON response (${
+          response.status
+        }): ${responseText.substring(0, 200)}`;
+      }
+      throw new Error(errorMessage);
+    }
 
-		if (!draftOrder?.invoiceUrl) {
-			throw new Error("No invoice URL returned from draft order API.");
-		}
+    // Parse the successful response
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (parseError) {
+      throw new Error(
+        `API returned invalid JSON response: ${responseText.substring(0, 200)}`
+      );
+    }
 
-		// Append tracking parameters to the invoice URL
-		const finalUrl = new URL(draftOrder.invoiceUrl);
+    const draftOrder = responseData.draftOrder;
 
-		// UTM parameters
-		finalUrl.searchParams.set("utm_source", utmSource);
-		finalUrl.searchParams.set("utm_medium", utmMedium);
-		finalUrl.searchParams.set("utm_campaign", utmCampaign);
+    if (!draftOrder?.invoiceUrl) {
+      throw new Error("No invoice URL returned from draft order API.");
+    }
 
-		// Add invoice number for tracking
-		finalUrl.searchParams.set("invoice", invoiceNumber);
+    // Append tracking parameters to the invoice URL
+    const finalUrl = new URL(draftOrder.invoiceUrl);
 
-		// Redirect to the invoice URL for payment
-		redirect(finalUrl.toString());
-	} catch (error) {
-		logError(error instanceof Error ? error : new Error("Unknown error"), {
-			context: "checkoutCartAction",
-			itemCount: cartItems?.length || 0,
-		});
+    // UTM parameters
+    finalUrl.searchParams.set("utm_source", utmSource);
+    finalUrl.searchParams.set("utm_medium", utmMedium);
+    finalUrl.searchParams.set("utm_campaign", utmCampaign);
 
-		// Re-throw with user-friendly message
-		throw new Error(
-			error instanceof Error ? error.message : ERROR_MESSAGES.SERVER_ERROR
-		);
-	}
+    // Add invoice number for tracking
+    finalUrl.searchParams.set("invoice", invoiceNumber);
+
+    // Redirect to the invoice URL for payment
+    redirect(finalUrl.toString());
+  } catch (error) {
+    logError(error instanceof Error ? error : new Error("Unknown error"), {
+      context: "checkoutCartAction",
+      itemCount: cartItems?.length || 0,
+    });
+
+    // Re-throw with user-friendly message
+    throw new Error(
+      error instanceof Error ? error.message : ERROR_MESSAGES.SERVER_ERROR
+    );
+  }
 }
