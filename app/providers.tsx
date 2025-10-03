@@ -21,7 +21,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   const providers: ProviderWithProps[] = [
     [ErrorBoundary, {}],
-    [DevToolsBlocker, {}],
+    // [DevToolsBlocker, {}],
     [
       (props: { children: React.ReactNode }) => (
         <QueryClientProvider client={queryClient} {...props} />

@@ -3,13 +3,15 @@
 import { Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { toast } from "sonner";
 import { EmptyCart } from "@/components/cart/empty-cart";
 import { QuantityInput } from "@/components/cart/quantity-input";
 import { CartSkeleton } from "@/components/skeletons/cart-skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/cart-context";
+import { checkoutCartAction } from "@/lib/actions";
 import { getProductPlaceholder } from "@/lib/placeholder";
 import { formatPrice } from "@/lib/utils";
 
@@ -17,11 +19,41 @@ export const dynamic = "force-dynamic";
 
 function CartContent() {
   const { items, removeItem, updateQuantity, getTotalPrice } = useCart();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const subtotal = getTotalPrice();
   const shipping = subtotal > 50 ? 0 : 9.99;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
+
+  const handleCheckout = async () => {
+    if (items.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    setIsCheckingOut(true);
+    try {
+      // Extract UTM parameters from URL if available
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmParams = {
+        source: urlParams.get("utm_source") || undefined,
+        medium: urlParams.get("utm_medium") || undefined,
+        campaign: urlParams.get("utm_campaign") || undefined,
+      };
+
+      await checkoutCartAction(items, utmParams);
+      // If successful, the action will redirect to payment page
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Checkout failed. Please try again."
+      );
+      setIsCheckingOut(false);
+    }
+  };
 
   if (items.length === 0) {
     return <EmptyCart />;
@@ -110,8 +142,13 @@ function CartContent() {
             <span>{formatPrice(total)}</span>
           </div>
         </div>
-        <Button className="mt-6 w-full" size="lg" asChild>
-          <Link href="/checkout">Proceed to Checkout</Link>
+        <Button
+          className="mt-6 w-full"
+          size="lg"
+          onClick={handleCheckout}
+          disabled={isCheckingOut}
+        >
+          {isCheckingOut ? "Processing..." : "Proceed to Checkout"}
         </Button>
         <p className="mt-2 text-muted-foreground text-xs text-center">
           Shipping calculated at checkout
