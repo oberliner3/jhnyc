@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
 import type { Address } from "@/lib/types";
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 interface Profile {
 	id: string;
 	full_name: string;

@@ -10,6 +10,7 @@ import { ProductSchema } from "@/components/common/product-schema";
 import { notFound } from "next/navigation";
 
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 interface ProductPageProps {
 	params: Promise<{ handle: string }>;

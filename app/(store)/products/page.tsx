@@ -6,6 +6,9 @@ import { getAllProducts } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import type { ApiProduct } from "@/lib/types";
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 function ProductsList() {
 	const [products, setProducts] = useState<ApiProduct[]>([]);
 	const [page, setPage] = useState(1);

@@ -42,3 +42,4 @@ yarn-error.log*
 next-env.d.ts
 backup_local_env
 backup_local_env
+.env*.local

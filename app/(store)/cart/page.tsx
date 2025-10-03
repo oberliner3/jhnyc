@@ -13,6 +13,9 @@ import { formatPrice } from "@/lib/utils";
 import { getProductPlaceholder } from "@/lib/placeholder";
 import { QuantityInput } from "@/components/cart/quantity-input";
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 function CartContent() {
 	const { items, removeItem, updateQuantity, getTotalPrice } = useCart();
 

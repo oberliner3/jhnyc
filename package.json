@@ -5,9 +5,21 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
+    "build:analyze": "ANALYZE=true next build --turbopack",
+    "build:no-cache": "next build --turbopack --no-cache",
     "check-types": "tsc --noemit",
     "start": "next start",
-    "lint": "tsc --noemit && eslint ."
+    "lint": "tsc --noemit && eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:check": "eslint . --max-warnings 0",
+    "type-check": "tsc --noemit",
+    "clean": "rm -rf .next out dist",
+    "clean:all": "rm -rf .next out dist node_modules pnpm-lock.yaml",
+    "env:dev": "cp .env.dev .env.local",
+    "env:check": "node -e \"console.log('Environment check:'); require('dotenv').config({path: '.env.dev'}); console.log('Redis URL:', process.env.UPSTASH_REDIS_REST_URL ? 'Set' : 'Missing'); console.log('Redis Token:', process.env.UPSTASH_REDIS_REST_TOKEN ? 'Set' : 'Missing');\"",
+    "test": "echo \"No tests configured\" && exit 0",
+    "preview": "next build && next start",
+    "postinstall": "echo \"Installation complete. Run 'pnpm env:dev' to set up environment variables.\""
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

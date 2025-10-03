@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signin } from "./actions";
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 export default function LoginPage() {
 	const emailId = useId();
 	const passwordId = useId();

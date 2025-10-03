@@ -2,6 +2,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/layout/page-layout";
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 export default function NotFound() {
 	return (
 		<PageLayout

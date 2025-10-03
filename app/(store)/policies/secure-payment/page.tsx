@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: 'Learn about our secure payment processing, accepted payment methods, and security measures.',
 };
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 const securityFeatures = [
   {
     icon: Lock,

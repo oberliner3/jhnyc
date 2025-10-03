@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   description: 'Learn about how we use cookies and similar technologies on our website.',
 };
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 export default function CookiePage() {
   return (
     <div className="min-h-screen bg-background">

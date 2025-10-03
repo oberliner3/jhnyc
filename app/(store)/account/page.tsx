@@ -10,6 +10,9 @@ export const metadata: Metadata = generateSEO({
 	path: "/account",
 });
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 export default function AccountPage() {
 	return (
 		<Suspense fallback={<AccountDashboardSkeleton />}>

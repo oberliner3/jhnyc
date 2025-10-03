@@ -8,6 +8,7 @@ import { Reviews } from "@/components/sections/reviews";
 import { generateSEO } from "@/lib/seo";
 
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata = generateSEO({
 	title: "Premium E-Commerce Store",

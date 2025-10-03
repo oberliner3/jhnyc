@@ -1,14 +1,39 @@
 import { Redis } from '@upstash/redis';
 
-// Initialize Redis client
-export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+// Initialize Redis client with fallback handling
+let redis: Redis | null = null;
+
+try {
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  
+  if (redisUrl && redisToken) {
+    redis = new Redis({
+      url: redisUrl,
+      token: redisToken,
+    });
+    console.log('✅ Redis client initialized successfully');
+  } else {
+    console.warn('⚠️ Redis configuration missing. Caching will be disabled.');
+    console.warn('Missing:', {
+      url: !redisUrl,
+      token: !redisToken
+    });
+  }
+} catch (error) {
+  console.error('❌ Failed to initialize Redis client:', error);
+  redis = null;
+}
+
+export { redis };
 
 // Cache utilities with error handling
 export const cache = {
   async get<T>(key: string): Promise<T | null> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache get');
+      return null;
+    }
     try {
       const data = await redis.get(key);
       return data as T;
@@ -19,6 +44,10 @@ export const cache = {
   },
 
   async set<T>(key: string, value: T, ttl: number = 300): Promise<void> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache set');
+      return;
+    }
     try {
       await redis.setex(key, ttl, value);
     } catch (error) {
@@ -27,6 +56,10 @@ export const cache = {
   },
 
   async del(key: string): Promise<void> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache del');
+      return;
+    }
     try {
       await redis.del(key);
     } catch (error) {
@@ -35,6 +68,10 @@ export const cache = {
   },
 
   async keys(pattern: string): Promise<string[]> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache keys');
+      return [];
+    }
     try {
       return await redis.keys(pattern);
     } catch (error) {
@@ -44,6 +81,10 @@ export const cache = {
   },
 
   async exists(key: string): Promise<boolean> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache exists');
+      return false;
+    }
     try {
       const result = await redis.exists(key);
       return result === 1;
@@ -54,6 +95,10 @@ export const cache = {
   },
 
   async ttl(key: string): Promise<number> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache ttl');
+      return -1;
+    }
     try {
       return await redis.ttl(key);
     } catch (error) {
@@ -67,6 +112,10 @@ export const cache = {
 export const invalidateCache = {
   // Invalidate product-related caches
   async products(): Promise<void> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache invalidation');
+      return;
+    }
     try {
       const keys = await redis.keys('products:*');
       if (keys.length > 0) {
@@ -80,6 +129,10 @@ export const invalidateCache = {
 
   // Invalidate specific product
   async product(productId: string): Promise<void> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache invalidation');
+      return;
+    }
     try {
       const keys = await redis.keys(`products:*${productId}*`);
       if (keys.length > 0) {
@@ -92,6 +145,10 @@ export const invalidateCache = {
 
   // Invalidate collection caches
   async collections(): Promise<void> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache invalidation');
+      return;
+    }
     try {
       const keys = await redis.keys('collections:*');
       if (keys.length > 0) {
@@ -105,6 +162,10 @@ export const invalidateCache = {
 
   // Clear all caches (admin function)
   async all(): Promise<void> {
+    if (!redis) {
+      console.warn('Redis not available, skipping cache clear');
+      return;
+    }
     try {
       await redis.flushdb();
       console.log('🗑️ Cleared all cache entries');
@@ -134,6 +195,16 @@ export const cacheKeys = {
 
 // Cache statistics
 export const getCacheStats = async () => {
+  if (!redis) {
+    console.warn('Redis not available, returning empty cache stats');
+    return {
+      totalKeys: 0,
+      productKeys: 0,
+      collectionKeys: 0,
+      searchKeys: 0,
+    };
+  }
+  
   try {
     const keys = await redis.keys('*');
     const stats = {

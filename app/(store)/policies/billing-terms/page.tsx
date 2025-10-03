@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   description: 'Understand our billing policies, payment terms, and conditions for all transactions.',
 };
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 export default function BillingTermsPage() {
   return (
     <div className="min-h-screen bg-background">

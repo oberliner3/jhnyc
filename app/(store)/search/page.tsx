@@ -6,6 +6,9 @@ import { ProductCard } from "@/components/product/product-card";
 import { searchProducts } from "@/lib/api";
 import type { ApiProduct } from "@/lib/types";
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 async function getSearchResults(query: string): Promise<ApiProduct[]> {
 	// Query Cosmos directly and map to internal Product type
 	const apiProducts = await searchProducts(query);

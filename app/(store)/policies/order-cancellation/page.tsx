@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   description: 'Learn about our order cancellation policies and procedures.',
 };
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 export default function OrderCancellationPage() {
   return (
     <div className="min-h-screen bg-background">

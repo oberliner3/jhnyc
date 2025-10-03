@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
 import {
 	Select,
 	SelectContent,

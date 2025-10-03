@@ -7,6 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { DraftOrder } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 
+// Force dynamic rendering to prevent prerender issues
+export const dynamic = 'force-dynamic';
+
 async function getOrders(): Promise<DraftOrder[]> {
 	const res = await fetch("/api/orders");
 	if (!res.ok) {
