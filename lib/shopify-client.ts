@@ -29,7 +29,12 @@ export const getAccessToken = () => {
   return getShopifyConfig().accessToken;
 };
 
-// Type definitions for our draft order creation
+// Type definitions
+type ShopifyUserError = { 
+  field?: string[]; 
+  message: string; 
+};
+
 export interface DraftOrderLineItem {
   title?: string;
   variant_id?: string | number;
@@ -125,7 +130,6 @@ function toGraphqlDraftOrderInput(input: DraftOrderInput) {
       : {}),
     quantity: li.quantity,
     ...(li.title ? { title: li.title } : {}),
-    // originalUnitPrice lets us set a custom price per line item
     ...(li.price !== undefined ? { originalUnitPrice: String(li.price) } : {}),
   }));
 
@@ -192,7 +196,6 @@ function toGraphqlDraftOrderInput(input: DraftOrderInput) {
     ...(input.email ? { email: input.email } : {}),
     ...(input.note ? { note: input.note } : {}),
     useCustomerDefaultAddress: Boolean(input.use_customer_default_address),
-    // tags: Shopify GraphQL expects [String], but we stored it as a single string
     ...(input.tags
       ? {
           tags: input.tags
@@ -204,7 +207,7 @@ function toGraphqlDraftOrderInput(input: DraftOrderInput) {
   };
 }
 
-async function shopifyFetch(query: string, variables: Record<string, any>) {
+async function shopifyFetch(query: string, variables: Record<string, unknown>) {
     const { shopDomain, accessToken } = getShopifyConfig();
     const apiUrl = `https://${shopDomain}/admin/api/2024-01/graphql.json`;
 
@@ -262,7 +265,7 @@ export async function createDraftOrder(orderData: DraftOrderInput) {
     }
 
     if (draftOrderCreate.userErrors && draftOrderCreate.userErrors.length > 0) {
-      throw new Error(`Shopify API errors: ${draftOrderCreate.userErrors.map((e: any) => e.message).join(", ")}`);
+      throw new Error(`Shopify API errors: ${draftOrderCreate.userErrors.map((e: ShopifyUserError) => e.message).join(", ")}`);
     }
 
     return draftOrderCreate.draftOrder;
@@ -320,7 +323,7 @@ export async function sendDraftOrderInvoice(
     }
 
     if (draftOrderInvoiceSend.userErrors && draftOrderInvoiceSend.userErrors.length > 0) {
-      throw new Error(`Shopify API errors: ${draftOrderInvoiceSend.userErrors.map((e: any) => e.message).join(", ")}`);
+      throw new Error(`Shopify API errors: ${draftOrderInvoiceSend.userErrors.map((e: ShopifyUserError) => e.message).join(", ")}`);
     }
 
     return draftOrderInvoiceSend.draftOrder;

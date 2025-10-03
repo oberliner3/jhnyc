@@ -107,6 +107,7 @@ export interface ApiProduct {
 	created_at: string;
 	updated_at: string;
 	quantity?: number;
+	raw_json?: string;
 }
 
 export interface ApiProductImage {

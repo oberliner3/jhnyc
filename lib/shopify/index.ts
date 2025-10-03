@@ -1,13 +1,11 @@
 // Unified Shopify service interface
-export {
+	export {
 	createDraftOrder,
 	sendDraftOrderInvoice,
 	createSimpleDraftOrder,
-	getShopifyAdmin,
 	getShopDomain,
 	getAccessToken,
 } from "../shopify-client";
-
 export type {
 	DraftOrderInput,
 	DraftOrderLineItem,

@@ -3,15 +3,12 @@
 import {
   ChevronLeft,
   ChevronRight,
-  Minus,
-  Plus,
   RefreshCw,
   Shield,
   Truck,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 import { ProductSchema } from "@/components/common/product-schema";
 import { SafeHtml } from "@/components/common/safe-html";
 import { BuyNowButton } from "@/components/product/buy-now-button";
@@ -22,8 +19,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -32,8 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { useCart } from "@/contexts/cart-context";
-import type { ApiProduct, ApiProductVariant } from "@/lib/types";
+import type { ApiProduct } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 
 import { useProductVariants } from "@/hooks/use-product-variants";
@@ -44,22 +38,13 @@ interface ProductDetailsClientProps {
 
 export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
   const { 
-    variants,
-    options,
     selectedVariant,
     selectedOptions,
     handleOptionChange 
   } = useProductVariants(product);
-  const { addItem } = useCart();
 
-  const [quantity, setQuantity] = useState(1);
+  const [quantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-
-  const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity >= 1 && newQuantity <= 99) {
-      setQuantity(newQuantity);
-    }
-  };
 
   const discountPercentage =
     product.compare_at_price && selectedVariant

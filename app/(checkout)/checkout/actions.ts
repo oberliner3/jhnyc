@@ -43,6 +43,8 @@ export async function handleCheckout(data: CheckoutData, sessionId: string) {
 	try {
 		const supabase = await createClient();
 
+		const { id: anonymousCartId } = await getOrCreateAnonymousCart(sessionId);
+
 		const {
 			data: { user },
 		} = await supabase.auth.getUser();

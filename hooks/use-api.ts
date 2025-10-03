@@ -1,22 +1,10 @@
 import { useState, useCallback } from "react";
+import { decode } from "msgpack-javascript";
 import { ApiError, ApiResponse, createApiResponse } from "@/lib/errors";
 
 interface UseApiOptions {
-  /**
-   * Enable automatic error toasts
-   * @default true
-   */
   showErrorToasts?: boolean;
-  
-  /**
-   * Default error message when no specific message is available
-   * @default "An unexpected error occurred"
-   */
   defaultErrorMessage?: string;
-  
-  /**
-   * Callback for handling errors
-   */
   onError?: (error: ApiError) => void;
 }
 
@@ -27,27 +15,6 @@ interface ApiState<T> {
   isSuccess: boolean;
 }
 
-/**
- * Hook for making API calls with consistent error handling
- * 
- * @example
- * ```tsx
- * const { data, isLoading, error, fetchData } = useApi<Product[]>();
- * 
- * // Simple GET request
- * useEffect(() => {
- *   fetchData('/api/products');
- * }, [fetchData]);
- * 
- * // POST request with body
- * const handleSubmit = () => {
- *   fetchData('/api/products', {
- *     method: 'POST',
- *     body: JSON.stringify({ name: 'New Product' })
- *   });
- * };
- * ```
- */
 export function useApi<T = unknown>(options: UseApiOptions = {}) {
   const {
     showErrorToasts = true,
@@ -64,11 +31,8 @@ export function useApi<T = unknown>(options: UseApiOptions = {}) {
 
   const handleError = useCallback((error: ApiError) => {
     if (showErrorToasts) {
-      // Use toast notification system if available
       if (typeof window !== 'undefined' && window.document) {
         console.error(`API Error: ${error.message || defaultErrorMessage}`);
-        // You could integrate with your toast system here
-        // toast.error(error.message || defaultErrorMessage);
       }
     }
     
@@ -88,6 +52,7 @@ export function useApi<T = unknown>(options: UseApiOptions = {}) {
         ...options,
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/x-msgpack, application/json;q=0.9',
           ...options.headers,
         },
       });
@@ -95,32 +60,30 @@ export function useApi<T = unknown>(options: UseApiOptions = {}) {
       const contentType = response.headers.get('Content-Type') || '';
       let data: unknown;
       
-      if (contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        data = await response.text();
-      }
-
       if (!response.ok) {
+        const errorBody = await response.json().catch(() => response.text());
+        type ErrorBody = { message?: string; };
         const apiError: ApiError = {
-          message: (data as { message?: string })?.message || `Error ${response.status}: ${response.statusText}`,
+          message: (errorBody as ErrorBody)?.message || `Error ${response.status}: ${response.statusText}`,
           status: response.status,
           endpoint: url,
           timestamp: new Date().toISOString()
         };
         
-        setState(prev => ({ 
-          ...prev, 
-          isLoading: false, 
-          error: apiError,
-          isSuccess: false
-        }));
-        
+        setState(prev => ({ ...prev, isLoading: false, error: apiError, isSuccess: false }));
         handleError(apiError);
         return createApiResponse<T>(undefined, apiError);
       }
 
-      // Type guard for ApiResponse format
+      if (contentType.includes('application/x-msgpack')) {
+        const arrayBuffer = await response.arrayBuffer();
+        data = decode(arrayBuffer);
+      } else if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
+
       const isApiResponse = (obj: unknown): obj is ApiResponse<T> => {
         return (
           obj !== null &&
@@ -130,40 +93,18 @@ export function useApi<T = unknown>(options: UseApiOptions = {}) {
         );
       };
 
-      // Handle responses that are already in ApiResponse format
       if (isApiResponse(data)) {
         if (data.error) {
-          setState(prev => ({ 
-            ...prev, 
-            isLoading: false, 
-            error: data.error ?? null,
-            isSuccess: false
-          }));
-          
+          setState(prev => ({ ...prev, isLoading: false, error: data.error ?? null, isSuccess: false }));
           handleError(data.error);
           return data;
         }
         
-        setState(prev => ({ 
-          ...prev, 
-          data: data.data, 
-          isLoading: false, 
-          error: null,
-          isSuccess: true
-        }));
-        
+        setState(prev => ({ ...prev, data: data.data, isLoading: false, error: null, isSuccess: true }));
         return data;
       }
       
-      // Handle regular JSON responses
-      setState(prev => ({ 
-        ...prev, 
-        data: data as T, 
-        isLoading: false, 
-        error: null,
-        isSuccess: true
-      }));
-      
+      setState(prev => ({ ...prev, data: data as T, isLoading: false, error: null, isSuccess: true }));
       return createApiResponse<T>(data as T);
     } catch (error) {
       const apiError: ApiError = {
@@ -172,13 +113,7 @@ export function useApi<T = unknown>(options: UseApiOptions = {}) {
         endpoint: url
       };
       
-      setState(prev => ({ 
-        ...prev, 
-        isLoading: false, 
-        error: apiError,
-        isSuccess: false
-      }));
-      
+      setState(prev => ({ ...prev, isLoading: false, error: apiError, isSuccess: false }));
       handleError(apiError);
       return createApiResponse<T>(undefined, apiError);
     }

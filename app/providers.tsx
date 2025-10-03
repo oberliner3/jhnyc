@@ -1,5 +1,3 @@
-"use client";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -8,6 +6,7 @@ import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { ConsentBanner } from "@/components/analytics/consent-banner";
 import DevToolsBlocker from "@/components/common/dev-tools-blocker";
 import ErrorBoundary from "@/components/common/error-boundary";
+import { MessagePackMonitor } from "@/components/admin/msgpack-monitor";
 import { PWAProvider } from "@/components/pwa/pwa-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/auth-context";
@@ -24,7 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // This makes it easy to add or remove providers without changing the nesting structure.
 const providers: ProviderConfig[] = [
     [ErrorBoundary, {}],
-    //  [DevToolsBlocker, {}],
+     [DevToolsBlocker, {}],
      [
        (props: { children: React.ReactNode }) => (
          <QueryClientProvider client={queryClient} {...props} />
@@ -32,27 +31,28 @@ const providers: ProviderConfig[] = [
        {},
      ],
 
-    //  [
-    //    ExperienceTrackingProvider,
-    //    {
-    //      config: trackingConfig,
-    //      disabled: !env.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED,
-    //    },
-    //  ],
+     [
+       ExperienceTrackingProvider,
+       {
+         config: trackingConfig,
+         disabled: !env.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED,
+       },
+     ],
     [AuthProvider, {}],
     [CartProvider, {}],
-    //  [PWAProvider, {}],
-    //  [AnalyticsProvider, {}],
+     [PWAProvider, {}],
+     [AnalyticsProvider, {}],
 
    ];
 
   return (
     <ComposeProvider providers={providers}>
       {children}
-      {/* <ConsentBanner /> */}
+      <ConsentBanner />
       <Toaster />
       <Analytics />
       <SpeedInsights />
+      <MessagePackMonitor />
     </ComposeProvider>
   );
 }

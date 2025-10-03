@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { createDraftOrderWithMessagePack, benchmarkSerialization } from "@/lib/msgpack-checkout";
-import { useFormTracking, useJourneyTracking } from "@/lib/experience-tracking/hooks";
 
 interface LineItem {
 	variantId: string;
@@ -44,10 +43,6 @@ interface DraftOrderFormState {
 }
 
 export function DraftOrderForm() {
-	// Experience tracking hooks
-	const { trackFormSubmit } = useFormTracking('draft-order-form');
-	const { startStep, completeStep } = useJourneyTracking('custom');
-	
 	const [formData, setFormData] = useState<DraftOrderFormState>({
 		lineItems: [{ variantId: "", quantity: 1, price: "" }],
 		customerEmail: "",
@@ -77,13 +72,6 @@ export function DraftOrderForm() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		
-		// Track form submission start
-		startStep('draft-order-form-submit', 1, {
-			lineItemsCount: formData.lineItems.length,
-			hasShippingAddress: !!formData.shippingAddress.address1,
-			hasCustomerEmail: !!formData.customerEmail
-		});
 		
 		setStatus({ loading: true, error: null, success: false, invoiceUrl: null });
 
@@ -143,10 +131,6 @@ export function DraftOrderForm() {
 					: "Invoice URL generated",
 			});
 			
-			// Track successful form submission
-			trackFormSubmit(true);
-			completeStep('draft-order-form-submit');
-
 			setStatus({
 				loading: false,
 				success: true,
@@ -159,13 +143,10 @@ export function DraftOrderForm() {
 				description: error instanceof Error ? error.message : "Unknown error",
 			});
 			
-			// Track failed form submission
-			const errorMessage = error instanceof Error ? error.message : "Unknown error";
-			trackFormSubmit(false, errorMessage);
 
 			setStatus({
 				loading: false,
-				error: errorMessage,
+				error: error instanceof Error ? error.message : "Unknown error",
 				success: false,
 				invoiceUrl: null,
 			});

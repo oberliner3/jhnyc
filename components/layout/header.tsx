@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { IconButton } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
 import { NAVIGATION_ITEMS } from "@/lib/constants";
-import { useClickTracking } from "@/lib/experience-tracking/hooks";
 import { AccountDropdown } from "./account-dropdown";
 import { MobileNav } from "./mobile-nav";
 
@@ -19,14 +18,6 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { getTotalItems, toggleCart } = useCart();
   const cartItemCount = getTotalItems();
-  
-  // Experience tracking hooks
-  const trackLogoClick = useClickTracking('header-logo');
-  const trackSearchToggle = useClickTracking('header-search-toggle');
-  const trackCartToggle = useClickTracking('header-cart-toggle', {
-    cartItemCount
-  });
-  const trackNavClick = useClickTracking('header-navigation');
 
   return (
     <header className="top-0 z-50 sticky bg-white/55 supports-backdrop-filter:bg-white/60 shadow-sm backdrop-blur w-full">
@@ -35,7 +26,7 @@ export function Header() {
         <MobileNav />
 
         {/* Logo */}
-        <div className="flex-1 md:flex-none" onClick={() => trackLogoClick()}>
+        <div className="flex-1 md:flex-none">
           <Logo />
         </div>
 
@@ -46,10 +37,6 @@ export function Header() {
               key={item.href}
               href={item.href}
               className="font-medium text-gray-700 hover:text-primary text-sm transition-colors"
-              onClick={() => trackNavClick(undefined, {
-                navigationItem: item.name,
-                destination: item.href
-              })}
             >
               {item.name}
             </Link>
@@ -63,10 +50,7 @@ export function Header() {
             variant="ghost"
             size="sm"
             className="text-gray-600 hover:text-gray-900"
-            onClick={(e) => {
-              trackSearchToggle(e);
-              setIsSearchOpen(!isSearchOpen);
-            }}
+            onClick={() => setIsSearchOpen(!isSearchOpen)}
             aria-label="Open search bar"
           >
             <Search className="w-5 h-5" />
@@ -81,10 +65,7 @@ export function Header() {
             variant="ghost"
             size="sm"
             className="relative text-gray-600 hover:text-gray-900"
-            onClick={(e) => {
-              trackCartToggle(e);
-              toggleCart();
-            }}
+            onClick={toggleCart}
             aria-label="Open cart"
           >
             <ShoppingCart className="w-5 h-5" />

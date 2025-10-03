@@ -3,21 +3,14 @@
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BuyNowButton } from "@/components/product/buy-now-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
-import {
-  useClickTracking,
-  useProductTracking,
-} from "@/lib/experience-tracking/hooks";
+import { useClickTracking } from "@/lib/experience-tracking/hooks";
 
-import type {
-  ApiProduct,
-  ApiProductOption,
-  ApiProductVariant,
-} from "@/lib/types";
+import type { ApiProduct } from "@/lib/types";
 import { formatPrice, stripHtml } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -29,18 +22,13 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { 
-    variants,
-    options,
     selectedVariant,
-    selectedOptions,
-    handleOptionChange 
+    setSelectedVariant,
   } = useProductVariants(product);
   const { addItem } = useCart();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Experience tracking hooks
-  const { trackProductView, trackProductClick, trackAddToCart } =
-    useProductTracking();
   const trackAddToCartClick = useClickTracking("product-add-to-cart", {
     productId: product.id,
     productTitle: product.title,
@@ -61,61 +49,17 @@ export function ProductCard({ product }: ProductCardProps) {
       )
     : 0;
 
-  // Track product view on component mount
-  useEffect(() => {
-    trackProductView(product.id.toString(), {
-      name: product.title,
-      price: product.price,
-      compareAtPrice: product.compare_at_price,
-      inStock: product.in_stock,
-      vendor: product.vendor,
-      productType: product.product_type,
-      tags: product.tags,
-      hasDiscount: discountPercentage > 0,
-      discountPercentage,
-    });
-  }, [
-    product.id,
-    product.title,
-    product.price,
-    product.compare_at_price,
-    product.in_stock,
-    product.vendor,
-    product.product_type,
-    product.tags,
-    discountPercentage,
-    trackProductView,
-  ]);
-
   const hasVariants = product.variants && product.variants.length > 1;
   const hasMultipleImages = product.images && product.images.length > 1;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    // Track add to cart event
-    trackAddToCart(product.id.toString(), 1, selectedVariant?.price || product.price, {
-      name: product.title,
-      vendor: product.vendor,
-      productType: product.product_type,
-      inStock: selectedVariant?.available || product.in_stock,
-      variantId: selectedVariant?.id,
-    });
-
     // Track click event
     trackAddToCartClick(e);
 
     // Allow adding out-of-stock items and handle variants in cart-context
     addItem(product, selectedVariant, 1);
-  };
-
-  const handleProductClick = () => {
-    // Track product click
-    trackProductClick(product.id.toString(), {
-      name: product.title,
-      price: product.price,
-      clickLocation: "product-card",
-    });
   };
 
   const currentImage =
@@ -135,7 +79,6 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link
         href={`/products/${product.handle}`}
         className="block"
-        onClick={handleProductClick}
       >
         <div className="relative bg-gray-100 aspect-square overflow-hidden">
           <Image
@@ -192,7 +135,6 @@ export function ProductCard({ product }: ProductCardProps) {
           <h3 className="font-semibold group-hover:text-primary line-clamp-1 transition-colors">
             <Link
               href={`/products/${product.handle}`}
-              onClick={handleProductClick}
             >
               {product.title}
             </Link>
@@ -267,7 +209,6 @@ export function ProductCard({ product }: ProductCardProps) {
             <Button size="sm" variant="default" className="flex-1" asChild>
               <Link
                 href={`/products/${product.handle}`}
-                onClick={handleProductClick}
               >
                 View Details
               </Link>
