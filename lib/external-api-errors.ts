@@ -104,7 +104,7 @@ export async function withCircuitBreaker<T>(
   } = options;
 
   const now = Date.now();
-  let state = circuitBreakers.get(key) || {
+  const state = circuitBreakers.get(key) || {
     failures: 0,
     lastFailureTime: 0,
     state: 'CLOSED' as const
