@@ -61,7 +61,7 @@ export async function withRetry<T>(
     }
   } = options;
 
-  let lastError: Error;
+  let lastError: Error = new Error('Unknown error during retry operation');
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
