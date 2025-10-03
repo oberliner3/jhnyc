@@ -78,13 +78,21 @@ export interface Partner {
 }
 
 export interface Address {
-	id: string;
-	type: string;
-	full_name: string;
-	address: string;
-	city: string;
-	postal_code: string;
-	country: string;
+  id?: string;
+  type?: 'shipping' | 'billing';
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+  company?: string;
+  address1: string;
+  address2?: string;
+  city: string;
+  province?: string; // State or Province
+  country: string;
+  zip: string; // Postal Code or ZIP Code
+  phone?: string;
+  isDefaultShipping?: boolean;
+  isDefaultBilling?: boolean;
 }
 
 // Types specific to the API response structure
