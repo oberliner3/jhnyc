@@ -44,7 +44,6 @@ export default async function RootLayout({
         <WebsiteSchema />
       </head>
       <body className="will-change-scroll">
-        <h1>hello hello hello this will be rendered </h1>
         <Providers>{children}</Providers>
       </body>
     </html>

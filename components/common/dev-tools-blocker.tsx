@@ -3,7 +3,7 @@
 import { useEffect, useId } from "react";
 import { toast } from "sonner";
 
-const DevToolsBlocker = () => {
+const DevToolsBlocker = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Skip in development
     if (process.env.NODE_ENV === "development") {
@@ -196,24 +196,27 @@ const DevToolsBlocker = () => {
 
   // Add a warning overlay when devtools are detected
   return (
-    <div
-      id={`devtools-warning-${useId()}`}
-      style={{ display: "none" }}
-      className="z-[9999] fixed inset-0 flex justify-center items-center bg-black/90"
-    >
-      <div className="bg-white p-8 rounded-lg max-w-md text-center">
-        <h2 className="mb-4 font-bold text-red-600 text-2xl">
-          ⚠️ Security Warning
-        </h2>
-        <p className="mb-4 text-gray-700">
-          Developer tools have been detected. This action is not allowed for
-          security reasons.
-        </p>
-        <p className="text-gray-700">
-          Please close developer tools to continue using the application.
-        </p>
+    <>
+      {children}
+      <div
+        id={`devtools-warning-${useId()}`}
+        style={{ display: "none" }}
+        className="z-[9999] fixed inset-0 flex justify-center items-center bg-black/90"
+      >
+        <div className="bg-white p-8 rounded-lg max-w-md text-center">
+          <h2 className="mb-4 font-bold text-red-600 text-2xl">
+            ⚠️ Security Warning
+          </h2>
+          <p className="mb-4 text-gray-700">
+            Developer tools have been detected. This action is not allowed for
+            security reasons.
+          </p>
+          <p className="text-gray-700">
+            Please close developer tools to continue using the application.
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
