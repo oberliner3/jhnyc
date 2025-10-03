@@ -30,6 +30,7 @@
     "@t3-oss/env-nextjs": "^0.13.8",
     "@tanstack/react-query": "^5.90.2",
     "@uidotdev/usehooks": "^2.4.1",
+    "@upstash/redis": "^1.35.4",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "class-variance-authority": "^0.7.1",
@@ -50,6 +51,7 @@
     "react-cookie-consent": "^9.0.0",
     "react-dom": "19.1.1",
     "react-hook-form": "^7.63.0",
+    "redis": "^5.8.3",
     "schema-dts": "^1.1.5",
     "sonner": "^2.0.7",
     "zod": "^4.1.11"

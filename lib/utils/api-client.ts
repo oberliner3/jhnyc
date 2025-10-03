@@ -8,11 +8,15 @@ import { decode } from "msgpack-javascript";
 import { API_CONFIG } from "@/lib/constants";
 import { env } from "@/lib/env-validation";
 import { ApiClientError, logError } from "@/lib/errors";
+import { cache } from "@/lib/redis";
+import { callExternalApi, ExternalApiError } from "@/lib/external-api-errors";
 
 export interface ApiClientOptions extends RequestInit {
   timeout?: number;
   retries?: number;
   context?: 'ssr' | 'client';
+  cacheKey?: string;
+  cacheTTL?: number;
 }
 
 /**
@@ -27,8 +31,19 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions =
     timeout = API_CONFIG.TIMEOUT,
     retries = API_CONFIG.RETRY_ATTEMPTS,
     context = typeof window === "undefined" ? "ssr" : "client",
+    cacheKey,
+    cacheTTL = 300, // 5 minutes default
     ...fetchOptions 
   } = options;
+
+  // Check cache first (only for SSR)
+  if (context === 'ssr' && cacheKey) {
+    const cached = await cache.get<T>(cacheKey);
+    if (cached) {
+      console.log(`📋 Cache hit for ${endpoint}`);
+      return cached;
+    }
+  }
 
   const isSSR = context === 'ssr';
   let url = endpoint;
@@ -69,35 +84,59 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions =
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const response = await fetch(url, {
-        ...fetchOptions,
-        headers,
-        signal: controller.signal,
-      });
+      let data: T;
+      
+      if (isSSR) {
+        // Use enhanced external API call for SSR
+        data = await callExternalApi<T>(url, {
+          ...fetchOptions,
+          headers,
+        }, 'external-api');
+      } else {
+        // Use standard fetch for client-side
+        const response = await fetch(url, {
+          ...fetchOptions,
+          headers,
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          throw new ApiClientError(
+            `API request failed: ${errorBody}`,
+            response.status,
+            response.statusText,
+            endpoint,
+          );
+        }
+
+        const contentType = response.headers.get("Content-Type");
+        
+        if (contentType?.includes("application/x-msgpack")) {
+          const arrayBuffer = await response.arrayBuffer();
+          data = decode(arrayBuffer) as T;
+        } else {
+          data = await response.json();
+        }
+      }
 
       clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new ApiClientError(
-          `API request failed: ${errorBody}`,
-          response.status,
-          response.statusText,
-          endpoint,
-        );
+      // Cache successful responses (only for SSR)
+      if (context === 'ssr' && cacheKey) {
+        await cache.set(cacheKey, data, cacheTTL);
+        console.log(`💾 Cached response for ${endpoint}`);
       }
 
-      const contentType = response.headers.get("Content-Type");
-      if (contentType?.includes("application/x-msgpack")) {
-        const arrayBuffer = await response.arrayBuffer();
-        return decode(arrayBuffer) as T;
-      }
-
-      return await response.json();
+      return data;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error("Unknown API error");
 
-      if (error instanceof ApiClientError && error.status) {
+      if (error instanceof ExternalApiError) {
+        if (!error.retryable) {
+          break; // Don't retry on non-retryable errors
+        }
+      } else if (error instanceof ApiClientError && error.status) {
         if (error.status >= 400 && error.status < 500 && error.status !== 429) {
           break; // Don't retry on client-side errors (except 429)
         }

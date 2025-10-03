@@ -1,6 +1,7 @@
 // Service Worker for Originz PWA
 const STATIC_CACHE = "originz-static-v1";
 const DYNAMIC_CACHE = "originz-dynamic-v1";
+const CACHE_NAME = STATIC_CACHE; // Alias for compatibility
 
 // Assets to cache on install
 const STATIC_ASSETS = [

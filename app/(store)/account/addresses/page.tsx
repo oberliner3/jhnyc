@@ -116,7 +116,7 @@ export default function AddressesPage() {
 												</div>
 												<div className="flex-1 space-y-1">
 													<p className="font-medium text-foreground">
-														{addr.fullName}
+														{addr.fullName || `${addr.firstName || ''} ${addr.lastName || ''}`.trim()}
 													</p>
 													<p className="text-muted-foreground leading-relaxed">
 														{addr.address1}

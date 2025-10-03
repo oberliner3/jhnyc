@@ -6,6 +6,7 @@
 import { logError } from "./errors";
 import type { ApiProduct } from "./types";
 import { apiClient } from "@/lib/utils/api-client";
+import { cacheKeys } from "@/lib/redis";
 
 /**
  * Enhanced data loader with automatic format selection
@@ -42,6 +43,9 @@ export async function loadProducts(
 ): Promise<ApiProduct[]> {
   const { limit = 20, page = 1, search, context } = options;
   
+  // Generate cache key
+  const cacheKey = cacheKeys.products(limit, page, search);
+  
   const params = new URLSearchParams();
   params.set("limit", limit.toString());
   params.set("page", page.toString());
@@ -54,7 +58,12 @@ export async function loadProducts(
     : `/products?${params.toString()}`;
   
   try {
-    const response = await loadDataOptimized<{ products: ApiProduct[] }>(endpoint, { context });
+    const response = await apiClient<{ products: ApiProduct[] }>(endpoint, { 
+      context,
+      cacheKey: context === 'ssr' ? cacheKey : undefined,
+      cacheTTL: 300 // 5 minutes
+    });
+    
     const products = Array.isArray(response.products) ? response.products : [];
     
     // Force all products to in_stock: true (as per your existing logic)
@@ -72,8 +81,15 @@ export async function loadProduct(
   id: string,
   options: { context?: 'ssr' | 'client' } = {}
 ): Promise<ApiProduct | null> {
+  const { context } = options;
+  const cacheKey = cacheKeys.product(id);
+  
   try {
-    const response = await loadDataOptimized<{ product: ApiProduct }>(`/products/${id}`, options);
+    const response = await apiClient<{ product: ApiProduct }>(`/products/${id}`, { 
+      context,
+      cacheKey: context === 'ssr' ? cacheKey : undefined,
+      cacheTTL: 600 // 10 minutes for individual products
+    });
     const product = response.product || null;
     return product ? { ...product, in_stock: true } : null;
   } catch (error) {
@@ -89,8 +105,15 @@ export async function loadProductByHandle(
   handle: string,
   options: { context?: 'ssr' | 'client' } = {}
 ): Promise<ApiProduct | null> {
+  const { context } = options;
+  const cacheKey = cacheKeys.productByHandle(handle);
+  
   try {
-    const response = await loadDataOptimized<{ product: ApiProduct }>(`/products/by-handle/${handle}`, options);
+    const response = await apiClient<{ product: ApiProduct }>(`/products/by-handle/${handle}`, { 
+      context,
+      cacheKey: context === 'ssr' ? cacheKey : undefined,
+      cacheTTL: 600 // 10 minutes for individual products
+    });
     const product = response.product || null;
     return product ? { ...product, in_stock: true } : null;
   } catch (error) {

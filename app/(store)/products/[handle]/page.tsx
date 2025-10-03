@@ -7,7 +7,7 @@ import { ProductProvider } from "@/contexts/product-context";
 import { SITE_CONFIG } from "@/lib/constants";
 import { generateSEO } from "@/lib/seo";
 import { ProductSchema } from "@/components/common/product-schema";
-import notFound from "@/app/not-found";
+import { notFound } from "next/navigation";
 
 export const revalidate = 60;
 
@@ -54,7 +54,6 @@ async function ProductPageContent({ handle }: { handle: string }) {
 
 	if (!product) {
 		notFound();
-		return null;
 	}
 
 	return (
