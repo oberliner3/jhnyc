@@ -15,10 +15,10 @@ interface AddressInputProps {
 }
 
 interface AddressDetails {
-	street: string;
+	address1: string;
 	city: string;
-	state: string;
-	postalCode: string;
+	province: string;
+	zip: string;
 	country: string;
 }
 

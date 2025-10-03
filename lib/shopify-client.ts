@@ -47,8 +47,8 @@ function toShopifyAddress(address: Address): DraftOrderShippingAddress {
         country: address.country,
         zip: address.zip,
         province: address.province || "",
-        firstName: address.firstName,
-        lastName: address.lastName,
+        first_name: address.firstName,
+        last_name: address.lastName,
         phone: address.phone,
         company: address.company,
     };
@@ -82,9 +82,9 @@ export interface DraftOrderShippingAddress {
   address1: string;
   address2?: string;
   city: string;
-  province: string;
+  province?: string;
   country: string;
-  zip: string;
+  zip?: string;
   phone?: string;
 }
 

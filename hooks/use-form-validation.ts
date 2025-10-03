@@ -6,10 +6,11 @@ import { countries } from "@/lib/countries";
 
 // Define validation schemas
 const addressSchema = z.object({
-	street: z.string().min(1, "Street address is required"),
+	address1: z.string().min(1, "Street address is required"),
+	address2: z.string().optional(),
 	city: z.string().min(1, "City is required"),
-	state: z.string().optional(),
-	postalCode: z.string().optional(),
+	province: z.string().optional(),
+	zip: z.string().optional(),
 	country: z.string().min(2, "Country is required"),
 });
 

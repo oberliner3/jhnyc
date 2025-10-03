@@ -33,11 +33,15 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions =
   const isSSR = context === 'ssr';
   let url = endpoint;
 
-  const headers: Record<string, string> = {
-    ...API_CONFIG.HEADERS,
-    ...fetchOptions.headers,
-    'Accept': 'application/x-msgpack, application/json;q=0.9',
-  };
+  const headers = new Headers(API_CONFIG.HEADERS);
+  headers.set('Accept', 'application/x-msgpack, application/json;q=0.9');
+
+  if (options.headers) {
+    const customHeaders = new Headers(options.headers);
+    customHeaders.forEach((value, key) => {
+      headers.set(key, value);
+    });
+  }
 
   // For SSR, construct the full external URL and add the API key
   if (isSSR) {
@@ -52,7 +56,7 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions =
     }
     const base = PRODUCT_STREAM_API.replace(/\/$/, "");
     url = `${base}/cosmos${endpoint}`;
-    headers['X-API-KEY'] = PRODUCT_STREAM_X_KEY;
+    headers.set('X-API-KEY', PRODUCT_STREAM_X_KEY);
   } else {
     // For client-side, use the relative API path
     url = endpoint.startsWith("/api/") ? endpoint : `/api${endpoint}`;

@@ -158,7 +158,7 @@ export const checkoutSchema = z.object({
 		)
 		.trim(),
 	address: z.object({
-		street: z
+		address1: z
 			.string()
 			.min(1, ERROR_MESSAGES.REQUIRED)
 			.max(
@@ -166,17 +166,18 @@ export const checkoutSchema = z.object({
 				`Street address must be less than ${LIMITS.ADDRESS_MAX_LENGTH} characters`,
 			)
 			.trim(),
+		address2: z.string().max(LIMITS.ADDRESS_MAX_LENGTH).trim().optional(),
 		city: z
 			.string()
 			.min(1, ERROR_MESSAGES.REQUIRED)
 			.max(100, "City must be less than 100 characters")
 			.trim(),
-		state: z
+		province: z
 			.string()
 			.max(100, "State must be less than 100 characters")
 			.trim()
 			.optional(),
-		postalCode: z
+		zip: z
 			.string()
 			.max(20, "Postal code must be less than 20 characters")
 			.trim()

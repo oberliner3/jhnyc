@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import type { CountryCode } from "libphonenumber-js";
 import {
@@ -48,11 +48,11 @@ export default function CheckoutPage() {
 			firstName: "",
 			lastName: "",
 			address: {
-				street: "",
+				address1: "",
 				city: "",
 				country: "US",
-				postalCode: "",
-				state: "",
+				zip: "",
+				province: "",
 			},
 			phone: "",
 		},
@@ -270,28 +270,27 @@ export default function CheckoutPage() {
 
 								{/* Address */}
 								<AddressInput
-									value={formData.address?.street || ""}
+									value={formData.address?.address1 || ""}
 									onChange={(value) =>
-										handleInputChange("address.street", value)
+										handleInputChange("address.address1", value)
 									}
 									onAddressSelect={(address) => {
-										handleInputChange("address.street", address.street);
+										handleInputChange("address.address1", address.address1);
 										handleInputChange("address.city", address.city);
-										handleInputChange("address.postalCode", address.postalCode);
-										// Some countries might not have states
-										if (address.state) {
-											handleInputChange("address.state", address.state);
+										handleInputChange("address.zip", address.zip);
+										if (address.province) {
+											handleInputChange("address.province", address.province);
 										}
 									}}
-									error={validationState["address.street"]?.error || undefined}
+									error={validationState["address.address1"]?.error || undefined}
 								/>
 
-								{/* Apartment/Suite (using state field) */}
+								{/* Apartment/Suite (using province field for now, can be separated) */}
 								<Input
 									placeholder="Apartment, suite, etc. (optional)"
-									value={formData.address?.state || ""}
+									value={formData.address?.address2 || ""}
 									onChange={(e) =>
-										handleInputChange("address.state", e.target.value)
+										handleInputChange("address.address2", e.target.value)
 									}
 									className="mt-1"
 								/>
@@ -331,9 +330,9 @@ export default function CheckoutPage() {
 										<Label htmlFor={inputPostalCodeId}>Postal code</Label>
 										<Input
 											id={inputPostalCodeId}
-											value={formData.address?.postalCode || ""}
+											value={formData.address?.zip || ""}
 											onChange={(e) =>
-												handleInputChange("address.postalCode", e.target.value)
+												handleInputChange("address.zip", e.target.value)
 											}
 											className="mt-1"
 										/>

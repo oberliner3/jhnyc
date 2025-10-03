@@ -116,13 +116,13 @@ export default function AddressesPage() {
 												</div>
 												<div className="flex-1 space-y-1">
 													<p className="font-medium text-foreground">
-														{addr.full_name}
+														{addr.fullName}
 													</p>
 													<p className="text-muted-foreground leading-relaxed">
-														{addr.address}
+														{addr.address1}
 													</p>
 													<p className="text-muted-foreground">
-														{addr.city}, {addr.postal_code}
+														{addr.city}, {addr.zip}
 													</p>
 													<p className="font-medium text-muted-foreground">
 														{addr.country}

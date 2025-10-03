@@ -89,7 +89,7 @@ export interface Address {
   city: string;
   province?: string; // State or Province
   country: string;
-  zip: string; // Postal Code or ZIP Code
+  zip?: string; // Postal Code or ZIP Code
   phone?: string;
   isDefaultShipping?: boolean;
   isDefaultBilling?: boolean;

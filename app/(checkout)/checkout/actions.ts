@@ -151,9 +151,10 @@ export async function handleCheckout(data: CheckoutData, sessionId: string) {
 								{
 									first_name: data.customer.firstName,
 									last_name: data.customer.lastName,
-									address1: data.customer.address.street,
+									address1: data.customer.address.address1,
 									city: data.customer.address.city,
-									zip: data.customer.address.postalCode || "",
+									zip: data.customer.address.zip || "",
+									province: data.customer.address.province || "",
 									country: data.customer.address.country,
 									phone: data.customer.phone || "",
 								},
