@@ -30,10 +30,29 @@ export const getAccessToken = () => {
 };
 
 // Type definitions
+import type { Address } from "./types";
+
+// Type definitions
 type ShopifyUserError = { 
   field?: string[]; 
   message: string; 
 };
+
+// Transformer function to map canonical Address to Shopify's format
+function toShopifyAddress(address: Address): DraftOrderShippingAddress {
+    return {
+        address1: address.address1,
+        address2: address.address2,
+        city: address.city,
+        country: address.country,
+        zip: address.zip,
+        province: address.province || "",
+        firstName: address.firstName,
+        lastName: address.lastName,
+        phone: address.phone,
+        company: address.company,
+    };
+}
 
 export interface DraftOrderLineItem {
   title?: string;
@@ -147,45 +166,11 @@ function toGraphqlDraftOrderInput(input: DraftOrderInput) {
     : undefined;
 
   const shippingAddress = input.shipping_address
-    ? {
-        address1: input.shipping_address.address1,
-        city: input.shipping_address.city,
-        zip: input.shipping_address.zip,
-        country: input.shipping_address.country,
-        ...(input.shipping_address.first_name
-          ? { firstName: input.shipping_address.first_name }
-          : {}),
-        ...(input.shipping_address.last_name
-          ? { lastName: input.shipping_address.last_name }
-          : {}),
-        ...(input.shipping_address.phone
-          ? { phone: input.shipping_address.phone }
-          : {}),
-        ...(input.shipping_address.province
-          ? { province: input.shipping_address.province }
-          : {}),
-      }
+    ? toShopifyAddress(input.shipping_address)
     : undefined;
 
   const billingAddress = input.billing_address
-    ? {
-        address1: input.billing_address.address1,
-        city: input.billing_address.city,
-        zip: input.billing_address.zip,
-        country: input.billing_address.country,
-        ...(input.billing_address.first_name
-          ? { firstName: input.billing_address.first_name }
-          : {}),
-        ...(input.billing_address.last_name
-          ? { lastName: input.billing_address.last_name }
-          : {}),
-        ...(input.billing_address.phone
-          ? { phone: input.billing_address.phone }
-          : {}),
-        ...(input.billing_address.province
-          ? { province: input.billing_address.province }
-          : {}),
-      }
+    ? toShopifyAddress(input.billing_address)
     : undefined;
 
   return {
