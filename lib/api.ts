@@ -274,6 +274,7 @@ export async function getCollectionByHandle(
 	try {
 		const data = await apiRequest<{ products: ApiProduct[] }>(endpoint);
 		const products = Array.isArray(data.products) ? data.products : [];
+		console.log(`[API] getCollectionByHandle('${handle}') returned ${products.length} products.`);
 		return products.map((p) => ({ ...p, in_stock: true }));
 	} catch (error) {
 		console.warn(

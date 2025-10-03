@@ -1,4 +1,3 @@
-import { createAdminApiClient } from "@shopify/admin-api-client";
 import { env } from "@/lib/env-validation";
 
 // SECURITY: Only use server-side environment variables - NEVER expose tokens to client
@@ -16,36 +15,18 @@ function getShopifyConfig() {
 	};
 }
 
-// Lazily initialize the Shopify Admin API client to avoid import-time env validation
-let _shopifyAdmin: ReturnType<typeof createAdminApiClient> | null = null;
-let _shopDomain: string | null = null;
-let _accessToken: string | null = null;
-
-export function getShopifyAdmin() {
-  if (_shopifyAdmin) return _shopifyAdmin;
-  const { shopDomain, accessToken } = getShopifyConfig();
-  _shopDomain = shopDomain;
-  _accessToken = accessToken;
-  _shopifyAdmin = createAdminApiClient({
-    storeDomain: shopDomain,
-    accessToken: accessToken,
-    apiVersion: "2025-07",
-  });
-  return _shopifyAdmin;
-}
-
 // Helper function to get shop domain without protocol
 export const getShopDomain = () => {
-	const domain = _shopDomain ?? getShopifyConfig().shopDomain;
-	if (!domain) {
+	const { shopDomain } = getShopifyConfig();
+	if (!shopDomain) {
 		throw new Error("Shop domain not configured");
 	}
-	return domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+	return shopDomain.replace(/^https?:\/\//, "").replace(/\/$/, "");
 };
 
 // Helper function to get access token
 export const getAccessToken = () => {
-  return _accessToken ?? getShopifyConfig().accessToken;
+  return getShopifyConfig().accessToken;
 };
 
 // Type definitions for our draft order creation
@@ -223,7 +204,28 @@ function toGraphqlDraftOrderInput(input: DraftOrderInput) {
   };
 }
 
-// Draft order creation function using the modern API client
+async function shopifyFetch(query: string, variables: Record<string, any>) {
+    const { shopDomain, accessToken } = getShopifyConfig();
+    const apiUrl = `https://${shopDomain}/admin/api/2024-01/graphql.json`;
+
+    const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Shopify-Access-Token': accessToken,
+        },
+        body: JSON.stringify({ query, variables }),
+    });
+
+    if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Shopify API request failed: ${response.status} ${response.statusText} - ${errorBody}`);
+    }
+
+    return response.json();
+}
+
+// Draft order creation function using fetch
 export async function createDraftOrder(orderData: DraftOrderInput) {
   try {
     const query = `
@@ -248,60 +250,29 @@ export async function createDraftOrder(orderData: DraftOrderInput) {
       }
     `;
 
-    const variables = { input: toGraphqlDraftOrderInput(orderData) } as const;
+    const variables = { input: toGraphqlDraftOrderInput(orderData) };
 
-    const response = await getShopifyAdmin().request(query, { variables });
+    const response = await shopifyFetch(query, variables);
 
-    type DraftOrderCreateResp = {
-      draftOrderCreate?: {
-        draftOrder: ShopifyDraftOrder;
-        userErrors?: Array<{ field?: string; message: string }>;
-      };
-      errors?: unknown;
-      extensions?: unknown;
-    };
-
-    const raw = response as { data?: unknown } | unknown;
-    const data = (
-      raw &&
-      typeof raw === "object" &&
-      "data" in (raw as Record<string, unknown>)
-        ? (raw as { data?: unknown }).data
-        : raw
-    ) as DraftOrderCreateResp | undefined;
-
-    const draftOrderCreate = data?.draftOrderCreate;
+    const draftOrderCreate = response.data?.draftOrderCreate;
 
     if (!draftOrderCreate) {
-      const errors =
-        data?.errors ??
-        (data as { extensions?: unknown } | undefined)?.extensions ??
-        data;
-      throw new Error(
-        `Shopify draftOrderCreate returned no data: ${JSON.stringify(errors)}`
-      );
+      const errors = response.errors || response.extensions;
+      throw new Error(`Shopify draftOrderCreate returned no data: ${JSON.stringify(errors)}`);
     }
 
     if (draftOrderCreate.userErrors && draftOrderCreate.userErrors.length > 0) {
-      throw new Error(
-        `Shopify API errors: ${draftOrderCreate.userErrors
-          .map((e) => e.message)
-          .join(", ")}`
-      );
+      throw new Error(`Shopify API errors: ${draftOrderCreate.userErrors.map((e: any) => e.message).join(", ")}`);
     }
 
     return draftOrderCreate.draftOrder;
   } catch (error) {
     console.error("Error creating draft order:", error);
-    throw new Error(
-      `Failed to create draft order: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+    throw new Error(`Failed to create draft order: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
 
-// Send invoice function
+// Send invoice function using fetch
 export async function sendDraftOrderInvoice(
   draftOrderId: string,
   invoiceData?: {
@@ -327,8 +298,7 @@ export async function sendDraftOrderInvoice(
       }
     `;
 
-    const response = await getShopifyAdmin().request(mutation, {
-      variables: {
+    const variables = {
         id: toGid("DraftOrder", draftOrderId)!,
         email: invoiceData
           ? {
@@ -338,60 +308,25 @@ export async function sendDraftOrderInvoice(
               customMessage: invoiceData.customMessage,
             }
           : undefined,
-      },
-    });
-
-    type DraftOrderInvoiceSendResp = {
-      draftOrderInvoiceSend?: {
-        draftOrder: ShopifyDraftOrder;
-        userErrors?: Array<{ field?: string; message: string }>;
-      };
-      errors?: unknown;
-      extensions?: unknown;
     };
 
-    const raw = response as { data?: unknown } | unknown;
-    const data = (
-      raw &&
-      typeof raw === "object" &&
-      "data" in (raw as Record<string, unknown>)
-        ? (raw as { data?: unknown }).data
-        : raw
-    ) as DraftOrderInvoiceSendResp | undefined;
+    const response = await shopifyFetch(mutation, variables);
 
-    const draftOrderInvoiceSend = data?.draftOrderInvoiceSend;
+    const draftOrderInvoiceSend = response.data?.draftOrderInvoiceSend;
 
     if (!draftOrderInvoiceSend) {
-      const errors =
-        data?.errors ??
-        (data as { extensions?: unknown } | undefined)?.extensions ??
-        data;
-      throw new Error(
-        `Shopify draftOrderInvoiceSend returned no data: ${JSON.stringify(
-          errors
-        )}`
-      );
+      const errors = response.errors || response.extensions;
+      throw new Error(`Shopify draftOrderInvoiceSend returned no data: ${JSON.stringify(errors)}`);
     }
 
-    if (
-      draftOrderInvoiceSend.userErrors &&
-      draftOrderInvoiceSend.userErrors.length > 0
-    ) {
-      throw new Error(
-        `Shopify API errors: ${draftOrderInvoiceSend.userErrors
-          .map((e) => e.message)
-          .join(", ")}`
-      );
+    if (draftOrderInvoiceSend.userErrors && draftOrderInvoiceSend.userErrors.length > 0) {
+      throw new Error(`Shopify API errors: ${draftOrderInvoiceSend.userErrors.map((e: any) => e.message).join(", ")}`);
     }
 
     return draftOrderInvoiceSend.draftOrder;
   } catch (error) {
     console.error("Error sending draft order invoice:", error);
-    throw new Error(
-      `Failed to send draft order invoice: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+    throw new Error(`Failed to send draft order invoice: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
 

@@ -31,19 +31,21 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-<meta name="apple-mobile-web-app-title" content={env.NEXT_PUBLIC_STORE_NAME} />
+        <meta
+          name="apple-mobile-web-app-title"
+          content={env.NEXT_PUBLIC_STORE_NAME}
+        />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="mobile-web-app-capable" content="yes" />
-<meta name="application-name" content={env.NEXT_PUBLIC_STORE_NAME} />
+        <meta name="application-name" content={env.NEXT_PUBLIC_STORE_NAME} />
         <meta name="msapplication-TileColor" content="hsl(var(--primary))" />
 
         <WebsiteSchema />
       </head>
       <body className="will-change-scroll">
-        <Providers>
-          {children}
-        </Providers>
+        <h1>hello hello hello this will be rendered </h1>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

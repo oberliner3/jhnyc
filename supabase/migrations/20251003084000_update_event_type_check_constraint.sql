@@ -1,0 +1,2 @@
+ALTER TABLE public.experience_tracks DROP CONSTRAINT experience_tracks_event_type_check;
+ALTER TABLE public.experience_tracks ADD CONSTRAINT experience_tracks_event_type_check CHECK ((event_type = ANY (ARRAY['page_view'::text, 'click'::text, 'scroll'::text, 'form_interaction'::text, 'product_view'::text, 'add_to_cart'::text, 'search'::text, 'filter'::text, 'sort'::text, 'hover'::text, 'video_interaction'::text, 'image_interaction'::text, 'checkout_step'::text, 'error'::text, 'performance'::text, 'product'::text])));

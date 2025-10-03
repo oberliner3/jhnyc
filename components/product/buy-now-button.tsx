@@ -60,25 +60,23 @@ export function BuyNowButton({
 
   // Style variations inspired by the PHP implementation
   const getButtonStyles = () => {
-    const baseStyles = "transition-all duration-300 ease-in-out font-semibold text-white border-none cursor-pointer";
+    const baseStyles = "transition-all duration-300 ease-in-out font-semibold text-white !important border-none cursor-pointer";
     
     switch (style) {
-      case 'minimal':
+      case 'minimal': // Corresponds to .custom-buy-now-loop
         return cn(
           baseStyles,
           "bg-[#212121] hover:bg-[#757575] text-white",
-          "rounded-sm px-5 py-3",
-          size === 'sm' && "px-4 py-2 text-sm",
-          size === 'lg' && "px-7 py-4 text-base"
+          "rounded-sm px-5 py-2.5 text-sm w-full text-center"
         );
-      case 'full-width':
+      case 'full-width': // Corresponds to .custom-buy-now-button
         return cn(
           baseStyles,
           "bg-[#212121] hover:bg-[#757575] text-white w-full",
-          "rounded-sm px-7 py-4 text-center",
-          "md:px-7 md:py-4 md:text-base",
-          "sm:px-5 sm:py-[18px] sm:text-[15px]", // tablet
-          "max-sm:px-[18px] max-sm:py-[18px] max-sm:text-sm" // mobile
+          "rounded-sm text-center",
+          "py-[16px] px-[28px] text-[16px]", // Base styles
+          "max-w-md:py-[18px] max-w-md:px-[20px] max-w-md:text-[15px]", // Tablet
+          "max-w-xs:py-[18px] max-w-xs:px-[18px] max-w-xs:text-[14px]" // Mobile
         );
       default:
         return cn(

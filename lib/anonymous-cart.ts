@@ -107,8 +107,7 @@ export async function getOrCreateAnonymousCart(
       items:anonymous_cart_items(*)
     `)
     .eq("session_id", sessionId)
-    .eq("status", "active")
-    .single();
+    .maybeSingle();
 
   if (error && error.code !== "PGRST116") {
     console.error("Error fetching anonymous cart:", error);

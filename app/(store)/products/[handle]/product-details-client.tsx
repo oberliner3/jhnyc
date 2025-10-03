@@ -36,60 +36,24 @@ import { useCart } from "@/contexts/cart-context";
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 
+import { useProductVariants } from "@/hooks/use-product-variants";
+
 interface ProductDetailsClientProps {
   product: ApiProduct;
 }
 
 export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
+  const { 
+    variants,
+    options,
+    selectedVariant,
+    selectedOptions,
+    handleOptionChange 
+  } = useProductVariants(product);
   const { addItem } = useCart();
 
-  const [selectedVariant, setSelectedVariant] = useState<
-    ApiProductVariant | undefined
-  >();
-  const [selectedOptions, setSelectedOptions] = useState<
-    Record<string, string>
-  >({});
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-
-  useEffect(() => {
-    if (product) {
-      if ((product.variants || []).length === 1) {
-        setSelectedVariant((product.variants || [])[0]);
-      } else {
-        const initialOptions: Record<string, string> = {};
-        (product.options || []).forEach((option) => {
-          initialOptions[option.name] = option.values[0];
-        });
-        setSelectedOptions(initialOptions);
-
-        if ((product.variants || []).length > 0) {
-          const variantName = (product.options || [])
-            .map((opt) => initialOptions[opt.name])
-            .join(" / ");
-          const variant = (product.variants || []).find(
-            (v) => v.title === variantName
-          );
-          setSelectedVariant(variant || (product.variants || [])[0]);
-        }
-      }
-    }
-  }, [product]);
-
-  const handleOptionChange = (optionName: string, value: string) => {
-    if (!product) return;
-    const newOptions = { ...selectedOptions, [optionName]: value };
-    setSelectedOptions(newOptions);
-
-    const variantName = (product.options || [])
-      .map((opt) => newOptions[opt.name])
-      .join(" / ");
-    const variant = (product.variants || []).find(
-      (v) => v.title === variantName
-    );
-    // Fallback to first available variant to avoid undefined selections
-    setSelectedVariant(variant || (product.variants || [])[0]);
-  };
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity >= 1 && newQuantity <= 99) {
@@ -268,56 +232,11 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
 
           {/* Add to Cart & Buy Now */}
           <div className="flex flex-col gap-3 p-4 rounded-md">
-            <div className="flex justify-between items-center content-between gap-2 py-2">
-              <div className="flex justify-center items-center gap-2 w-1/2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleQuantityChange(quantity - 1)}
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="w-4 h-4" />
-                </Button>
-                <Input
-                  type="number"
-                  min="1"
-                  max="99"
-                  value={quantity}
-                  onChange={(e) =>
-                    handleQuantityChange(parseInt(e.target.value, 10) || 1)
-                  }
-                  className="w-full text-center"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleQuantityChange(quantity + 1)}
-                  disabled={quantity >= 99}
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              <Button
-                size="lg"
-                variant="default"
-                className="w-1/2"
-                onClick={() => {
-                  if ((product.variants || []).length > 1 && !selectedVariant) {
-                    toast.error("Please select a product variant");
-                    return;
-                  }
-                  addItem(product, selectedVariant, quantity);
-                }}
-                disabled={!product.in_stock}
-              >
-                {product.in_stock ? "Add to Cart" : "Out of Stock"}
-              </Button>
-            </div>
-
             <BuyNowButton
               product={product}
               variant={selectedVariant}
               quantity={quantity}
+              style="full-width"
               className="w-full"
             />
           </div>

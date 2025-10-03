@@ -1,0 +1,1 @@
+ALTER TABLE experience_tracks ADD COLUMN product_id text;

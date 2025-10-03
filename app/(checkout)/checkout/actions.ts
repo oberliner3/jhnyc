@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { getOrCreateAnonymousCart } from "@/lib/anonymous-cart";
 import { createDraftOrder } from "@/lib/shopify-client";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/client";
 
 export interface CheckoutItem {
 	productId: string;
@@ -47,13 +47,11 @@ export async function handleCheckout(data: CheckoutData, sessionId: string) {
 			data: { user },
 		} = await supabase.auth.getUser();
 
-		const userId = user?.id;
-		let anonymousCartId: string | undefined;
-
 		if (!user) {
-			const anonymousCart = await getOrCreateAnonymousCart(sessionId);
-			anonymousCartId = anonymousCart.id;
+			return { success: false, error: "User is not authenticated" };
 		}
+
+		const userId = user.id;
 
 		// Create order in database
 		const { data: order, error: orderError } = await supabase
