@@ -20,18 +20,6 @@ export const env = createEnv({
       (str) => str === "true" || str === "1",
       z.boolean().default(false)
     ),
-    NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED: z.preprocess(
-      (str) => str === "true" || str === "1",
-      z.boolean().default(false)
-    ),
-    NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE: z.preprocess(
-      (val) => (val ? parseFloat(String(val)) : 1.0),
-      z.number().min(0).max(1).default(1.0)
-    ),
-    NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG: z.preprocess(
-      (str) => str === "true" || str === "1",
-      z.boolean().default(false)
-    ),
   },
   runtimeEnv: {
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -45,9 +33,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_STORE_NAME: process.env.NEXT_PUBLIC_STORE_NAME,
-    NEXT_PUBLIC_CHAT_WIDGET_ENABLED: process.env.NEXT_PUBLIC_CHAT_WIDGET_ENABLED,
-    NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED: process.env.NEXT_PUBLIC_EXPERIENCE_TRACKING_ENABLED,
-    NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE: process.env.NEXT_PUBLIC_EXPERIENCE_TRACKING_SAMPLE_RATE,
-    NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG: process.env.NEXT_PUBLIC_EXPERIENCE_TRACKING_DEBUG,
+    NEXT_PUBLIC_CHAT_WIDGET_ENABLED:
+      process.env.NEXT_PUBLIC_CHAT_WIDGET_ENABLED,
   },
 });

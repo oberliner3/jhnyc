@@ -8,11 +8,16 @@ import { BuyNowButton } from "@/components/product/buy-now-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
-import { useClickTracking } from "@/lib/experience-tracking/hooks";
 
 import type { ApiProduct } from "@/lib/types";
 import { formatPrice, stripHtml } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { useProductVariants } from "@/hooks/use-product-variants";
 
@@ -21,25 +26,9 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { 
-    selectedVariant,
-    setSelectedVariant,
-  } = useProductVariants(product);
+  const { selectedVariant, setSelectedVariant } = useProductVariants(product);
   const { addItem } = useCart();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  // Experience tracking hooks
-  const trackAddToCartClick = useClickTracking("product-add-to-cart", {
-    productId: product.id,
-    productTitle: product.title,
-    price: selectedVariant?.price || product.price,
-    inStock: selectedVariant?.available || product.in_stock,
-  });
-  const trackBuyNowClick = useClickTracking("product-buy-now", {
-    productId: product.id,
-    productTitle: product.title,
-    price: selectedVariant?.price || product.price,
-  });
 
   const discountPercentage = product.compare_at_price
     ? Math.round(
@@ -54,11 +43,6 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-
-    // Track click event
-    trackAddToCartClick(e);
-
-    // Allow adding out-of-stock items and handle variants in cart-context
     addItem(product, selectedVariant, 1);
   };
 
@@ -76,10 +60,7 @@ export function ProductCard({ product }: ProductCardProps) {
       onMouseLeave={() => hasMultipleImages && setCurrentImageIndex(0)}
     >
       {/* Product Image */}
-      <Link
-        href={`/products/${product.handle}`}
-        className="block"
-      >
+      <Link href={`/products/${product.handle}`} className="block">
         <div className="relative bg-gray-100 aspect-square overflow-hidden">
           <Image
             src={currentImage}
@@ -106,7 +87,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Quick Actions Overlay */}
           <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 p-4 transition-opacity duration-300">
             <div className="flex gap-2">
-              <div onClick={() => trackBuyNowClick()}>
+              <div>
                 <BuyNowButton
                   product={product}
                   variant={selectedVariant}
@@ -133,11 +114,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="space-y-3 p-4">
         <div className="space-y-1">
           <h3 className="font-semibold group-hover:text-primary line-clamp-1 transition-colors">
-            <Link
-              href={`/products/${product.handle}`}
-            >
-              {product.title}
-            </Link>
+            <Link href={`/products/${product.handle}`}>{product.title}</Link>
           </h3>
           {shortDescription && (
             <p className="text-muted-foreground text-sm line-clamp-2">
@@ -207,11 +184,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Mobile: Always visible buttons */}
           <div className="md:hidden flex gap-2">
             <Button size="sm" variant="default" className="flex-1" asChild>
-              <Link
-                href={`/products/${product.handle}`}
-              >
-                View Details
-              </Link>
+              <Link href={`/products/${product.handle}`}>View Details</Link>
             </Button>
           </div>
         </div>

@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { MessageCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useClickTracking } from '@/lib/experience-tracking/hooks';
+
 
 interface InlineChatProps {
   /** Chat iframe URL */
@@ -22,23 +22,21 @@ interface InlineChatProps {
   showRefresh?: boolean;
 }
 
-const DEFAULT_CHAT_URL = "https://app.chatsimple.ai/iframe23/f32afe72-604b-4370-8925-4bd184983c75/973ce147-59fb-4ff8-b178-eab37198c1fe/b0a9f7de-992d-4f78-8add-ec34034fe737";
+const DEFAULT_CHAT_URL =
+  "https://app.chatsimple.ai/iframe23/f32afe72-604b-4370-8925-4bd184983c75/973ce147-59fb-4ff8-b178-eab37198c1fe/b0a9f7de-992d-4f78-8add-ec34034fe737";
 
 export function InlineChat({
   src = DEFAULT_CHAT_URL,
   height = 500,
-  width = '100%',
-  title = 'Live Chat Support',
-  className = '',
+  width = "100%",
+  title = "Live Chat Support",
+  className = "",
   showHeader = true,
   showRefresh = true,
 }: InlineChatProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [key, setKey] = useState(0); // Used to force iframe reload
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  
-  // Experience tracking
-  const trackChatRefresh = useClickTracking('inline-chat-refresh');
 
   const handleIframeLoad = () => {
     setIsLoading(false);
@@ -46,15 +44,14 @@ export function InlineChat({
 
   const handleRefresh = () => {
     setIsLoading(true);
-    setKey(prev => prev + 1);
-    trackChatRefresh();
+    setKey((prev) => prev + 1);
   };
 
-  const containerHeight = typeof height === 'number' ? `${height}px` : height;
-  const containerWidth = typeof width === 'number' ? `${width}px` : width;
+  const containerHeight = typeof height === "number" ? `${height}px` : height;
+  const containerWidth = typeof width === "number" ? `${width}px` : width;
 
   return (
-    <div 
+    <div
       className={`
         relative border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm
         ${className}
@@ -74,7 +71,7 @@ export function InlineChat({
               </div>
             )}
           </div>
-          
+
           {showRefresh && (
             <Button
               variant="ghost"
@@ -84,7 +81,9 @@ export function InlineChat({
               className="h-8 w-8 p-0"
               aria-label="Refresh chat"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+              />
             </Button>
           )}
         </div>
@@ -100,7 +99,7 @@ export function InlineChat({
             </div>
           </div>
         )}
-        
+
         <iframe
           key={key}
           ref={iframeRef}
@@ -111,8 +110,10 @@ export function InlineChat({
           onLoad={handleIframeLoad}
           className="border-none bg-transparent"
           style={{
-            display: 'block',
-            height: showHeader ? `calc(${containerHeight} - 64px)` : containerHeight,
+            display: "block",
+            height: showHeader
+              ? `calc(${containerHeight} - 64px)`
+              : containerHeight,
           }}
           allow="microphone; camera; geolocation; fullscreen"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"

@@ -47,7 +47,7 @@ export function ClientSuccessPage({ orderId }: ClientSuccessPageProps) {
           Order Confirmed!
         </h1>
         <p className="text-gray-600">
-          Thank you for your purchase. We've received your order and will
+          Thank you for your purchase. We&apos;ve received your order and will
           process it shortly.
         </p>
       </div>
@@ -92,7 +92,7 @@ export function ClientSuccessPage({ orderId }: ClientSuccessPageProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            What's Next?
+            What&apos;s Next?
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -103,8 +103,8 @@ export function ClientSuccessPage({ orderId }: ClientSuccessPageProps) {
             <div>
               <h4 className="text-sm font-medium">Order Confirmation</h4>
               <p className="text-sm text-gray-600">
-                You'll receive an email confirmation with your order details
-                shortly.
+                You&apos;ll receive an email confirmation with your order
+                details shortly.
               </p>
             </div>
           </div>
@@ -115,8 +115,8 @@ export function ClientSuccessPage({ orderId }: ClientSuccessPageProps) {
             <div>
               <h4 className="text-sm font-medium">Processing</h4>
               <p className="text-sm text-gray-600">
-                We'll prepare your order and send you tracking information once
-                it ships.
+                We&apos;ll prepare your order and send you tracking information
+                once it ships.
               </p>
             </div>
           </div>

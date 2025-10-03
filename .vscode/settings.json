@@ -11,5 +11,8 @@
 	"Codegeex.CommitMessage.LanguagePreference": "English",
 	"Codegeex.GenerationPreference": "automatic",
 	"Codegeex.SidebarUI.LanguagePreference": "English",
-	"Codegeex.RepoIndex": true
+	"Codegeex.RepoIndex": true,
+	"[json]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
 }
