@@ -3,5 +3,12 @@
 		"source.fixAll.biome": "explicit",
 		"source.organizeImports.biome": "explicit"
 	},
-	"editor.defaultFormatter": "biomejs.biome"
+	"editor.defaultFormatter": "biomejs.biome",
+	"CodeGPT.apiKey": "Gemini CLI",
+	"Codegeex.Chat.LanguagePreference": "English",
+	"Codegeex.Comment.LanguagePreference": "English",
+	"Codegeex.CommitMessageStyle": "ConventionalCommits",
+	"Codegeex.CommitMessage.LanguagePreference": "English",
+	"Codegeex.GenerationPreference": "automatic",
+	"Codegeex.SidebarUI.LanguagePreference": "English"
 }
