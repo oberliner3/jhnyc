@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getOrCreateAnonymousCart } from "@/lib/anonymous-cart";
 import { createDraftOrder } from "@/lib/shopify-client";
 import { createClient } from "@/utils/supabase/client";
+import type { Address } from "@/lib/types";
 
 export interface CheckoutItem {
 	productId: string;
@@ -16,13 +17,7 @@ export interface CheckoutCustomer {
 	email: string;
 	firstName: string;
 	lastName: string;
-	address: {
-		street: string;
-		city: string;
-		state?: string;
-		postalCode?: string;
-		country: string;
-	};
+	address: Address;
 	phone?: string;
 }
 
@@ -65,19 +60,19 @@ export async function handleCheckout(data: CheckoutData, sessionId: string) {
 				total: data.totals.total,
 				shipping_address: {
 					name: `${data.customer.firstName} ${data.customer.lastName}`,
-					address: data.customer.address.street,
+					address: data.customer.address.address1,
 					city: data.customer.address.city,
-					state: data.customer.address.state || "",
-					postal_code: data.customer.address.postalCode || "",
+					state: data.customer.address.province || "",
+					postal_code: data.customer.address.zip || "",
 					country: data.customer.address.country,
 					phone: data.customer.phone || "",
 				},
 				billing_address: {
 					name: `${data.customer.firstName} ${data.customer.lastName}`,
-					address: data.customer.address.street,
+					address: data.customer.address.address1,
 					city: data.customer.address.city,
-					state: data.customer.address.state || "",
-					postal_code: data.customer.address.postalCode || "",
+					state: data.customer.address.province || "",
+					postal_code: data.customer.address.zip || "",
 					country: data.customer.address.country,
 					phone: data.customer.phone || "",
 				},
@@ -167,18 +162,20 @@ export async function handleCheckout(data: CheckoutData, sessionId: string) {
 						shipping_address: {
 							first_name: data.customer.firstName,
 							last_name: data.customer.lastName,
-							address1: data.customer.address.street,
+							address1: data.customer.address.address1,
 							city: data.customer.address.city,
-							zip: data.customer.address.postalCode || "",
+							zip: data.customer.address.zip || "",
+							province: data.customer.address.province || "",
 							country: data.customer.address.country,
 							phone: data.customer.phone || "",
 						},
 						billing_address: {
 							first_name: data.customer.firstName,
 							last_name: data.customer.lastName,
-							address1: data.customer.address.street,
+							address1: data.customer.address.address1,
 							city: data.customer.address.city,
-							zip: data.customer.address.postalCode || "",
+							zip: data.customer.address.zip || "",
+							province: data.customer.address.province || "",
 							country: data.customer.address.country,
 							phone: data.customer.phone || "",
 						},
