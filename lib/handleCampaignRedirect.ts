@@ -1,8 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
 import { LIMITS, ERROR_MESSAGES } from "./constants";
-import { ShopifyApiError, logError } from "./errors";
-import { createSimpleDraftOrder } from "./shopify-client";
+import { logError } from "./errors";
 import type { ApiProduct } from "./types";
 
 import { generateInvoiceNumber } from "./utils/invoice";
@@ -39,15 +38,36 @@ export async function handleCampaignRedirect(
 
 		const invoiceNumber = generateInvoiceNumber();
 
-		// Create draft order using the modern Shopify client
-		const draftOrder = await createSimpleDraftOrder({
-			productTitle: tracking.product_title || invoiceNumber,
-			price: product.price,
-			quantity: quantity,
+		// Prepare the payload for the /api/draft-orders endpoint
+		const payload = {
+			lineItems: [
+				{
+					productTitle: tracking.product_title || invoiceNumber,
+					price: product.price,
+					quantity: quantity,
+				},
+			],
+			tags: `${tracking.utm_source || ""},${tracking.utm_medium || ""},${tracking.utm_campaign || ""}`,
+		};
+
+		const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/draft-orders`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(payload),
 		});
 
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.error || "Failed to create draft order via API.");
+		}
+
+		const responseData = await response.json();
+		const draftOrder = responseData.draftOrder;
+
 		if (!draftOrder?.invoiceUrl) {
-			throw new ShopifyApiError("No invoice URL returned from Shopify");
+			throw new Error("No invoice URL returned from draft order API.");
 		}
 
 		const redirectUrl = new URL(draftOrder.invoiceUrl);
@@ -68,10 +88,6 @@ export async function handleCampaignRedirect(
 		});
 
 		// Re-throw with user-friendly message
-		if (error instanceof ShopifyApiError) {
-			throw new Error(ERROR_MESSAGES.SHOPIFY_ERROR);
-		}
-
 		throw new Error(
 			error instanceof Error ? error.message : ERROR_MESSAGES.SERVER_ERROR
 		);

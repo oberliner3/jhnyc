@@ -1,6 +1,5 @@
 import { ServerPageLayout } from "@/components/layout/page-layout-wrapper";
 
-
 export default function StoreLayout({
   children,
 }: {

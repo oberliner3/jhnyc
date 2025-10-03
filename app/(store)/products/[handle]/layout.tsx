@@ -1,7 +1,9 @@
 export default function ProductDetailLayout({
-	children,
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	return <div className="mt-2 p-2 pt-3 overflow-hidden container">{children}</div>;
+  return (
+    <div className="mt-2 p-2 pt-3 overflow-hidden container">{children}</div>
+  );
 }

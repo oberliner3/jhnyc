@@ -2,9 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { getOrCreateAnonymousCart } from "@/lib/anonymous-cart";
-import { createDraftOrder } from "@/lib/shopify-client";
-import { createClient } from "@/utils/supabase/client";
+import { createDraftOrder } from "@/lib/shopify/client";
 import type { Address } from "@/lib/types";
+import { createClient } from "@/utils/supabase/client";
 
 export interface CheckoutItem {
 	productId: string;
@@ -191,7 +191,7 @@ export async function handleCheckout(data: CheckoutData, sessionId: string) {
 				});
 
 				if (draftOrder?.invoiceUrl) {
-					redirect(draftOrder.invoiceUrl);
+					redirect(draftOrder.invoiceUrl as string);
 				}
 			} catch (shopifyError) {
 				console.error("Shopify integration error:", shopifyError);

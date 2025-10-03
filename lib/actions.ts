@@ -1,8 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createSimpleDraftOrder } from "@/lib/shopify-client";
-import { logError, ShopifyApiError } from "@/lib/errors";
+import { logError } from "@/lib/errors";
 import { LIMITS, ERROR_MESSAGES } from "@/lib/constants";
 import { generateInvoiceNumber } from "@/lib/utils/invoice";
 
@@ -54,18 +53,39 @@ export async function buyNowAction(formData: FormData): Promise<never> {
 		// Generate invoice number using utility function
 		const invoiceNumber = generateInvoiceNumber();
 
-		// Create draft order using the modern Shopify client
-		const draftOrder = await createSimpleDraftOrder({
-			productTitle: invoiceNumber, // Use generated invoice number as title (matching PHP)
-			variantId: variantId,
-			productId: productId,
-			price: price,
-			quantity: quantity,
+		// Prepare the payload for the /api/draft-orders endpoint
+		const payload = {
+			lineItems: [
+				{
+					productTitle: invoiceNumber, // Use generated invoice number as title (matching PHP)
+					variantId: variantId,
+					productId: productId,
+					price: price,
+					quantity: quantity,
+				},
+			],
 			customerEmail: customerEmail || undefined,
+			tags: `${utmSource},${utmMedium},${utmCampaign}`, // Combine UTMs into tags
+		};
+
+		const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/draft-orders`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(payload),
 		});
 
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.error || "Failed to create draft order via API.");
+		}
+
+		const responseData = await response.json();
+		const draftOrder = responseData.draftOrder;
+
 		if (!draftOrder?.invoiceUrl) {
-			throw new ShopifyApiError("No invoice URL returned from Shopify");
+			throw new Error("No invoice URL returned from draft order API.");
 		}
 
 		// Append all tracking parameters to the invoice URL (matching PHP implementation)
@@ -93,10 +113,6 @@ export async function buyNowAction(formData: FormData): Promise<never> {
 		});
 
 		// Re-throw with user-friendly message
-		if (error instanceof ShopifyApiError) {
-			throw new Error(ERROR_MESSAGES.SHOPIFY_ERROR);
-		}
-
 		throw new Error(
 			error instanceof Error ? error.message : ERROR_MESSAGES.SERVER_ERROR,
 		);

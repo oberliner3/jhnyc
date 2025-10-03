@@ -7,6 +7,7 @@ export const metadata: Metadata = generateSEO({
   description: "Information about our return and exchange policy.",
   path: "/returns-exchange",
 });
+export const dynamic = "force-dynamic";
 
 export default function ReturnsExchangePage() {
   return (

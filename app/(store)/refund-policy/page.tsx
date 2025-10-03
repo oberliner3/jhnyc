@@ -8,7 +8,7 @@ export const metadata: Metadata = generateSEO({
     "Read our refund policy to understand our process for returns and refunds.",
   path: "/refund-policy",
 });
-
+export const dynamic = "force-dynamic";
 export default function RefundPolicyPage() {
   return (
     <div className="px-4 py-8 container">

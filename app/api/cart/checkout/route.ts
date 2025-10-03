@@ -3,7 +3,6 @@ import { createClient } from "@/utils/supabase/server";
 
 interface Product {
 	price: number;
-	// Add other product properties if needed
 }
 
 interface CartItem {
@@ -11,7 +10,6 @@ interface CartItem {
 	variant_id: string;
 	quantity: number;
 	products: Product;
-	// Add other cart item properties if needed
 }
 
 type CheckoutInput = {

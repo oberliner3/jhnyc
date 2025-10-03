@@ -1,72 +1,357 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createDraftOrder, sendDraftOrderInvoice } from "@/lib/shopify-client";
-import type { DraftOrderInput, DraftOrderLineItem, DraftOrderShippingAddress } from "@/lib/shopify-client";
-import { 
-	decodeShopifyDraftOrder, 
-	encodeShopifyData,
-	calculateCompressionRatio 
-} from "@/lib/msgpack-shopify";
+import { env } from "@/lib/env-validation";
+import type { Address } from "@/lib/types";
+
+// SECURITY: Only use server-side environment variables - NEVER expose tokens to client
+function getShopifyConfig() {
+	const tok = env.SHOPIFY_ACCESS_TOKEN ?? env.SHOPIFY_TOKEN;
+	if (!tok || !env.SHOPIFY_SHOP || !env.SHOPIFY_SHOP_NAME) {
+		throw new Error(
+			"Shopify configuration is missing. Provide SHOPIFY_ACCESS_TOKEN (or SHOPIFY_TOKEN), SHOPIFY_SHOP, and SHOPIFY_SHOP_NAME.",
+		);
+	}
+	return {
+		shopDomain: env.SHOPIFY_SHOP,
+		shopName: env.SHOPIFY_SHOP_NAME,
+		accessToken: tok,
+	};
+}
+
+type ShopifyUserError = {
+	field?: string[];
+	message: string;
+};
+
+// Transformer function to map canonical Address to Shopify's format
+function toShopifyAddress(address: Address): DraftOrderShippingAddress {
+	return {
+		address1: address.address1,
+		address2: address.address2,
+		city: address.city,
+		country: address.country,
+		zip: address.zip,
+		province: address.province || "",
+		first_name: address.firstName,
+		last_name: address.lastName,
+		phone: address.phone,
+		company: address.company,
+	};
+}
+
+export interface DraftOrderLineItem {
+	title?: string;
+	variant_id?: string | number;
+	product_id?: string | number;
+	quantity: number;
+	price?: string | number;
+	sku?: string;
+	grams?: number;
+	taxable?: boolean;
+	requires_shipping?: boolean;
+}
+
+export interface DraftOrderCustomer {
+	id?: string | number;
+	email?: string;
+	first_name?: string;
+	last_name?: string;
+	phone?: string;
+	accepts_marketing?: boolean;
+}
+
+export interface DraftOrderShippingAddress {
+	first_name?: string;
+	last_name?: string;
+	company?: string;
+	address1: string;
+	address2?: string;
+	city: string;
+	province?: string;
+	country: string;
+	zip?: string;
+	phone?: string;
+}
+
+export interface ShopifyDraftOrder {
+	id: string;
+	name: string;
+	invoiceUrl?: string;
+	order?: { id: string };
+	customer?: {
+		id?: string;
+		email?: string;
+		firstName?: string;
+		lastName?: string;
+	};
+	totalPrice: string;
+	subtotalPrice: string;
+	totalTax: string;
+	currencyCode: string;
+	note?: string;
+	tags?: string[];
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface DraftOrderInput {
+	line_items: DraftOrderLineItem[];
+	customer?: DraftOrderCustomer;
+	shipping_address?: DraftOrderShippingAddress;
+	billing_address?: DraftOrderShippingAddress;
+	tags?: string;
+	note?: string;
+	email?: string;
+	currency?: string;
+	use_customer_default_address?: boolean;
+	tax_lines?: Array<{
+		title: string;
+		rate: number;
+		price: string;
+	}>;
+	shipping_lines?: Array<{
+		title: string;
+		price: string;
+		code?: string;
+	}>;
+}
+
+// Helpers to format Shopify GraphQL IDs
+function toGid(
+	type: "Product" | "ProductVariant" | "DraftOrder",
+	id: string | number | undefined,
+) {
+	if (!id) return undefined;
+	const str = String(id);
+	return str.startsWith("gid://") ? str : `gid://shopify/${type}/${str}`;
+}
+
+// Map our REST-like input to Shopify GraphQL DraftOrderInput
+function toGraphqlDraftOrderInput(input: DraftOrderInput) {
+	const lineItems = (input.line_items || []).map((li) => ({
+		...(li.variant_id
+			? { variantId: toGid("ProductVariant", li.variant_id) }
+			: {}),
+		quantity: li.quantity,
+		...(li.title ? { title: li.title } : {}),
+		...(li.price !== undefined ? { originalUnitPrice: String(li.price) } : {}),
+	}));
+
+	const customer = input.customer
+		? {
+				...(input.customer.email ? { email: input.customer.email } : {}),
+				...(input.customer.first_name
+					? { firstName: input.customer.first_name }
+					: {}),
+				...(input.customer.last_name
+					? { lastName: input.customer.last_name }
+					: {}),
+				...(input.customer.phone ? { phone: input.customer.phone } : {}),
+			}
+		: undefined;
+
+	const shippingAddress = input.shipping_address
+		? toShopifyAddress(input.shipping_address)
+		: undefined;
+
+	const billingAddress = input.billing_address
+		? toShopifyAddress(input.billing_address)
+		: undefined;
+
+	return {
+		lineItems,
+		...(customer ? { customer } : {}),
+		...(shippingAddress ? { shippingAddress } : {}),
+		...(billingAddress ? { billingAddress } : {}),
+		...(input.email ? { email: input.email } : {}),
+		...(input.note ? { note: input.note } : {}),
+		useCustomerDefaultAddress: Boolean(input.use_customer_default_address),
+		...(input.tags
+			? {
+					tags: input.tags
+						.split(",")
+						.map((t) => t.trim())
+						.filter(Boolean),
+				}
+			: {}),
+	};
+}
+
+async function shopifyFetch(query: string, variables: Record<string, unknown>) {
+	const { shopDomain, accessToken } = getShopifyConfig();
+	const apiUrl = `https://${shopDomain}/admin/api/2024-01/graphql.json`;
+
+	const response = await fetch(apiUrl, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"X-Shopify-Access-Token": accessToken,
+		},
+		body: JSON.stringify({ query, variables }),
+	});
+
+	if (!response.ok) {
+		const errorBody = await response.text();
+		throw new Error(
+			`Shopify API request failed: ${response.status} ${response.statusText} - ${errorBody}`,
+		);
+	}
+
+	return response.json();
+}
+
+// Draft order creation function using fetch
+async function createDraftOrder(orderData: DraftOrderInput) {
+	try {
+		const query = `
+      mutation draftOrderCreate($input: DraftOrderInput!) {
+        draftOrderCreate(input: $input) {
+          draftOrder {
+            id
+            name
+            invoiceUrl
+            order { id }
+            customer { id email firstName lastName }
+            totalPrice
+            subtotalPrice
+            totalTax
+            currencyCode
+            tags
+            createdAt
+            updatedAt
+          }
+          userErrors { field message }
+        }
+      }
+    `;
+
+		const variables = { input: toGraphqlDraftOrderInput(orderData) };
+
+		const response = await shopifyFetch(query, variables);
+
+		const draftOrderCreate = response.data?.draftOrderCreate;
+
+		if (!draftOrderCreate) {
+			const errors = response.errors || response.extensions;
+			throw new Error(
+				`Shopify draftOrderCreate returned no data: ${JSON.stringify(errors)}`,
+			);
+		}
+
+		if (draftOrderCreate.userErrors && draftOrderCreate.userErrors.length > 0) {
+			throw new Error(
+				`Shopify API errors: ${draftOrderCreate.userErrors.map((e: ShopifyUserError) => e.message).join(", ")}`,
+			);
+		}
+
+		return draftOrderCreate.draftOrder;
+	} catch (error) {
+		console.error("Error creating draft order:", error);
+		throw new Error(
+			`Failed to create draft order: ${error instanceof Error ? error.message : "Unknown error"}`,
+		);
+	}
+}
+
+// Send invoice function using fetch
+async function sendDraftOrderInvoice(
+	draftOrderId: string,
+	invoiceData?: {
+		to?: string;
+		from?: string;
+		subject?: string;
+		customMessage?: string;
+	},
+) {
+	try {
+		const mutation = `
+      mutation draftOrderInvoiceSend($id: ID!, $email: EmailInput) {
+        draftOrderInvoiceSend(id: $id, email: $email) {
+          draftOrder {
+            id
+            invoiceUrl
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+
+		const variables = {
+			id: toGid("DraftOrder", draftOrderId)!,
+			email: invoiceData
+				? {
+						to: invoiceData.to,
+						from: invoiceData.from,
+						subject: invoiceData.subject,
+						customMessage: invoiceData.customMessage,
+					}
+				: undefined,
+		};
+
+		const response = await shopifyFetch(mutation, variables);
+
+		const draftOrderInvoiceSend = response.data?.draftOrderInvoiceSend;
+
+		if (!draftOrderInvoiceSend) {
+			const errors = response.errors || response.extensions;
+			throw new Error(
+				`Shopify draftOrderInvoiceSend returned no data: ${JSON.stringify(errors)}`,
+			);
+		}
+
+		if (
+			draftOrderInvoiceSend.userErrors &&
+			draftOrderInvoiceSend.userErrors.length > 0
+		) {
+			throw new Error(
+				`Shopify API errors: ${draftOrderInvoiceSend.userErrors.map((e: ShopifyUserError) => e.message).join(", ")}`,
+			);
+		}
+
+		return draftOrderInvoiceSend.draftOrder;
+	} catch (error) {
+		console.error("Error sending draft order invoice:", error);
+		throw new Error(
+			`Failed to send draft order invoice: ${error instanceof Error ? error.message : "Unknown error"}`,
+		);
+	}
+}
 
 interface RequestLineItem {
-  title?: string;
-  variantId?: string;
-  productId?: string;
-  quantity: number;
-  price?: string;
-  sku?: string;
-  grams?: number;
-  taxable?: boolean;
-  requiresShipping?: boolean;
+	title?: string;
+	variantId?: string;
+	productId?: string;
+	quantity: number;
+	price?: string;
+	sku?: string;
+	grams?: number;
+	taxable?: boolean;
+	requiresShipping?: boolean;
 }
 
 interface DraftOrderRequestBody {
-  lineItems: RequestLineItem[];
-  customerEmail?: string;
-  customerFirstName?: string;
-  customerLastName?: string;
-  customerPhone?: string;
-  shippingAddress?: DraftOrderShippingAddress;
-  billingAddress?: DraftOrderShippingAddress;
-  note?: string;
-  tags?: string;
-  sendInvoice?: boolean;
-  invoiceData?: {
-    subject?: string;
-    customMessage?: string;
-    from?: string;
-  };
+	lineItems: RequestLineItem[];
+	customerEmail?: string;
+	customerFirstName?: string;
+	customerLastName?: string;
+	customerPhone?: string;
+	shippingAddress?: DraftOrderShippingAddress;
+	billingAddress?: DraftOrderShippingAddress;
+	note?: string;
+	tags?: string;
+	sendInvoice?: boolean;
+	invoiceData?: {
+		subject?: string;
+		customMessage?: string;
+		from?: string;
+	};
 }
 
 export async function POST(request: NextRequest) {
 	try {
-		// Check if request is MessagePack or JSON
-		const contentType = request.headers.get("Content-Type");
-		let body: DraftOrderRequestBody;
-		
-		if (contentType?.includes("application/x-msgpack")) {
-			const arrayBuffer = await request.arrayBuffer();
-			const uint8Array = new Uint8Array(arrayBuffer);
-			// Decode MessagePack data - note this returns DraftOrderInput format
-			const decodedData = decodeShopifyDraftOrder(uint8Array);
-			// Transform to DraftOrderRequestBody format
-			body = {
-				lineItems: decodedData.line_items || [],
-				customerEmail: decodedData.customer?.email,
-				customerFirstName: decodedData.customer?.first_name,
-				customerLastName: decodedData.customer?.last_name,
-				customerPhone: decodedData.customer?.phone,
-				shippingAddress: decodedData.shipping_address,
-				billingAddress: decodedData.billing_address,
-				note: decodedData.note,
-				tags: decodedData.tags,
-				// Add default values for missing properties
-				sendInvoice: false,
-				invoiceData: undefined,
-			} as DraftOrderRequestBody;
-			console.log("📦 Received MessagePack draft order request");
-		} else {
-			body = await request.json();
-		}
+		const body: DraftOrderRequestBody = await request.json();
 
 		const {
 			lineItems,
@@ -179,24 +464,8 @@ export async function POST(request: NextRequest) {
 			...(invoiceError && { invoiceError }),
 		};
 
-		// Check if client accepts MessagePack response
-		const acceptHeader = request.headers.get("Accept");
-		if (acceptHeader?.includes("application/x-msgpack")) {
-			const encodedResponse = encodeShopifyData(responseData);
-			const compressionStats = calculateCompressionRatio(responseData);
-			
-			console.log(`📦 Sending MessagePack response - Compression: ${compressionStats.savings} (${compressionStats.originalSize}B → ${compressionStats.compressedSize}B)`);
-			
-			const response = new NextResponse(Buffer.from(encodedResponse), {
-				headers: { 
-					"Content-Type": "application/x-msgpack",
-					"X-Compression-Ratio": compressionStats.compressionRatio.toString(),
-					"X-Compression-Savings": compressionStats.savings,
-				},
-			});
-			return response;
-		}
-
+		// Removed MessagePack encoding for outgoing responses as per new architecture
+		// If MessagePack is still desired for generic API communication, it should be handled by a generic utility.
 		return NextResponse.json(responseData);
 	} catch (error) {
 		console.error("Draft order creation error:", error);

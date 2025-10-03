@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getAllProducts } from "@/lib/api";
 import { SITE_CONFIG } from "@/lib/constants";
-import { stripHtml, escapeXml } from "@/lib/utils";
 import type { ApiProduct } from "@/lib/types";
+import { escapeXml, stripHtml } from "@/lib/utils";
 
 async function fetchAllProducts(): Promise<ApiProduct[]> {
 	const pageSize = 250;
@@ -34,7 +34,7 @@ export async function GET() {
 					typeof product.compare_at_price === "number" &&
 					product.compare_at_price > product.price;
 				const basePrice = formatPriceForGMC(
-					hasSale ? product.compare_at_price! : product.price,
+					hasSale && product.compare_at_price ? product.compare_at_price : product.price,
 				);
 				const salePrice = hasSale ? formatPriceForGMC(product.price) : null;
 				const weight = formatWeight(product.variants?.[0]?.grams);

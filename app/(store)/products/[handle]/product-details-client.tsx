@@ -27,21 +27,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useProductVariants } from "@/hooks/use-product-variants";
 import type { ApiProduct } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
-
-import { useProductVariants } from "@/hooks/use-product-variants";
 
 interface ProductDetailsClientProps {
   product: ApiProduct;
 }
 
 export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
-  const { 
-    selectedVariant,
-    selectedOptions,
-    handleOptionChange 
-  } = useProductVariants(product);
+  const { selectedVariant, selectedOptions, handleOptionChange } =
+    useProductVariants(product);
 
   const [quantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -155,7 +151,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
         <div className="space-y-6">
           <div>
             <Badge variant="outline" className="m-2 p-2">
-              {product.product_type.split('/')[0]}
+              {product.product_type.split("/")[0]}
             </Badge>
             <h1 className="font-bold text-xl lg:text-4xl tracking-tight">
               {product.title.toWellFormed()}
@@ -163,14 +159,16 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
           </div>
 
           {/* Options */}
-          
+
           {product.variants &&
             product.variants.length > 0 &&
             product.variants[0].title !== "Title" && (
               <div className="space-y-4">
                 {(product.variants || []).map((variant) => (
                   <div key={variant.id}>
-                    <h3 className="mb-2 font-medium text-sm">{variant.title}</h3>
+                    <h3 className="mb-2 font-medium text-sm">
+                      {variant.title}
+                    </h3>
                     <Select
                       onValueChange={(value) =>
                         handleOptionChange(variant.title, value)
@@ -199,13 +197,14 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
               <span className="font-bold text-3xl">
                 {formatPrice(currentPrice)}
               </span>
-             
-              {product.compare_at_price && product.compare_at_price > 0 ?
-                (product.compare_at_price >= product.price && (
-                  <span className="font-semibold text-red-500 text-lg line-through">
-                    {formatPrice(product.compare_at_price)}
-                  </span>
-                )) : null}
+
+              {product.compare_at_price && product.compare_at_price > 0
+                ? product.compare_at_price >= product.price && (
+                    <span className="font-semibold text-red-500 text-lg line-through">
+                      {formatPrice(product.compare_at_price)}
+                    </span>
+                  )
+                : null}
             </div>
             {product.compare_at_price && discountPercentage > 0 ? (
               <p className="text-green-600 text-sm">

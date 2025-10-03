@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "build:analyze": "ANALYZE=true next build --turbopack",
     "build:no-cache": "next build --turbopack --no-cache",
     "check-types": "tsc --noemit",

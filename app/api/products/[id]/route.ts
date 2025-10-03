@@ -1,24 +1,23 @@
-import { type NextRequest, NextResponse } from "next/server";
 import { encode } from "msgpack-javascript";
+import { type NextRequest, NextResponse } from "next/server";
 import { loadProduct } from "@/lib/msgpack-loader";
 
 export async function GET(
 	request: NextRequest,
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	context: any,
+	context: { params: Promise<{ id: string }> },
 ) {
+	const { id } = await context.params;
 	try {
-		const { id } = context.params;
 
 		// Use optimized MessagePack loader with SSR context
-		const product = await loadProduct(id, { context: 'ssr' });
+		const product = await loadProduct(id, { context: "ssr" });
 
 		if (!product) {
 			return NextResponse.json({ error: "Product not found" }, { status: 404 });
 		}
 
 		const acceptHeader = request.headers.get("Accept");
-		if (acceptHeader && acceptHeader.includes("application/x-msgpack")) {
+		if (acceptHeader?.includes("application/x-msgpack")) {
 			const encodedData = encode(product);
 			const response = new NextResponse(encodedData, {
 				headers: { "Content-Type": "application/x-msgpack" },
@@ -40,7 +39,7 @@ export async function GET(
 		return response;
 	} catch (error) {
 		console.error(
-			`[API] Failed to fetch product with id ${context.params.id} from external API:`,
+			`[API] Failed to fetch product with id ${id} from external API:`,
 			error,
 		);
 		return NextResponse.json(

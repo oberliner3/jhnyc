@@ -1,45 +1,49 @@
-import { Metadata } from 'next';
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy',
-  description: 'Learn about how we use cookies and similar technologies on our website.',
+  title: "Cookie Policy",
+  description:
+    "Learn about how we use cookies and similar technologies on our website.",
 };
 
-// Force dynamic rendering to prevent prerender issues
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function CookiePage() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+    <div className="bg-background min-h-screen">
+      <div className="mx-auto px-4 py-8 container">
+        <div className="mx-auto max-w-4xl">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Cookie Policy</h1>
+          <div className="mb-12 text-center">
+            <h1 className="mb-4 font-bold text-4xl">Cookie Policy</h1>
             <p className="text-muted-foreground text-lg">
               Last updated: January 1, 2025
             </p>
           </div>
 
           {/* Content */}
-          <div className="prose prose-gray max-w-none">
+          <div className="max-w-none prose prose-gray">
             <h2>What Are Cookies?</h2>
             <p>
-              Cookies are small text files that are placed on your computer or mobile device when you 
-              visit a website. They are widely used to make websites work more efficiently and to provide 
-              information to website owners.
+              Cookies are small text files that are placed on your computer or
+              mobile device when you visit a website. They are widely used to
+              make websites work more efficiently and to provide information to
+              website owners.
             </p>
 
             <h2>How We Use Cookies</h2>
             <p>
-              We use cookies and similar technologies to improve your browsing experience, analyze website 
-              traffic, and provide personalized content and advertisements.
+              We use cookies and similar technologies to improve your browsing
+              experience, analyze website traffic, and provide personalized
+              content and advertisements.
             </p>
 
             <h3>Essential Cookies</h3>
             <p>
-              These cookies are necessary for the website to function properly. They enable core functionality 
-              such as security, network management, and accessibility. You cannot opt-out of these cookies.
+              These cookies are necessary for the website to function properly.
+              They enable core functionality such as security, network
+              management, and accessibility. You cannot opt-out of these
+              cookies.
             </p>
             <ul>
               <li>Authentication and security</li>
@@ -50,8 +54,9 @@ export default function CookiePage() {
 
             <h3>Analytics Cookies</h3>
             <p>
-              These cookies help us understand how visitors interact with our website by collecting and 
-              reporting information anonymously. This helps us improve our website performance and user experience.
+              These cookies help us understand how visitors interact with our
+              website by collecting and reporting information anonymously. This
+              helps us improve our website performance and user experience.
             </p>
             <ul>
               <li>Google Analytics</li>
@@ -62,8 +67,9 @@ export default function CookiePage() {
 
             <h3>Marketing Cookies</h3>
             <p>
-              These cookies are used to track visitors across websites to display relevant and engaging 
-              advertisements. They may be set by us or by third-party advertising partners.
+              These cookies are used to track visitors across websites to
+              display relevant and engaging advertisements. They may be set by
+              us or by third-party advertising partners.
             </p>
             <ul>
               <li>Targeted advertising</li>
@@ -74,8 +80,8 @@ export default function CookiePage() {
 
             <h3>Functional Cookies</h3>
             <p>
-              These cookies enable enhanced functionality and personalization, such as remembering your 
-              preferences and settings.
+              These cookies enable enhanced functionality and personalization,
+              such as remembering your preferences and settings.
             </p>
             <ul>
               <li>Language preferences</li>
@@ -86,19 +92,33 @@ export default function CookiePage() {
 
             <h2>Third-Party Cookies</h2>
             <p>
-              We may use third-party services that place their own cookies on your device. These include:
+              We may use third-party services that place their own cookies on
+              your device. These include:
             </p>
             <ul>
-              <li><strong>Google Analytics:</strong> For website analytics and performance tracking</li>
-              <li><strong>Facebook Pixel:</strong> For advertising and social media integration</li>
-              <li><strong>Payment Processors:</strong> For secure payment processing</li>
-              <li><strong>Customer Support:</strong> For live chat and support services</li>
+              <li>
+                <strong>Google Analytics:</strong> For website analytics and
+                performance tracking
+              </li>
+              <li>
+                <strong>Facebook Pixel:</strong> For advertising and social
+                media integration
+              </li>
+              <li>
+                <strong>Payment Processors:</strong> For secure payment
+                processing
+              </li>
+              <li>
+                <strong>Customer Support:</strong> For live chat and support
+                services
+              </li>
             </ul>
 
             <h2>Managing Your Cookie Preferences</h2>
             <h3>Browser Settings</h3>
             <p>
-              Most web browsers allow you to control cookies through their settings. You can typically:
+              Most web browsers allow you to control cookies through their
+              settings. You can typically:
             </p>
             <ul>
               <li>View what cookies are stored on your device</li>
@@ -110,7 +130,8 @@ export default function CookiePage() {
 
             <h3>Cookie Banner</h3>
             <p>
-              When you first visit our website, you&apos;ll see a cookie banner that allows you to:
+              When you first visit our website, you&apos;ll see a cookie banner
+              that allows you to:
             </p>
             <ul>
               <li>Accept all cookies</li>
@@ -121,17 +142,46 @@ export default function CookiePage() {
 
             <h3>Opt-Out Links</h3>
             <p>
-              You can opt out of certain third-party cookies using these resources:
+              You can opt out of certain third-party cookies using these
+              resources:
             </p>
             <ul>
-              <li><a href="https://tools.google.com/dlpage/gaoptout" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out</a></li>
-              <li><a href="https://www.facebook.com/help/568137493302217" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Facebook Pixel Opt-out</a></li>
-              <li><a href="https://optout.networkadvertising.org/" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Network Advertising Initiative</a></li>
+              <li>
+                <a
+                  href="https://tools.google.com/dlpage/gaoptout"
+                  className="text-primary hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Google Analytics Opt-out
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.facebook.com/help/568137493302217"
+                  className="text-primary hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Facebook Pixel Opt-out
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://optout.networkadvertising.org/"
+                  className="text-primary hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Network Advertising Initiative
+                </a>
+              </li>
             </ul>
 
             <h2>Impact of Disabling Cookies</h2>
             <p>
-              If you disable cookies, some features of our website may not function properly:
+              If you disable cookies, some features of our website may not
+              function properly:
             </p>
             <ul>
               <li>Shopping cart may not remember items</li>
@@ -142,24 +192,35 @@ export default function CookiePage() {
 
             <h2>Updates to This Policy</h2>
             <p>
-              We may update this Cookie Policy from time to time to reflect changes in our practices 
-              or for legal, regulatory, or operational reasons. We will notify you of any material 
-              changes by posting the updated policy on our website.
+              We may update this Cookie Policy from time to time to reflect
+              changes in our practices or for legal, regulatory, or operational
+              reasons. We will notify you of any material changes by posting the
+              updated policy on our website.
             </p>
 
             <h2>Contact Us</h2>
             <p>
-              If you have questions about our use of cookies or this Cookie Policy, please contact us:
+              If you have questions about our use of cookies or this Cookie
+              Policy, please contact us:
             </p>
             <ul>
-              <li>Email: <a href="mailto:privacy@example.com" className="text-primary hover:underline">privacy@example.com</a></li>
+              <li>
+                Email:{" "}
+                <a
+                  href="mailto:privacy@example.com"
+                  className="text-primary hover:underline"
+                >
+                  privacy@example.com
+                </a>
+              </li>
               <li>Phone: (970) 710-6334</li>
               <li>Address: 1308 E 41st Pl, Los Angeles, CA 90011, USA</li>
             </ul>
 
             <h2>Your Rights</h2>
             <p>
-              Depending on your location, you may have certain rights regarding cookies and data processing:
+              Depending on your location, you may have certain rights regarding
+              cookies and data processing:
             </p>
             <ul>
               <li>Right to information about data processing</li>
@@ -171,8 +232,14 @@ export default function CookiePage() {
             </ul>
 
             <p>
-              For more information about your privacy rights, please see our{' '}
-              <a href="/privacy-policy" className="text-primary hover:underline">Privacy Policy</a>.
+              For more information about your privacy rights, please see our{" "}
+              <a
+                href="/privacy-policy"
+                className="text-primary hover:underline"
+              >
+                Privacy Policy
+              </a>
+              .
             </p>
           </div>
         </div>

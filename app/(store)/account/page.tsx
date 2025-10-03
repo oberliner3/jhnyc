@@ -5,18 +5,17 @@ import { AccountDashboardSkeleton } from "@/components/skeletons/account-skeleto
 import { generateSEO } from "@/lib/seo";
 
 export const metadata: Metadata = generateSEO({
-	title: "Account",
-	description: "Manage your account settings and view your orders.",
-	path: "/account",
+  title: "Account",
+  description: "Manage your account settings and view your orders.",
+  path: "/account",
 });
 
-// Force dynamic rendering to prevent prerender issues
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function AccountPage() {
-	return (
-		<Suspense fallback={<AccountDashboardSkeleton />}>
-			<AccountGate />
-		</Suspense>
-	);
+  return (
+    <Suspense fallback={<AccountDashboardSkeleton />}>
+      <AccountGate />
+    </Suspense>
+  );
 }
