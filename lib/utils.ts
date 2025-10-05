@@ -4,6 +4,19 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: clsx.ClassValue[]) {
 	return twMerge(clsx.clsx(inputs));
 }
+
+export const DEFAULT_UTM_PARAMS = {
+  utm_source: "google",
+  utm_medium: "cpc",
+  utm_campaign: "buy-now",
+} as const;
+
+export type UTMParams = Partial<typeof DEFAULT_UTM_PARAMS>;
+
+export function mergeUtmParams(utm?: UTMParams) {
+  return { ...DEFAULT_UTM_PARAMS, ...utm };
+}
+
 export function formatPrice(price: number, currency = "USD") {
 	return new Intl.NumberFormat("en-US", {
 		style: "currency",

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { env } from "@/lib/env-validation";
-import { loadDataOptimized } from "@/lib/msgpack-loader";
+import { fetchJsonData } from "@/lib/api";
 
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 		console.log(`🔧 Environment:`, envInfo);
 
 		// Test the collections endpoint
-		const collectionData = await loadDataOptimized<{
+		const collectionData = await fetchJsonData<{
 			products?: Array<{ title?: string; [key: string]: unknown }>;
 			meta?: {
 				total?: number;
@@ -30,12 +30,10 @@ export async function GET(request: Request) {
 				limit?: number;
 				total_pages?: number;
 			};
-		}>(`/collections/${collection}?limit=5`, {
-			context: "ssr",
-		});
+		}>(`/collections/${collection}?limit=5`);
 
 		// Test the regular products endpoint
-		const productsData = await loadDataOptimized<{
+		const productsData = await fetchJsonData<{
 			products?: Array<{ title?: string; [key: string]: unknown }>;
 			meta?: {
 				total?: number;
@@ -43,9 +41,7 @@ export async function GET(request: Request) {
 				limit?: number;
 				total_pages?: number;
 			};
-		}>("/products?limit=5", {
-			context: "ssr",
-		});
+		}>("/products?limit=5");
 
 		return NextResponse.json({
 			success: true,

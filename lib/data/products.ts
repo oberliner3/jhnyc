@@ -1,18 +1,84 @@
-import { getAllProducts } from "@/lib/api";
-import type { ApiProduct } from "@/lib/types";
+import { PRODUCT_STREAM_API } from "@/lib/constants";
 
-// Fetch first 5 products from the API
-export async function getFeaturedProducts(): Promise<ApiProduct[]> {
-	try {
-		const apiProducts = await getAllProducts({ limit: 5 });
-		return apiProducts;
-	} catch (error) {
-		console.error("Failed to fetch featured products:", error);
-		return [];
-	}
+interface GetProductsOptions {
+  limit: number;
+  page: number;
+  search?: string;
+  context?: 'ssr' | 'client';
 }
 
-// For backward compatibility, keep the constant but make it a Promise
-// This will be used in server components with await
-// In client components, use the useQuery hook with getFeaturedProducts
-export const FEATURED_PRODUCTS = getFeaturedProducts();
+export async function getProducts({ limit, page, search, context }: GetProductsOptions): Promise<any[]> {
+  // This is a placeholder function. In a real application, you would fetch data from an external API.
+  // For now, it returns an empty array.
+  console.log(`[getProducts] Fetching products with limit=${limit}, page=${page}, search=${search || 'none'}, context=${context}`);
+
+  // Simulate API call
+  const url = new URL(`${PRODUCT_STREAM_API}/products`);
+  url.searchParams.set('limit', limit.toString());
+  url.searchParams.set('page', page.toString());
+  if (search) {
+    url.searchParams.set('search', search);
+  }
+
+  try {
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error(`API call failed with status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.products || [];
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
+}
+
+interface GetProductByHandleOptions {
+  context?: 'ssr' | 'client';
+}
+
+export async function getProductByHandle(handle: string, { context }: GetProductByHandleOptions): Promise<any | null> {
+  console.log(`[getProductByHandle] Fetching product with handle=${handle}, context=${context}`);
+
+  const url = new URL(`${PRODUCT_STREAM_API}/products/handle/${handle}`);
+
+  try {
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null; // Product not found
+      }
+      throw new Error(`API call failed with status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.product || null;
+  } catch (error) {
+    console.error("Error fetching product by handle:", error);
+    return null;
+  }
+}
+
+interface GetProductByIdOptions {
+  context?: 'ssr' | 'client';
+}
+
+export async function getProductById(id: string, { context }: GetProductByIdOptions): Promise<any | null> {
+  console.log(`[getProductById] Fetching product with id=${id}, context=${context}`);
+
+  const url = new URL(`${PRODUCT_STREAM_API}/products/${id}`);
+
+  try {
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null; // Product not found
+      }
+      throw new Error(`API call failed with status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.product || null;
+  } catch (error) {
+    console.error("Error fetching product by id:", error);
+    return null;
+  }
+}

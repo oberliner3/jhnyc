@@ -21,8 +21,7 @@ All endpoints require an API key for access. The API key must be provided in the
 - **Description:** Retrieves a paginated list of all products.
 - **Query Parameters:**
     - `page` (optional, integer, default: 1): The page number to retrieve.
-    - `limit` (optional, integer, default: 50, max: 100): The number of products to retrieve per page.
-    - `format` (optional, string, default: 'json'): The response format. Can be `json` or `msgpack`.
+    - `format` (optional, string, default: 'json'): The response format. Can only be `json`.
 - **Example Response:**
   ```json
   {
@@ -54,9 +53,7 @@ All endpoints require an API key for access. The API key must be provided in the
 - **Endpoint:** `GET /products/search`
 - **Description:** Searches for products based on a query.
 - **Query Parameters:**
-    - `q` (required, string): The search query.
-    - `fields` (optional, string): A comma-separated list of fields to retrieve.
-    - `format` (optional, string, default: 'json'): The response format. Can be `json` or `msgpack`.
+    - `format` (optional, string, default: 'json'): The response format. Can only be `json`.
 - **Example Response:**
   ```json
   {
@@ -76,8 +73,7 @@ All endpoints require an API key for access. The API key must be provided in the
 - **Description:** Retrieves a single product by its ID or handle.
 - **Path Parameters:**
     - `key` (required, string): The ID or handle of the product.
-- **Query Parameters:**
-    - `format` (optional, string, default: 'json'): The response format. Can be `json` or `msgpack`.
+    - `format` (optional, string, default: 'json'): The response format. Can only be `json`.
 - **Example Response:**
   ```json
   {
@@ -106,7 +102,7 @@ All endpoints require an API key for access. The API key must be provided in the
     - `handle` (required, string): The handle of the collection.
 - **Query Parameters:**
     - `fields` (optional, string): A comma-separated list of fields to retrieve.
-    - `format` (optional, string, default: 'json'): The response format. Can be `json` or `msgpack`.
+    - `format` (optional, string, default: 'json'): The response format. Can only be `json`.
     - `page` (optional, integer, default: 1): The page number to retrieve.
     - `limit` (optional, integer, default: 50, max: 100): The number of products to retrieve per page.
 - **Example Response:**

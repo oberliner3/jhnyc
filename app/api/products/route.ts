@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { encode } from "msgpack-javascript";
-import { loadProducts } from "@/lib/msgpack-loader";
+import { getProducts } from "@/lib/data/products";
 
 export async function GET(request: NextRequest) {
 	try {
@@ -13,8 +12,8 @@ export async function GET(request: NextRequest) {
 
 		console.log(`🔍 Loading products from external API: limit=${limit}, page=${page}, search=${search || 'none'}`);
 
-		// Use optimized MessagePack loader with SSR context
-		const products = await loadProducts({
+		// Use a generic product loader that returns JSON
+		const products = await getProducts({
 			limit,
 			page,
 			search,
@@ -36,28 +35,6 @@ export async function GET(request: NextRequest) {
 			total: filteredProducts.length,
 			hasMore: products.length === limit, // Simple heuristic
 		};
-
-		// Check if client accepts MessagePack response
-		const acceptHeader = request.headers.get("Accept");
-		if (acceptHeader?.includes("application/x-msgpack")) {
-			const encodedData = encode(responseData);
-			const jsonSize = new TextEncoder().encode(JSON.stringify(responseData)).length;
-			const compressionRatio = jsonSize / encodedData.length;
-			const savings = ((1 - encodedData.length / jsonSize) * 100).toFixed(1);
-			
-			console.log(`📦 Sending MessagePack products response - Compression: ${savings}% (${jsonSize}B → ${encodedData.length}B)`);
-			
-			const response = new NextResponse(encodedData, {
-				headers: { 
-					"Content-Type": "application/x-msgpack",
-					"X-Compression-Ratio": compressionRatio.toFixed(2),
-					"X-Compression-Savings": `${savings}%`,
-					"X-Original-Size": jsonSize.toString(),
-					"Cache-Control": "public, s-maxage=300, stale-while-revalidate=600", // 5 min cache, 10 min stale
-				},
-			});
-			return response;
-		}
 
 		// Standard JSON response with caching
 		const response = NextResponse.json(responseData);
