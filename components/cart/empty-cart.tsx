@@ -26,8 +26,8 @@ export function EmptyCart() {
 	useEffect(() => {
 		fetchProducts(8)
       .then(setFeaturedProducts)
-      .catch((error) => {
-        console.error("Error loading featured products:", error);
+      .catch(() => {
+        // Error already logged by fetch, silently fail
       });
 	}, []);
 

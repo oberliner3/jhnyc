@@ -4,17 +4,20 @@ import type { Address } from "@/lib/types";
 
 // SECURITY: Only use server-side environment variables - NEVER expose tokens to client
 function getShopifyConfig() {
-	const tok = env.SHOPIFY_ACCESS_TOKEN ?? env.SHOPIFY_TOKEN;
-	if (!tok || !env.SHOPIFY_SHOP || !env.SHOPIFY_SHOP_NAME) {
-		throw new Error(
-			"Shopify configuration is missing. Provide SHOPIFY_ACCESS_TOKEN (or SHOPIFY_TOKEN), SHOPIFY_SHOP, and SHOPIFY_SHOP_NAME.",
-		);
-	}
+	if (
+    !env.SHOPIFY_ACCESS_TOKEN ||
+    !env.SHOPIFY_SHOP ||
+    !env.SHOPIFY_SHOP_NAME
+  ) {
+    throw new Error(
+      "Shopify configuration is missing. Provide SHOPIFY_ACCESS_TOKEN, SHOPIFY_SHOP, and SHOPIFY_SHOP_NAME."
+    );
+  }
 	return {
-		shopDomain: env.SHOPIFY_SHOP,
-		shopName: env.SHOPIFY_SHOP_NAME,
-		accessToken: tok,
-	};
+    shopDomain: env.SHOPIFY_SHOP,
+    shopName: env.SHOPIFY_SHOP_NAME,
+    accessToken: env.SHOPIFY_ACCESS_TOKEN,
+  };
 }
 
 type ShopifyUserError = {

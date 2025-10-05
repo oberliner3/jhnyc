@@ -148,6 +148,7 @@ export async function handleCheckout(data: CheckoutData, sessionId: string) {
               email: data.customer.email,
               first_name: data.customer.firstName,
               last_name: data.customer.lastName,
+              phone: data.customer.phone || "",
               addresses: [
                 {
                   first_name: data.customer.firstName,
@@ -183,6 +184,7 @@ export async function handleCheckout(data: CheckoutData, sessionId: string) {
             },
             use_customer_default_address: false,
             note: `Order #${order.id}`,
+            tags: "online-store",
           },
         };
 
@@ -195,13 +197,15 @@ export async function handleCheckout(data: CheckoutData, sessionId: string) {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              lineItems: shopifyData.draft_order.line_items.map((item) => ({
-                title: item.title,
-                variantId: item.variant_id,
-                productId: item.product_id,
-                quantity: item.quantity,
-                price: item.price?.toString(),
-              })),
+              lineItems: shopifyData.draft_order.line_items.map(
+                (item, index) => ({
+                  title: item.title,
+                  variantId: item.variant_id,
+                  productId: data.items[index]?.productId || "",
+                  quantity: item.quantity,
+                  price: item.price?.toString(),
+                })
+              ),
               customerEmail: shopifyData.draft_order.customer?.email,
               customerFirstName: shopifyData.draft_order.customer?.first_name,
               customerLastName: shopifyData.draft_order.customer?.last_name,

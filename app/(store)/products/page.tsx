@@ -37,8 +37,9 @@ function ProductsList() {
           setHasMore(false);
         }
       })
-      .catch((error) => {
-        console.error("Error loading products:", error);
+      .catch(() => {
+        // Error already logged by fetch, just update UI state
+        setHasMore(false);
       })
       .finally(() => {
         setIsLoading(false);
@@ -59,8 +60,9 @@ function ProductsList() {
       } else {
         setHasMore(false);
       }
-    } catch (error) {
-      console.error("Error loading more products:", error);
+    } catch {
+      // Error already logged by fetch, just update UI state
+      setHasMore(false);
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +77,9 @@ function ProductsList() {
       </div>
       {hasMore && (
         <div className="mt-8 text-center">
-          <Button onClick={loadMore}>Load More</Button>
+          <Button onClick={loadMore} disabled={isLoading}>
+            {isLoading ? "Loading..." : "Load More"}
+          </Button>
         </div>
       )}
     </div>

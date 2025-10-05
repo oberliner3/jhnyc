@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { SITE_CONFIG } from "@/lib/constants";
-import type { ApiProduct } from "@/lib/types";
 import { escapeXml, stripHtml } from "@/lib/utils/xml-utils";
 import {
   fetchAllProducts,

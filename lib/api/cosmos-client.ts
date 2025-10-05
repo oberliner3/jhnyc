@@ -26,6 +26,7 @@ function getServerConfig() {
   }
 
   // Import env only when needed (server-side)
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { env } = require("@/lib/env-validation");
 
   return {
