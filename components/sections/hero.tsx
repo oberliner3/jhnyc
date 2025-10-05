@@ -28,24 +28,24 @@ export function Hero() {
 	}, [controls, isInView]);
 
 	return (
-    <section className="relative bg-background overflow-hidden border-b">
-      <div className="container px-4 py-2 lg:py-4">
-        <div className="grid items-center gap-10 lg:grid-cols-12">
-          {/* Visual */}
-          <div className="lg:col-span-6 order-last lg:order-none">
-            <div className="relative mx-auto lg:mx-0 overflow-hidden rounded-xl shadow-sm bg-card lg:max-w-none max-w-sm aspect-square lg:aspect-4/5">
-              <Image
-                src="https://images.unsplash.com/photo-1530738472658-404f693bd4b2?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.1.0"
-                alt="Hero product showcase"
-                fill
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="object-cover"
-                priority
-              />
-            </div>
-          </div>
+    <section className="relative h-screen overflow-hidden scroll-snap-align-start">
+      {/* Background Image with Gradient Overlay */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://images.unsplash.com/photo-1530738472658-404f693bd4b2?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.1.0"
+          alt="Hero product showcase"
+          fill
+          sizes="(min-width: 1024px) 100vw, 100vw"
+          className="object-cover"
+          priority
+        />
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
+      </div>
 
-          {/* Copy */}
+      <div className="container relative z-10 flex items-center h-full px-4 py-2 lg:py-4">
+        <div className="grid items-center gap-10 lg:grid-cols-12 w-full">
+          {/* Text Content */}
           <div className="lg:col-span-6 space-y-8 animate-fade-in">
             <div className="space-y-5">
               <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs tracking-wide uppercase text-foreground/70">
