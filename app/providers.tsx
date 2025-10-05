@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
-import DevToolsBlocker from "@/components/common/dev-tools-blocker";
+
 import ErrorBoundary from "@/components/common/error-boundary";
 import { PWAProvider } from "@/components/pwa/pwa-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -21,7 +21,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   const providers: ProviderWithProps[] = [
     [ErrorBoundary, {}],
-    // [DevToolsBlocker, {}],
+
     [
       (props: { children: React.ReactNode }) => (
         <QueryClientProvider client={queryClient} {...props} />

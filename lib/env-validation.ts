@@ -4,8 +4,8 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-    PRODUCT_STREAM_API: z.url(),
-    PRODUCT_STREAM_X_KEY: z.string().min(1),
+    COSMOS_API_BASE_URL: z.url(),
+    COSMOS_API_KEY: z.string().min(1),
     SHOPIFY_ACCESS_TOKEN: z.string().min(1),
     SHOPIFY_TOKEN: z.string().optional(),
     SHOPIFY_SHOP: z.string().optional(),
@@ -23,8 +23,8 @@ export const env = createEnv({
   },
   runtimeEnv: {
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    PRODUCT_STREAM_API: process.env.PRODUCT_STREAM_API,
-    PRODUCT_STREAM_X_KEY: process.env.PRODUCT_STREAM_X_KEY,
+    COSMOS_API_BASE_URL: process.env.COSMOS_API_BASE_URL,
+    COSMOS_API_KEY: process.env.COSMOS_API_KEY,
     SHOPIFY_ACCESS_TOKEN: process.env.SHOPIFY_ACCESS_TOKEN,
     SHOPIFY_TOKEN: process.env.SHOPIFY_TOKEN,
     SHOPIFY_SHOP: process.env.SHOPIFY_SHOP,

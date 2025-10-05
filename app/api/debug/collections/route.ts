@@ -10,11 +10,13 @@ export async function GET(request: Request) {
 		// Test environment variables
 
 		const envInfo = {
-			hasApiUrl: !!env.PRODUCT_STREAM_API,
-			hasApiKey: !!env.PRODUCT_STREAM_X_KEY,
-			apiUrl: env.PRODUCT_STREAM_API?.replace(/[^/]*$/g, "***") || "undefined", // Mask for security
-			keyLength: env.PRODUCT_STREAM_X_KEY?.length || 0,
-		};
+      hasApiUrl: !!env.COSMOS_API_BASE_URL,
+      hasApiKey: !!env.COSMOS_API_KEY,
+      apiUrl:
+        env.COSMOS_API_BASE_URL?.replace(/(^https?:\/\/[^/]+).*/, "$1/***") ||
+        "undefined",
+      keyLength: env.COSMOS_API_KEY?.length || 0,
+    };
 
 		console.log(`🔍 Debug: Testing collection "${collection}"`);
 		console.log(`🔧 Environment:`, envInfo);

@@ -22,7 +22,6 @@ export async function buyNowAction(formData: FormData): Promise<never> {
     const productTitle = String(formData.get("productTitle") || "").trim();
     const productImage = String(formData.get("productImage") || "").trim();
     const customerEmail = String(formData.get("customerEmail") || "").trim();
-
     // Extract UTM parameters (matching PHP implementation)
     const utmSource = String(formData.get("utm_source") || "google").trim();
     const utmMedium = String(formData.get("utm_medium") || "cpc").trim();
@@ -95,6 +94,7 @@ export async function buyNowAction(formData: FormData): Promise<never> {
         errorMessage = `API returned non-JSON response (${
           response.status
         }): ${responseText.substring(0, 200)}`;
+        console.log(parseError);
       }
       throw new Error(errorMessage);
     }
@@ -104,6 +104,7 @@ export async function buyNowAction(formData: FormData): Promise<never> {
     try {
       responseData = JSON.parse(responseText);
     } catch (parseError) {
+      console.log(parseError);
       throw new Error(
         `API returned invalid JSON response: ${responseText.substring(0, 200)}`
       );
@@ -230,6 +231,7 @@ export async function checkoutCartAction(
         const errorData = JSON.parse(responseText);
         errorMessage = errorData.error || errorMessage;
       } catch (parseError) {
+        console.log(parseError);
         // If response is not JSON, show the text
         errorMessage = `API returned non-JSON response (${
           response.status
@@ -243,6 +245,7 @@ export async function checkoutCartAction(
     try {
       responseData = JSON.parse(responseText);
     } catch (parseError) {
+      console.log(parseError);
       throw new Error(
         `API returned invalid JSON response: ${responseText.substring(0, 200)}`
       );

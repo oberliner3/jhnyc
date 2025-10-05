@@ -4,52 +4,46 @@
  * MessagePack, retries, timeouts, and consistent error handling.
  */
 
-import { decode } from "msgpack-javascript";
 import { API_CONFIG } from "@/lib/constants";
 import { env } from "@/lib/env-validation";
 import { ApiClientError, logError } from "@/lib/errors";
 import { cache } from "@/lib/redis";
 import { callExternalApi, ExternalApiError } from "@/lib/external-api-errors";
+import { decode } from "msgpack-javascript";
 
 export interface ApiClientOptions extends RequestInit {
   timeout?: number;
   retries?: number;
-  context?: 'ssr' | 'client';
+  context?: "ssr" | "client";
   cacheKey?: string;
   cacheTTL?: number;
 }
 
 /**
  * Performs an API request with built-in support for MessagePack, retries, and timeouts.
- * 
+ *
  * @param endpoint The API endpoint to call (e.g., '/products').
  * @param options Configuration for the request, extending the standard `fetch` options.
  * @returns The decoded response data.
  */
-export async function apiClient<T>(endpoint: string, options: ApiClientOptions = {}): Promise<T> {
-  const { 
+export async function apiClient<T>(
+  endpoint: string,
+  options: ApiClientOptions = {}
+): Promise<T> {
+  const {
     timeout = API_CONFIG.TIMEOUT,
     retries = API_CONFIG.RETRY_ATTEMPTS,
     context = typeof window === "undefined" ? "ssr" : "client",
     cacheKey,
-    cacheTTL = 300, // 5 minutes default
-    ...fetchOptions 
+    cacheTTL = 300,
+    ...fetchOptions
   } = options;
 
-  // Check cache first (only for SSR)
-  if (context === 'ssr' && cacheKey) {
-    const cached = await cache.get<T>(cacheKey);
-    if (cached) {
-      console.log(`📋 Cache hit for ${endpoint}`);
-      return cached;
-    }
-  }
-
-  const isSSR = context === 'ssr';
-  let url = endpoint;
-
-  const headers = new Headers(API_CONFIG.HEADERS);
-  headers.set('Accept', 'application/x-msgpack, application/json;q=0.9');
+  const isServer = context === "ssr";
+  const headers = new Headers({
+    Accept: "application/json",
+    ...API_CONFIG.HEADERS,
+  });
 
   if (options.headers) {
     const customHeaders = new Headers(options.headers);
@@ -58,104 +52,150 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions =
     });
   }
 
-  // For SSR, construct the full external URL and add the API key
-  if (isSSR) {
-    const { PRODUCT_STREAM_API, PRODUCT_STREAM_X_KEY } = env;
-    if (!PRODUCT_STREAM_API || !PRODUCT_STREAM_X_KEY) {
-      throw new ApiClientError(
-        "API configuration missing: PRODUCT_STREAM_API or PRODUCT_STREAM_X_KEY not configured",
-        500,
-        "Configuration Error",
-        endpoint,
-      );
-    }
-    const base = PRODUCT_STREAM_API.replace(/\/$/, "");
-    url = `${base}/cosmos${endpoint}`;
-    headers.set('X-API-KEY', PRODUCT_STREAM_X_KEY);
-  } else {
-    // For client-side, use the relative API path
-    url = endpoint.startsWith("/api/") ? endpoint : `/api${endpoint}`;
-  }
-
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
+  let lastError: Error = new Error("API request failed.");
 
-  let lastError: Error = new Error("API request failed after all retries.");
+  const buildUrl = () => {
+    const base = env.COSMOS_API_BASE_URL?.replace(/\/$/, "") ?? "";
+    const normalised = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    const path = normalised.startsWith("/cosmos")
+      ? normalised
+      : `/cosmos${normalised}`;
 
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      let data: T;
-      
-      if (isSSR) {
-        // Use enhanced external API call for SSR
-        data = await callExternalApi<T>(url, {
-          ...fetchOptions,
-          headers,
-        }, 'external-api');
-      } else {
-        // Use standard fetch for client-side
-        const response = await fetch(url, {
-          ...fetchOptions,
-          headers,
-          signal: controller.signal,
-        });
+    return isServer ? `${base}${path}` : `/api${path}`;
+  };
 
-        if (!response.ok) {
-          const errorBody = await response.text();
-          throw new ApiClientError(
-            `API request failed: ${errorBody}`,
-            response.status,
-            response.statusText,
-            endpoint,
-          );
-        }
+  const performRequest = async () => {
+    const requestUrl = buildUrl();
 
-        const contentType = response.headers.get("Content-Type");
-        
-        if (contentType?.includes("application/x-msgpack")) {
-          const arrayBuffer = await response.arrayBuffer();
-          data = decode(arrayBuffer) as T;
-        } else {
-          data = await response.json();
+    if (isServer) {
+      applyServerHeaders(headers);
+
+      if (cacheKey) {
+        const cached = await cache.get<T>(cacheKey);
+        if (cached) {
+          return cached;
         }
       }
 
-      clearTimeout(timeoutId);
+      const data = await fetchFromExternal<T>(
+        requestUrl,
+        fetchOptions,
+        headers
+      );
 
-      // Cache successful responses (only for SSR)
-      if (context === 'ssr' && cacheKey) {
+      if (cacheKey) {
         await cache.set(cacheKey, data, cacheTTL);
-        console.log(`💾 Cached response for ${endpoint}`);
       }
 
       return data;
+    }
+
+    return fetchFromInternal<T>(
+      requestUrl,
+      fetchOptions,
+      headers,
+      controller.signal
+    );
+  };
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const data = await performRequest();
+      clearTimeout(timeoutId);
+      return data;
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error("Unknown API error");
-
-      if (error instanceof ExternalApiError) {
-        if (!error.retryable) {
-          break; // Don't retry on non-retryable errors
-        }
-      } else if (error instanceof ApiClientError && error.status) {
-        if (error.status >= 400 && error.status < 500 && error.status !== 429) {
-          break; // Don't retry on client-side errors (except 429)
-        }
-      }
-
-      if (attempt < retries) {
-        const delay = API_CONFIG.RETRY_DELAY * 2 ** (attempt - 1);
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
+      lastError =
+        error instanceof Error ? error : new Error("Unknown API error");
     }
   }
 
   clearTimeout(timeoutId);
+  logError(lastError, { endpoint, attempts: retries, url: buildUrl() });
+  throw lastError;
+}
 
-  logError(lastError, {
-    endpoint,
-    url,
-    attempts: retries,
+function applyServerHeaders(headers: Headers) {
+  const { COSMOS_API_KEY } = env;
+
+  if (!COSMOS_API_KEY) {
+    throw new ApiClientError(
+      "API configuration missing: COSMOS_API_KEY not configured",
+      500,
+      "Configuration Error",
+      "external-api"
+    );
+  }
+
+  headers.set("X-API-Key", COSMOS_API_KEY);
+  headers.set("Accept", "application/json, application/x-msgpack;q=0.9");
+  headers.set("Content-Type", "application/json");
+}
+
+async function fetchFromExternal<T>(
+  url: string,
+  options: RequestInit,
+  headers: Headers
+): Promise<T> {
+  try {
+    const data = await callExternalApi<T>(
+      url,
+      {
+        ...options,
+        headers,
+      },
+      "external-api"
+    );
+
+    return data;
+  } catch (error) {
+    if (error instanceof ExternalApiError) {
+      throw error;
+    }
+
+    throw new ApiClientError(
+      error instanceof Error ? error.message : "External API error",
+      500,
+      "External API Error",
+      url
+    );
+  }
+}
+
+async function fetchFromInternal<T>(
+  url: string,
+  options: RequestInit,
+  headers: Headers,
+  signal: AbortSignal
+): Promise<T> {
+  const response = await fetch(url, {
+    ...options,
+    headers,
+    signal,
   });
 
-  throw lastError;
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new ApiClientError(
+      `API request failed: ${errorBody}`,
+      response.status,
+      response.statusText,
+      url
+    );
+  }
+
+  const contentType = response.headers.get("Content-Type") || "";
+
+  if (contentType.includes("application/x-msgpack")) {
+    const arrayBuffer = await response.arrayBuffer();
+    return decode(arrayBuffer) as T;
+  }
+
+  if (contentType.includes("application/json")) {
+    return (await response.json()) as T;
+  }
+
+  const text = await response.text();
+  return text as T;
 }

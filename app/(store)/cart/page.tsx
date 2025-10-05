@@ -2,7 +2,7 @@
 
 import { Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+
 import { Suspense, useState } from "react";
 import { toast } from "sonner";
 import { EmptyCart } from "@/components/cart/empty-cart";

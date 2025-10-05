@@ -37,13 +37,13 @@ export function BuyNowButton({
 }: BuyNowButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    setIsLoading(true);
-    toast.loading("Processing your order...", {
-      id: "buy-now-processing",
-      description: `Adding ${product.title} to checkout`,
-    });
-  };
+  // const handleSubmit = async () => {
+  //   setIsLoading(true);
+  //   toast.loading("Processing your order...", {
+  //     id: "buy-now-processing",
+  //     description: `Adding ${product.title} to checkout`,
+  //   });
+  // };
 
   const handleError = (error?: unknown) => {
     setIsLoading(false);
@@ -60,16 +60,17 @@ export function BuyNowButton({
 
   // Style variations inspired by the PHP implementation
   const getButtonStyles = () => {
-    const baseStyles = "transition-all duration-300 ease-in-out font-semibold text-white !important border-none cursor-pointer";
-    
+    const baseStyles =
+      "transition-all duration-300 ease-in-out font-semibold text-white !important border-none cursor-pointer";
+
     switch (style) {
-      case 'minimal': // Corresponds to .custom-buy-now-loop
+      case "minimal": // Corresponds to .custom-buy-now-loop
         return cn(
           baseStyles,
           "bg-[#212121] hover:bg-[#757575] text-white",
           "rounded-sm px-5 py-2.5 text-sm w-full text-center"
         );
-      case 'full-width': // Corresponds to .custom-buy-now-button
+      case "full-width": // Corresponds to .custom-buy-now-button
         return cn(
           baseStyles,
           "bg-[#212121] hover:bg-[#757575] text-white w-full",
@@ -79,16 +80,12 @@ export function BuyNowButton({
           "max-w-xs:py-[18px] max-w-xs:px-[18px] max-w-xs:text-[14px]" // Mobile
         );
       default:
-        return cn(
-          "bg-orange-500 hover:bg-orange-600 text-white",
-          baseStyles
-        );
+        return cn("bg-orange-500 hover:bg-orange-600 text-white", baseStyles);
     }
   };
 
   return (
     <form
-      action="/api/buy-now"
       action={async (formData) => {
         try {
           await buyNowAction(formData);
@@ -96,7 +93,7 @@ export function BuyNowButton({
           handleError(error);
         }
       }}
-      className={style === 'full-width' ? 'w-full' : ''}
+      className={style === "full-width" ? "w-full" : ""}
     >
       <input
         type="hidden"
@@ -116,7 +113,7 @@ export function BuyNowButton({
         name="productImage"
         value={variant?.featured_image || product.images?.[0]?.src || ""}
       />
-      
+
       {/* UTM Parameters */}
       <input type="hidden" name="utm_source" value={utmParams.utm_source} />
       <input type="hidden" name="utm_medium" value={utmParams.utm_medium} />
@@ -127,7 +124,7 @@ export function BuyNowButton({
         disabled={isLoading || !product.in_stock || !variant}
         className={cn(
           getButtonStyles(),
-          style === 'full-width' && 'w-full',
+          style === "full-width" && "w-full",
           className
         )}
         size={size}
