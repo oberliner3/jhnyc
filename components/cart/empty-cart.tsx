@@ -13,7 +13,10 @@ export function EmptyCart() {
 	const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
 
 	useEffect(() => {
-		getProducts({ limit: 4 }).then(setFeaturedProducts);
+		getProducts({
+      limit: 8,
+      page: 1,
+    }).then(setFeaturedProducts);
 	}, []);
 
 	return (

@@ -9,7 +9,6 @@ import { env } from "@/lib/env-validation";
 import { ApiClientError, logError } from "@/lib/errors";
 import { cache } from "@/lib/redis";
 import { callExternalApi, ExternalApiError } from "@/lib/external-api-errors";
-import { decode } from "msgpack-javascript";
 
 export interface ApiClientOptions extends RequestInit {
   timeout?: number;
@@ -129,7 +128,7 @@ function applyServerHeaders(headers: Headers) {
   }
 
   headers.set("X-API-Key", COSMOS_API_KEY);
-  headers.set("Accept", "application/json, application/x-msgpack;q=0.9");
+  headers.set("Accept", "application/json");
   headers.set("Content-Type", "application/json");
 }
 
@@ -186,11 +185,6 @@ async function fetchFromInternal<T>(
   }
 
   const contentType = response.headers.get("Content-Type") || "";
-
-  if (contentType.includes("application/x-msgpack")) {
-    const arrayBuffer = await response.arrayBuffer();
-    return decode(arrayBuffer) as T;
-  }
 
   if (contentType.includes("application/json")) {
     return (await response.json()) as T;

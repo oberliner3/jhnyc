@@ -4,7 +4,7 @@ import { SITE_CONFIG } from "@/lib/constants";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	try {
-		const products = await getProducts({ limit: 10000 });
+		const products = await getProducts({ limit: 10000, page: 1 });
 
 		// Core pages
 		const corePages: MetadataRoute.Sitemap = [

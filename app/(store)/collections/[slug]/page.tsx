@@ -124,6 +124,7 @@ async function CollectionProducts({
         // Fallback to the old filtering method if collection API fails
         const allProducts = await getProducts({
           limit: 200,
+          page: 1,
         });
 
         let filteredProducts = allProducts;

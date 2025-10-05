@@ -8,8 +8,9 @@ import { getCollectionByHandle } from "@/lib/data/products";
 
 async function FeaturedProductsList() {
 	const apiProducts = await getCollectionByHandle("featured", {
-		limit: 8,
-	});
+    limit: 8,
+    page: 1,
+  });
 	const products = apiProducts;
 
 	return (

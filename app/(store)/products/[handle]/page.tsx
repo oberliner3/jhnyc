@@ -8,18 +8,24 @@ import { getProducts, getProductByHandle } from "@/lib/data/products";
 import { SITE_CONFIG } from "@/lib/constants";
 import { generateSEO } from "@/lib/seo";
 import { ProductDetailsClient } from "./product-details-client";
+import { ApiProduct } from "@/lib/types";
 
 export const revalidate = 60;
 export const dynamic = "force-dynamic";
 
-interface ProductPageProps {
+export interface ProductPageProps {
   params: Promise<{ handle: string }>;
 }
 
 export async function generateStaticParams() {
   try {
-    const products: ApiProduct[] = await getProducts({ limit: 100 });
-    return products.filter((p: ApiProduct) => p.handle).map((p: ApiProduct) => ({ handle: p.handle }));
+    const products: ApiProduct[] = await getProducts({
+      limit: 100,
+      page: 1,
+    });
+    return products
+      .filter((p: ApiProduct) => p.handle)
+      .map((p: ApiProduct) => ({ handle: p.handle }));
   } catch {
     return [] as { handle: string }[];
   }
@@ -30,7 +36,9 @@ export async function generateMetadata({
 }: ProductPageProps): Promise<Metadata> {
   try {
     const { handle } = await params;
-    const product = await getProductByHandle(handle);
+    const product = await getProductByHandle(handle, {
+      context: "ssr",
+    });
 
     if (!product) {
       return generateSEO({ title: "Product Not Found" });
@@ -51,7 +59,7 @@ export async function generateMetadata({
 }
 
 async function ProductPageContent({ handle }: { handle: string }) {
-  const product = await getProductByHandle(handle);
+  const product = await getProductByHandle(handle, { context: "ssr" });
 
   if (!product) {
     notFound();

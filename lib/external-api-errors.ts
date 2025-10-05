@@ -58,21 +58,21 @@ export async function withRetry<T>(
         return error.retryable || error.status >= 500;
       }
       return true;
-    }
+    },
   } = options;
 
-  let lastError: Error = new Error('Unknown error during retry operation');
-  
+  let lastError: Error = new Error("Unknown error during retry operation");
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error as Error;
-      
+
       if (attempt === maxRetries || !retryCondition(error as Error)) {
         break;
       }
-      
+
       // Calculate delay with exponential backoff and jitter
       const delay = Math.min(
         baseDelay * Math.pow(backoffMultiplier, attempt - 1),
@@ -80,12 +80,16 @@ export async function withRetry<T>(
       );
       const jitter = Math.random() * 0.1 * delay; // 10% jitter
       const totalDelay = delay + jitter;
-      
-      console.log(`🔄 Retry attempt ${attempt}/${maxRetries} after ${totalDelay.toFixed(0)}ms`);
-      await new Promise(resolve => setTimeout(resolve, totalDelay));
+
+      console.log(
+        `🔄 Retry attempt ${attempt}/${maxRetries} after ${totalDelay.toFixed(
+          0
+        )}ms`
+      );
+      await new Promise((resolve) => setTimeout(resolve, totalDelay));
     }
   }
-  
+
   throw lastError;
 }
 
@@ -100,14 +104,14 @@ export async function withCircuitBreaker<T>(
   const {
     failureThreshold = 5,
     resetTimeout = 60000, // 1 minute
-    monitoringPeriod = 300000 // 5 minutes
+    monitoringPeriod = 300000, // 5 minutes
   } = options;
 
   const now = Date.now();
   const state = circuitBreakers.get(key) || {
     failures: 0,
     lastFailureTime: 0,
-    state: 'CLOSED' as const
+    state: "CLOSED" as const,
   };
 
   // Reset failures if monitoring period has passed
@@ -116,9 +120,9 @@ export async function withCircuitBreaker<T>(
   }
 
   // Check circuit breaker state
-  if (state.state === 'OPEN') {
+  if (state.state === "OPEN") {
     if (now - state.lastFailureTime > resetTimeout) {
-      state.state = 'HALF_OPEN';
+      state.state = "HALF_OPEN";
       console.log(`🔓 Circuit breaker ${key} moved to HALF_OPEN`);
     } else {
       throw new ExternalApiError(
@@ -132,24 +136,26 @@ export async function withCircuitBreaker<T>(
 
   try {
     const result = await fn();
-    
+
     // Success - reset circuit breaker
-    if (state.state === 'HALF_OPEN') {
-      state.state = 'CLOSED';
+    if (state.state === "HALF_OPEN") {
+      state.state = "CLOSED";
       state.failures = 0;
       console.log(`✅ Circuit breaker ${key} reset to CLOSED`);
     }
-    
+
     return result;
   } catch (error) {
     state.failures++;
     state.lastFailureTime = now;
-    
+
     if (state.failures >= failureThreshold) {
-      state.state = 'OPEN';
-      console.log(`🔒 Circuit breaker ${key} moved to OPEN (${state.failures} failures)`);
+      state.state = "OPEN";
+      console.log(
+        `🔒 Circuit breaker ${key} moved to OPEN (${state.failures} failures)`
+      );
     }
-    
+
     circuitBreakers.set(key, state);
     throw error;
   }
@@ -163,71 +169,72 @@ export async function resilientFetch(
   options: RequestInit = {},
   circuitBreakerKey?: string
 ): Promise<Response> {
-  const fetchWithRetry = () => withRetry(async () => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-    
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new ExternalApiError(
-          `HTTP ${response.status}: ${errorBody}`,
-          response.status,
-          url,
-          response.status >= 500, // Retry on 5xx errors
-        );
-      }
-      
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      
-      if (error instanceof ExternalApiError) {
-        throw error;
-      }
-      
-      // Handle network errors
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
+  const fetchWithRetry = () =>
+    withRetry(async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorBody = await response.text();
           throw new ExternalApiError(
-            'Request timeout',
-            408,
+            `HTTP ${response.status}: ${errorBody}`,
+            response.status,
+            url,
+            response.status >= 500 // Retry on 5xx errors
+          );
+        }
+
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+
+        if (error instanceof ExternalApiError) {
+          throw error;
+        }
+
+        // Handle network errors
+        if (error instanceof Error) {
+          if (error.name === "AbortError") {
+            throw new ExternalApiError(
+              "Request timeout",
+              408,
+              url,
+              true,
+              error
+            );
+          }
+
+          throw new ExternalApiError(
+            `Network error: ${error.message}`,
+            0,
             url,
             true,
             error
           );
         }
-        
+
         throw new ExternalApiError(
-          `Network error: ${error.message}`,
+          "Unknown error",
           0,
           url,
           true,
-          error
+          error as Error
         );
       }
-      
-      throw new ExternalApiError(
-        'Unknown error',
-        0,
-        url,
-        true,
-        error as Error
-      );
-    }
-  });
+    });
 
   if (circuitBreakerKey) {
     return withCircuitBreaker(circuitBreakerKey, fetchWithRetry);
   }
-  
+
   return fetchWithRetry();
 }
 
@@ -239,30 +246,30 @@ export async function checkApiHealth(
   timeout: number = 5000
 ): Promise<{ healthy: boolean; latency: number; error?: string }> {
   const startTime = Date.now();
-  
+
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
-    
+
     const response = await fetch(url, {
-      method: 'HEAD',
-      signal: controller.signal
+      method: "HEAD",
+      signal: controller.signal,
     });
-    
+
     clearTimeout(timeoutId);
     const latency = Date.now() - startTime;
-    
+
     return {
       healthy: response.ok,
       latency,
-      error: response.ok ? undefined : `HTTP ${response.status}`
+      error: response.ok ? undefined : `HTTP ${response.status}`,
     };
   } catch (error) {
     const latency = Date.now() - startTime;
     return {
       healthy: false,
       latency,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -272,30 +279,27 @@ export async function checkApiHealth(
  */
 export class RateLimiter {
   private requests: number[] = [];
-  
-  constructor(
-    private maxRequests: number,
-    private windowMs: number
-  ) {}
-  
+
+  constructor(private maxRequests: number, private windowMs: number) {}
+
   async waitIfNeeded(): Promise<void> {
     const now = Date.now();
-    
+
     // Remove old requests outside the window
     this.requests = this.requests.filter(
-      timestamp => now - timestamp < this.windowMs
+      (timestamp) => now - timestamp < this.windowMs
     );
-    
+
     if (this.requests.length >= this.maxRequests) {
       const oldestRequest = Math.min(...this.requests);
       const waitTime = this.windowMs - (now - oldestRequest);
-      
+
       if (waitTime > 0) {
         console.log(`⏳ Rate limit reached, waiting ${waitTime}ms`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
       }
     }
-    
+
     this.requests.push(now);
   }
 }
@@ -315,16 +319,8 @@ export async function callExternalApi<T>(
 ): Promise<T> {
   // Apply rate limiting
   await externalApiRateLimiter.waitIfNeeded();
-  
+
   const response = await resilientFetch(url, options, circuitBreakerKey);
-  
-  const contentType = response.headers.get('Content-Type');
-  
-  if (contentType?.includes('application/x-msgpack')) {
-    const arrayBuffer = await response.arrayBuffer();
-    const { decode } = await import('msgpack-javascript');
-    return decode(arrayBuffer) as T;
-  }
-  
+
   return response.json();
 }

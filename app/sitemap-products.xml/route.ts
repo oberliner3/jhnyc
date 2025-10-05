@@ -4,7 +4,11 @@ import { SITE_CONFIG } from "@/lib/constants";
 
 export async function GET() {
 	try {
-		const products = await getProducts({ limit: 10000 });
+		const products = await getProducts({
+      limit: 10000,
+      page: 1,
+      context: "ssr",
+    });
 
 		const productEntries = products
 			.map((product) => {

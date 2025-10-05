@@ -222,6 +222,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
               quantity={quantity}
               style="full-width"
               className="w-full"
+
             />
           </div>
 

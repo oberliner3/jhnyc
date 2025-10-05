@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";
 import { toast } from "sonner";
 import { buyNowAction } from "@/lib/actions";
-import { mergeUtmParams } from "@/lib/utils";
+import { mergeUtmParams, UTMParams } from "@/lib/utils";
 
 interface BuyNowButtonProps {
   product: ApiProduct;
@@ -15,11 +15,7 @@ interface BuyNowButtonProps {
   className?: string;
   style?: "default" | "minimal" | "full-width";
   size?: "sm" | "lg";
-  utmParams?: {
-    utm_source?: string;
-    utm_medium?: string;
-    utm_campaign?: string;
-  };
+  utmParams?: UTMParams;
 }
 
 export function BuyNowButton({
@@ -32,7 +28,7 @@ export function BuyNowButton({
   utmParams,
 }: BuyNowButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const mergedUtm = mergeUtmParams(utmParams);
+  const mergedUtm = mergeUtmParams({ ...utmParams });
 
   const handleError = (error?: unknown) => {
     setIsLoading(false);

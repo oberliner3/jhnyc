@@ -8,7 +8,9 @@ interface ProductDetailsServerProps {
 export async function ProductDetailsServer({
   slug,
 }: ProductDetailsServerProps) {
-  const product = await getProductByHandle(slug);
+  const product = await getProductByHandle(slug, {
+    context: "ssr",
+  });
 
   if (!product) {
     // Handle case where product is not found
