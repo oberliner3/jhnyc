@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
-import { getAllProducts } from "@/lib/api";
+import { getProducts } from "@/lib/data/products";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	try {
-		const products = await getAllProducts();
+		const products = await getProducts({ limit: 10000 });
 
 		// Core pages
 		const corePages: MetadataRoute.Sitemap = [

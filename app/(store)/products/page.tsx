@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
-import { getAllProducts } from "@/lib/api";
+import { getProducts } from "@/lib/data/products";
 import type { ApiProduct } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ function ProductsList() {
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    getAllProducts({ limit: 24, page: 1 }).then((initialProducts) => {
+    getProducts({ limit: 24, page: 1 }).then((initialProducts) => {
       setProducts(initialProducts);
       if (initialProducts.length < 24) {
         setHasMore(false);
@@ -24,7 +24,7 @@ function ProductsList() {
 
   const loadMore = async () => {
     const nextPage = page + 1;
-    const newProducts = await getAllProducts({ limit: 24, page: nextPage });
+    const newProducts = await getProducts({ limit: 24, page: nextPage });
     if (newProducts.length > 0) {
       setProducts((prevProducts) => [...prevProducts, ...newProducts]);
       setPage(nextPage);

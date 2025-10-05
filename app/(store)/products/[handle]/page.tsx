@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { ProductSchema } from "@/components/common/product-schema";
 import { ProductDetailsSkeleton } from "@/components/skeletons/product-details-skeleton";
 import { ProductProvider } from "@/contexts/product-context";
-import { getAllProducts, getProductByHandle } from "@/lib/api";
+import { getProducts, getProductByHandle } from "@/lib/data/products";
 import { SITE_CONFIG } from "@/lib/constants";
 import { generateSEO } from "@/lib/seo";
 import { ProductDetailsClient } from "./product-details-client";
@@ -18,8 +18,8 @@ interface ProductPageProps {
 
 export async function generateStaticParams() {
   try {
-    const products = await getAllProducts({ limit: 100 });
-    return products.filter((p) => p.handle).map((p) => ({ handle: p.handle }));
+    const products: ApiProduct[] = await getProducts({ limit: 100 });
+    return products.filter((p: ApiProduct) => p.handle).map((p: ApiProduct) => ({ handle: p.handle }));
   } catch {
     return [] as { handle: string }[];
   }

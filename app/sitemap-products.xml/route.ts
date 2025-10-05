@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getAllProducts } from "@/lib/api";
+import { getProducts } from "@/lib/data/products";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export async function GET() {
 	try {
-		const products = await getAllProducts();
+		const products = await getProducts({ limit: 10000 });
 
 		const productEntries = products
 			.map((product) => {

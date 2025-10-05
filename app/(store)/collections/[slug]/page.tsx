@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { CollectionSkeleton } from "@/components/skeletons/collection-skeleton";
 import { Button } from "@/components/ui/button";
-import { loadDataOptimized, loadProducts } from "@/lib/msgpack-loader";
+import { getProducts, getCollectionByHandle } from "@/lib/data/products";
 import { generateSEO } from "@/lib/seo";
 import type { ApiProduct } from "@/lib/types";
 
@@ -83,50 +83,34 @@ async function CollectionProducts({
     ];
 
     if (slug === "all") {
-      // Use the regular products endpoint with pagination
-      products = await loadProducts({
+      products = await getProducts({
         limit: productsPerPage,
         page,
-        context: "ssr",
       });
       // Fetch one more product to check if there's a next page
-      const nextPageProducts = await loadProducts({
+      const nextPageProducts = await getProducts({
         limit: 1,
         page: page + 1,
-        context: "ssr",
       });
       hasNextPage = nextPageProducts.length > 0;
       totalProducts = products.length; // We don't have exact total, use products length
     } else if (apiCollections.includes(slug)) {
       // Use the external API collections endpoint directly
       try {
-        const collectionData = await loadDataOptimized<{
-          products: ApiProduct[];
-          meta?: {
-            total: number;
-            page: number;
-            limit: number;
-            total_pages: number;
-          };
-        }>(`/collections/${slug}?page=${page}&limit=${productsPerPage}`, {
-          context: "ssr",
+        const collectionProducts = await getCollectionByHandle(slug, {
+          page,
+          limit: productsPerPage,
         });
 
-        products = Array.isArray(collectionData.products)
-          ? collectionData.products
+        products = Array.isArray(collectionProducts)
+          ? collectionProducts
           : [];
         // Force all products to in_stock: true (as per your existing logic)
-        products = products.map((p) => ({ ...p, in_stock: true }));
+        products = products.map((p: ApiProduct) => ({ ...p, in_stock: true }));
 
-        // Handle pagination from API meta data
-        if (collectionData.meta) {
-          totalProducts = collectionData.meta.total;
-          hasNextPage = page < collectionData.meta.total_pages;
-        } else {
-          // Fallback: assume there might be more if we got a full page
-          totalProducts = products.length;
-          hasNextPage = products.length === productsPerPage;
-        }
+        // For collections, we don't have meta directly from getCollectionByHandle, so we'll estimate
+        totalProducts = products.length;
+        hasNextPage = products.length === productsPerPage; // Simple heuristic
 
         console.log(
           `🎆 Collection "${slug}" from API: ${products.length} products, total: ${totalProducts}, hasNext: ${hasNextPage}`
@@ -138,9 +122,8 @@ async function CollectionProducts({
         );
 
         // Fallback to the old filtering method if collection API fails
-        const allProducts = await loadProducts({
+        const allProducts = await getProducts({
           limit: 200,
-          context: "ssr",
         });
 
         let filteredProducts = allProducts;
@@ -190,10 +173,9 @@ async function CollectionProducts({
       }
     } else {
       // Unknown collection, try to load as regular products
-      products = await loadProducts({
+      products = await getProducts({
         limit: productsPerPage,
         page,
-        context: "ssr",
       });
       totalProducts = products.length;
       hasNextPage = products.length === productsPerPage;

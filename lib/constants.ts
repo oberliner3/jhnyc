@@ -84,6 +84,7 @@ export const API_CONFIG = {
 	RETRY_ATTEMPTS: 3,
 	RETRY_DELAY: 1000, // Base retry delay in milliseconds
 	TIMEOUT: LIMITS.API_TIMEOUT,
+	PRODUCT_STREAM_API: env.COSMOS_API_BASE_URL,
 	HEADERS: {
 		"Content-Type": "application/json",
 		"User-Agent": "ua-x-originz/1.0.0",

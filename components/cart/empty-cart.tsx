@@ -4,7 +4,7 @@ import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product/product-card";
-import { getAllProducts } from "@/lib/api";
+import { getProducts } from "@/lib/data/products";
 import { useEffect, useState } from "react";
 
 import type { ApiProduct } from "@/lib/types";
@@ -13,7 +13,7 @@ export function EmptyCart() {
 	const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
 
 	useEffect(() => {
-		getAllProducts({ limit: 4 }).then(setFeaturedProducts);
+		getProducts({ limit: 4 }).then(setFeaturedProducts);
 	}, []);
 
 	return (

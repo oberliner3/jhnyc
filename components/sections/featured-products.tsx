@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { FeaturedProductsSkeleton } from "@/components/skeletons/featured-products-skeleton";
 import { Button } from "@/components/ui/button";
-import { getCollectionByHandle } from "@/lib/api";
+import { getCollectionByHandle } from "@/lib/data/products";
 
 async function FeaturedProductsList() {
 	const apiProducts = await getCollectionByHandle("featured", {

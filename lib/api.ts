@@ -1,7 +1,7 @@
-import { PRODUCT_STREAM_API } from "@/lib/constants";
+import { API_CONFIG } from "@/lib/constants";
 
 export async function fetchJsonData<T>(path: string, options?: RequestInit): Promise<T> {
-  const url = new URL(path, PRODUCT_STREAM_API);
+  const url = new URL(path, API_CONFIG.PRODUCT_STREAM_API);
   const response = await fetch(url.toString(), options);
 
   if (!response.ok) {

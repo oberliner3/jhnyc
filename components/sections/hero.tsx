@@ -88,10 +88,15 @@ export function Hero() {
                   <div className="aspect-video">
                     <iframe
                       className="rounded-lg w-full h-full"
-                      src="https://www.youtube.com/embed/njVnaQmtfOE"
-                      title="YouTube video player"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      src="https://www.youtube.com/embed/Hz50_YpicEg"
+                      title="Palm Tree Shadow Free White Background Videos, Motion Graphics, No Copyright | All Background Videos"
+                      frameBorder={0}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
                       allowFullScreen
+                      allowTransparency
+                      loading="lazy"
+                      seamless
                     ></iframe>
                   </div>
                 </DialogContent>

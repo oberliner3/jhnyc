@@ -1,4 +1,4 @@
-import { getProductByHandle } from "@/lib/api";
+import { getProductByHandle } from "@/lib/data/products";
 import { ProductDetailsClient } from "./product-details-client";
 
 interface ProductDetailsServerProps {

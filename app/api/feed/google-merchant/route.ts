@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAllProducts } from "@/lib/api";
+import { getProducts } from "@/lib/data/products";
 import { SITE_CONFIG } from "@/lib/constants";
 import type { ApiProduct } from "@/lib/types";
 import { escapeXml, stripHtml } from "@/lib/utils";
@@ -9,7 +9,7 @@ async function fetchAllProducts(): Promise<ApiProduct[]> {
 	let page = 1;
 	const all: ApiProduct[] = [];
 	while (true) {
-		const batch = await getAllProducts({ limit: pageSize, page });
+		const batch = await getProducts({ limit: pageSize, page });
 		if (!batch || batch.length === 0) break;
 		all.push(...batch);
 		if (batch.length < pageSize) break;

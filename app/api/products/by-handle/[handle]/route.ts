@@ -23,4 +23,14 @@ export async function GET(
 		);
 
 		return response;
-
+	} catch (error) {
+		console.error(
+			`[API] Failed to fetch product with handle ${(await context.params).handle} from external API:`,
+			error,
+		);
+		return NextResponse.json(
+			{ error: "Failed to fetch product" },
+			{ status: 500 },
+		);
+	}
+}
