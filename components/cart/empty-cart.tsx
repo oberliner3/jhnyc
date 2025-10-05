@@ -4,19 +4,31 @@ import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product/product-card";
-import { getProducts } from "@/lib/data/products";
 import { useEffect, useState } from "react";
 
 import type { ApiProduct } from "@/lib/types";
+
+/**
+ * Fetch products from API route
+ */
+async function fetchProducts(limit: number = 8): Promise<ApiProduct[]> {
+  const response = await fetch(`/api/products?page=1&limit=${limit}`);
+  if (!response.ok) {
+    return [];
+  }
+  const data = await response.json();
+  return data.products || [];
+}
 
 export function EmptyCart() {
 	const [featuredProducts, setFeaturedProducts] = useState<ApiProduct[]>([]);
 
 	useEffect(() => {
-		getProducts({
-      limit: 8,
-      page: 1,
-    }).then(setFeaturedProducts);
+		fetchProducts(8)
+      .then(setFeaturedProducts)
+      .catch((error) => {
+        console.error("Error loading featured products:", error);
+      });
 	}, []);
 
 	return (

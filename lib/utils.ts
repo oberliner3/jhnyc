@@ -91,17 +91,5 @@ export function generateImage({
 	});
 }
 
-export function stripHtml(html: string): string {
-	return html.replace(/(<([^>]+)>)/gi, "");
-}
-
-// Escape XML special characters to keep feeds valid
-export function escapeXml(str: string | undefined | null): string {
-	if (!str) return "";
-	return String(str)
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&apos;");
-}
+// Re-export from xml-utils for backward compatibility
+export { stripHtml, escapeXml } from "./utils/xml-utils";

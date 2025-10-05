@@ -3,15 +3,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product/product-card";
-import { searchProducts } from "@/lib/data/products";
 import type { ApiProduct } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Fetch search results from API route
+ */
 async function getSearchResults(query: string): Promise<ApiProduct[]> {
-  // Query Cosmos directly and map to internal Product type
-  const apiProducts = await searchProducts(query, { limit: 20, page: 1 });
-  return apiProducts;
+  const response = await fetch(
+    `/api/products?search=${encodeURIComponent(query)}&limit=20&page=1`
+  );
+  if (!response.ok) {
+    throw new Error("Failed to search products");
+  }
+  const data = await response.json();
+  return data.products || [];
 }
 
 export default function SearchPage() {

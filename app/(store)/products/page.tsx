@@ -3,33 +3,66 @@
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
-import { getProducts } from "@/lib/data/products";
 import type { ApiProduct } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+/**
+ * Fetch products from API route
+ */
+async function fetchProducts(
+  page: number,
+  limit: number = 24
+): Promise<ApiProduct[]> {
+  const response = await fetch(`/api/products?page=${page}&limit=${limit}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
+  const data = await response.json();
+  return data.products || [];
+}
 
 function ProductsList() {
   const [products, setProducts] = useState<ApiProduct[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    getProducts({ limit: 24, page: 1 }).then((initialProducts) => {
-      setProducts(initialProducts);
-      if (initialProducts.length < 24) {
-        setHasMore(false);
-      }
-    });
+    setIsLoading(true);
+    fetchProducts(1, 24)
+      .then((initialProducts) => {
+        setProducts(initialProducts);
+        if (initialProducts.length < 24) {
+          setHasMore(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Error loading products:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   const loadMore = async () => {
-    const nextPage = page + 1;
-    const newProducts = await getProducts({ limit: 24, page: nextPage });
-    if (newProducts.length > 0) {
-      setProducts((prevProducts) => [...prevProducts, ...newProducts]);
-      setPage(nextPage);
-    } else {
-      setHasMore(false);
+    setIsLoading(true);
+    try {
+      const nextPage = page + 1;
+      const newProducts = await fetchProducts(nextPage, 24);
+      if (newProducts.length > 0) {
+        setProducts((prevProducts) => [...prevProducts, ...newProducts]);
+        setPage(nextPage);
+        if (newProducts.length < 24) {
+          setHasMore(false);
+        }
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error("Error loading more products:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

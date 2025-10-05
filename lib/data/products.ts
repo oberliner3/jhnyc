@@ -1,5 +1,6 @@
-import { API_CONFIG } from "@/lib/constants";
 import type { ApiProduct } from "@/lib/types";
+import { logger } from "@/lib/utils/logger";
+import * as cosmosClient from "@/lib/api/cosmos-client";
 
 export interface GetProductsOptions {
   limit: number;
@@ -8,37 +9,45 @@ export interface GetProductsOptions {
   context?: "ssr" | "client";
 }
 
+/**
+ * Get products with optional search
+ * Wrapper around COSMOS API client for backward compatibility
+ */
 export async function getProducts({
   limit,
   page,
   search,
   context,
 }: GetProductsOptions): Promise<ApiProduct[]> {
-  // This is a placeholder function. In a real application, you would fetch data from an external API.
-  // For now, it returns an empty array.
-  console.log(
-    `[getProducts] Fetching products with limit=${limit}, page=${page}, search=${
-      search || "none"
-    }, context=${context}`
-  );
-
-  // Simulate API call
-  const url = new URL(`${API_CONFIG.PRODUCT_STREAM_API}/products`);
-  url.searchParams.set("limit", limit.toString());
-  url.searchParams.set("page", page.toString());
-  if (search) {
-    url.searchParams.set("search", search);
-  }
+  logger.debug("Fetching products", {
+    limit,
+    page,
+    search: search || "none",
+    context,
+  });
 
   try {
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      throw new Error(`API call failed with status: ${response.status}`);
+    // If search query provided, use search endpoint
+    if (search) {
+      const response = await cosmosClient.searchProducts(
+        search,
+        { limit, page },
+        {
+          cache: context === "ssr" ? "force-cache" : "default",
+          revalidate: 300,
+        }
+      );
+      return response.products || [];
     }
-    const data = await response.json();
-    return data.products || [];
+
+    // Otherwise use regular products endpoint
+    const response = await cosmosClient.getProducts(
+      { limit, page },
+      { cache: context === "ssr" ? "force-cache" : "default", revalidate: 300 }
+    );
+    return response.products || [];
   } catch (error) {
-    console.error("Error fetching products:", error);
+    logger.error("Error fetching products", error);
     return [];
   }
 }
@@ -47,30 +56,23 @@ export interface GetProductByHandleOptions {
   context?: "ssr" | "client";
 }
 
+/**
+ * Get product by handle
+ */
 export async function getProductByHandle(
   handle: string,
   { context = "ssr" }: GetProductByHandleOptions
 ): Promise<ApiProduct | null> {
-  console.log(
-    `[getProductByHandle] Fetching product with handle=${handle}, context=${context}`
-  );
-
-  const url = new URL(
-    `${API_CONFIG.PRODUCT_STREAM_API}/products/handle/${handle}`
-  );
+  logger.debug("Fetching product by handle", { handle, context });
 
   try {
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null; // Product not found
-      }
-      throw new Error(`API call failed with status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.product || null;
+    const response = await cosmosClient.getProduct(handle, {
+      cache: context === "ssr" ? "force-cache" : "default",
+      revalidate: 300,
+    });
+    return response.product || null;
   } catch (error) {
-    console.error("Error fetching product by handle:", error);
+    logger.error("Error fetching product by handle", error, { handle });
     return null;
   }
 }
@@ -79,27 +81,23 @@ interface GetProductByIdOptions {
   context?: "ssr" | "client";
 }
 
+/**
+ * Get product by ID
+ */
 export async function getProductById(
   id: string,
   { context }: GetProductByIdOptions
 ): Promise<ApiProduct | null> {
-  console.log(
-    `[getProductById] Fetching product with id=${id}, context=${context}`
-  );
-
-  const url = new URL(`${API_CONFIG.PRODUCT_STREAM_API}/products/${id}`);
+  logger.debug("Fetching product by ID", { id, context });
 
   try {
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null; // Product not found
-      }
-      throw new Error(`API call failed with status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.product || null;
-  } catch {
+    const response = await cosmosClient.getProduct(id, {
+      cache: context === "ssr" ? "force-cache" : "default",
+      revalidate: 300,
+    });
+    return response.product || null;
+  } catch (error) {
+    logger.error("Error fetching product by ID", error, { id });
     return null;
   }
 }
@@ -110,28 +108,24 @@ interface SearchProductsOptions {
   context?: "ssr" | "client";
 }
 
+/**
+ * Search for products
+ */
 export async function searchProducts(
   query: string,
   { limit, page, context }: SearchProductsOptions
 ): Promise<ApiProduct[]> {
-  console.log(
-    `[searchProducts] Searching for products with query=${query}, limit=${limit}, page=${page}, context=${context}`
-  );
-
-  const url = new URL(`${API_CONFIG.PRODUCT_STREAM_API}/products/search`);
-  url.searchParams.set("q", query);
-  url.searchParams.set("limit", limit.toString());
-  url.searchParams.set("page", page.toString());
+  logger.debug("Searching products", { query, limit, page, context });
 
   try {
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      throw new Error(`API call failed with status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.products || [];
+    const response = await cosmosClient.searchProducts(
+      query,
+      { limit, page },
+      { cache: context === "ssr" ? "force-cache" : "default", revalidate: 180 }
+    );
+    return response.products || [];
   } catch (error) {
-    console.log(error)
+    logger.error("Error searching products", error, { query });
     return [];
   }
 }
@@ -143,30 +137,30 @@ interface GetCollectionByHandleOptions {
   context?: "ssr" | "client";
 }
 
+/**
+ * Get products from a collection
+ */
 export async function getCollectionByHandle(
   handle: string,
   { limit, page, fields, context }: GetCollectionByHandleOptions
 ): Promise<ApiProduct[]> {
-  console.log(
-    `[getCollectionByHandle] Fetching collection with handle=${handle}, limit=${limit}, page=${page}, context=${context}`
-  );
-
-  const url = new URL(`${API_CONFIG.PRODUCT_STREAM_API}/collections/${handle}`);
-  url.searchParams.set("limit", limit.toString());
-  url.searchParams.set("page", page.toString());
-  if (fields) {
-    url.searchParams.set("fields", fields);
-  }
+  logger.debug("Fetching collection by handle", {
+    handle,
+    limit,
+    page,
+    fields,
+    context,
+  });
 
   try {
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      throw new Error(`API call failed with status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.products || [];
+    const response = await cosmosClient.getCollection(
+      handle,
+      { limit, page, fields },
+      { cache: context === "ssr" ? "force-cache" : "default", revalidate: 600 }
+    );
+    return response.products || [];
   } catch (error) {
-    console.error("Error fetching collection by handle:", error);
+    logger.error("Error fetching collection by handle", error, { handle });
     return [];
   }
 }
