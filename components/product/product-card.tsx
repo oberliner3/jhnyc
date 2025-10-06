@@ -54,64 +54,33 @@ export function ProductCard({ product }: ProductCardProps) {
   const shortDescription = stripHtml(product.body_html || "").slice(0, 100);
 
   return (
-    <div
-      className="group relative bg-card hover:shadow-xl border rounded-lg overflow-hidden text-card-foreground transition-all duration-300"
+    <article
+      className="group relative bg-card hover:shadow-xl border rounded-lg overflow-hidden text-card-foreground transition-all duration-300 flex flex-col"
       onMouseEnter={() => hasMultipleImages && setCurrentImageIndex(1)}
       onMouseLeave={() => hasMultipleImages && setCurrentImageIndex(0)}
     >
-      {/* Product Image */}
-      <Link href={`/products/${product.handle}`} className="block">
-        <div className="relative bg-gray-100 aspect-square overflow-hidden">
-          <Image
-            src={currentImage}
-            alt={product.title}
-            fill
-            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            priority={false}
-            loading="lazy"
-          />
-          {discountPercentage > 0 && (
-            <Badge variant="destructive" className="top-2 left-2 z-10 absolute">
-              -{discountPercentage}%
-            </Badge>
-          )}
-          {!product.in_stock && (
-            <div className="z-10 absolute inset-0 flex justify-center items-center bg-black/40">
-              <Badge variant="secondary" className="bg-white text-black">
-                Out of Stock
+      <header className="relative">
+        <Link href={`/products/${product.handle}`} className="block">
+          <div className="relative bg-gray-100 aspect-square overflow-hidden">
+            <Image
+              src={currentImage}
+              alt={product.title}
+              fill
+              className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              priority={false}
+              loading="lazy"
+            />
+            {discountPercentage > 0 && (
+              <Badge variant="destructive" className="top-2 left-2 z-10 absolute">
+                -{discountPercentage}%
               </Badge>
-            </div>
-          )}
-
-          {/* Quick Actions Overlay */}
-          <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 p-4 transition-opacity duration-300">
-            <div className="flex gap-2">
-              <div>
-                <BuyNowButton
-                  product={product}
-                  variant={selectedVariant}
-                  quantity={1}
-                  style="minimal"
-                  size="sm"
-                  className="flex-1 bg-white/90 hover:bg-white border-none text-black"
-                />
-              </div>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={handleAddToCart}
-                disabled={!product.in_stock}
-              >
-                <ShoppingCart className="w-4 h-4" />
-              </Button>
-            </div>
+            )}
           </div>
-        </div>
-      </Link>
+        </Link>
+      </header>
 
-      {/* Product Info */}
-      <div className="space-y-3 p-4">
+      <div className="p-4 space-y-3 flex-grow">
         <div className="space-y-1">
           <h3 className="font-semibold group-hover:text-primary line-clamp-1 transition-colors">
             <Link href={`/products/${product.handle}`}>{product.title}</Link>
@@ -122,7 +91,19 @@ export function ProductCard({ product }: ProductCardProps) {
             </p>
           )}
         </div>
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-lg">
+            {formatPrice(selectedVariant?.price || product.price)}
+          </span>
+          {product.compare_at_price && (
+            <span className="text-muted-foreground text-sm line-through">
+              {formatPrice(product.compare_at_price)}
+            </span>
+          )}
+        </div>
+      </div>
 
+      <footer className="p-4 pt-0 space-y-3">
         {hasVariants && (
           <div>
             <Select
@@ -145,50 +126,24 @@ export function ProductCard({ product }: ProductCardProps) {
             </Select>
           </div>
         )}
-
-        {/* Price and Actions */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-lg">
-              {formatPrice(selectedVariant?.price || product.price)}
-            </span>
-            {product.compare_at_price && (
-              <span className="text-muted-foreground text-sm line-through">
-                {formatPrice(product.compare_at_price)}
-              </span>
-            )}
-          </div>
-
-          {/* Desktop: Hidden buttons that appear on hover */}
-          <div className="hidden md:flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div onClick={() => {}} className="flex-1">
-              <BuyNowButton
-                product={product}
-                variant={selectedVariant}
-                quantity={1}
-                style="minimal"
-                size="sm"
-                className="w-full"
-              />
-            </div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleAddToCart}
-              disabled={!product.in_stock}
-            >
-              <ShoppingCart className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Mobile: Always visible buttons */}
-          <div className="md:hidden flex gap-2">
-            <Button size="sm" variant="default" className="flex-1" asChild>
-              <Link href={`/products/${product.handle}`}>View Details</Link>
-            </Button>
-          </div>
+        <div className="flex gap-2">
+          <BuyNowButton
+            product={product}
+            variant={selectedVariant}
+            quantity={1}
+            style="minimal"
+            size="sm"
+            className="flex-1"
+          />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAddToCart}
+          >
+            <ShoppingCart className="w-4 h-4" />
+          </Button>
         </div>
-      </div>
-    </div>
+      </footer>
+    </article>
   );
 }
