@@ -22,6 +22,27 @@ const eslintConfig = [{
   rules: {
     "react/no-danger": "error",
     "react/no-danger-with-children": "error",
+    // Prevent importing server-side modules in client components
+    // This prevents the critical production error where server-side environment
+    // variables are accessed on the client. See PRODUCTION_ERROR_FIX_V2.md
+    "no-restricted-imports": ["error", {
+      patterns: [{
+        group: ["**/lib/api/*", "**/lib/utils/*-server-utils*"],
+        message: "Server-side modules cannot be imported in client components. Use API routes (e.g., /api/products) instead. See docs/MIGRATION_GUIDE.md for details."
+      }]
+    }],
+  },
+}, {
+  // Allow server-side files to import server-side modules
+  files: [
+    "app/api/**/*.ts",
+    "app/api/**/*.tsx",
+    "lib/api/**/*.ts",
+    "lib/utils/*-server-utils.ts",
+    "lib/data/**/*.ts",
+  ],
+  rules: {
+    "no-restricted-imports": "off",
   },
 }, {
   files: [

@@ -1,21 +1,13 @@
 /**
  * Product Utility Functions
  * Shared utilities for product data manipulation and formatting
+ *
+ * NOTE: This file contains ONLY pure utility functions that can be used
+ * on both client and server. Server-side functions that access the COSMOS
+ * API are in separate files to prevent client-side bundle inclusion.
+ *
+ * For server-side product fetching, see: lib/utils/product-server-utils.ts
  */
-
-import type { ApiProduct } from "@/lib/types";
-import { fetchAllProducts as cosmosClientFetchAll } from "@/lib/api/cosmos-client";
-
-/**
- * Fetch all products with pagination
- * Used by merchant feeds and bulk operations
- * Re-exports from COSMOS client for convenience
- */
-export async function fetchAllProducts(
-  pageSize: number = 250
-): Promise<ApiProduct[]> {
-  return cosmosClientFetchAll(pageSize);
-}
 
 /**
  * Format price for merchant feeds (Google/Bing)

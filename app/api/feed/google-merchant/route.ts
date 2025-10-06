@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { SITE_CONFIG } from "@/lib/constants";
 import { escapeXml, stripHtml } from "@/lib/utils/xml-utils";
+import { fetchAllProducts } from "@/lib/utils/product-server-utils";
 import {
-  fetchAllProducts,
   formatPriceForMerchant,
   formatWeight,
 } from "@/lib/utils/product-utils";
