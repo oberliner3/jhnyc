@@ -97,25 +97,29 @@ export interface Address {
 
 // Types specific to the API response structure
 export interface ApiProduct {
-	id: string;
-	title: string;
-	handle: string;
-	body_html: string;
-	price: number;
-	compare_at_price?: number;
-	images: ApiProductImage[];
-	product_type: string;
-	in_stock: boolean;
-	rating: number;
-	review_count: number;
-	tags: string;
-	vendor: string;
-	variants: ApiProductVariant[];
-	options: ApiProductOption[];
-	created_at: string;
-	updated_at: string;
-	quantity?: number;
-	raw_json?: string;
+  id: string;
+  title: string;
+  handle: string;
+  body_html: string;
+  price: number;
+  compare_at_price?: number;
+  images: ApiProductImage[];
+  product_type: string;
+  in_stock: boolean;
+  rating: number;
+  review_count: number;
+  /**
+   * Product tags - can be either a comma-separated string or an array
+   * Use normalizeProductTags() utility to safely handle both formats
+   */
+  tags: string[] | null;
+  vendor: string;
+  variants: ApiProductVariant[];
+  options: ApiProductOption[];
+  created_at: string;
+  updated_at: string;
+  quantity?: number;
+  raw_json?: string;
 }
 
 export interface ApiProductImage {

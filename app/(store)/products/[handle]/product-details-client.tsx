@@ -12,6 +12,7 @@ import { useState } from "react";
 import { ProductSchema } from "@/components/common/product-schema";
 import { SafeHtml } from "@/components/common/safe-html";
 import { BuyNowButton } from "@/components/product/buy-now-button";
+import { normalizeProductTags } from "@/lib/utils";
 import {
   Accordion,
   AccordionContent,
@@ -222,7 +223,6 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
               quantity={quantity}
               style="full-width"
               className="w-full"
-
             />
           </div>
 
@@ -241,15 +241,18 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-            {product.tags && product.tags.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 mt-4">
-                {product.tags.split(",").map((tag) => (
-                  <Badge key={tag} variant="outline">
-                    {tag.split("_").join(" ").toUpperCase()}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            {(() => {
+              const productTags = normalizeProductTags(product.tags);
+              return productTags.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-2 mt-4">
+                  {productTags.map((tag) => (
+                    <Badge key={tag} variant="outline">
+                      {tag.split("_").join(" ").toUpperCase()}
+                    </Badge>
+                  ))}
+                </div>
+              ) : null;
+            })()}
           </div>
 
           <Separator />
