@@ -39,7 +39,7 @@ export function Hero() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="absolute inset-0 bg-black/60"></div>
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
       </div>
@@ -53,11 +53,10 @@ export function Hero() {
                 New Collection
               </div>
               <h1 className="text-4xl lg:text-6xl font-semibold tracking-tight text-foreground">
-                Timeless essentials for everyday life.
+                Beyond the Hype: Exclusive Drops, Unseen Prices.
               </h1>
-              <p className="max-w-xl text-lg text-muted-foreground">
-                Considered design, premium materials, and meticulous attention
-                to detail. Elevate your daily rituals with pieces that last.
+              <p className="max-w-xl text-lg text-foreground/80">
+                We curate limited-run flash sales and promotions on premium brands, giving you access to deals you won&apos;t find anywhere else.
               </p>
             </div>
 
