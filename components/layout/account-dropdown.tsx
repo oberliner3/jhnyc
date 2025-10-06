@@ -23,7 +23,8 @@ export function AccountDropdown() {
 	if (!user) {
 		return (
 			<Button variant="ghost" size="icon" asChild>
-<User className="w-6 h-6" />
+				<Link href="/account">
+					<User className="w-6 h-6" />
 					<span className="sr-only">Sign In</span>
 				</Link>
 			</Button>
@@ -34,7 +35,7 @@ export function AccountDropdown() {
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant="ghost" size="icon">
-					<User className="w-5 h-5" />
+					<User className="w-6 h-6" />
 					<span className="sr-only">Account</span>
 				</Button>
 			</DropdownMenuTrigger>
