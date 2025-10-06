@@ -4,7 +4,7 @@ import { Download, Shield, Smartphone, Wifi, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { env } from "@/lib/env-validation";
+
 
 interface BeforeInstallPromptEvent extends Event {
 	readonly platforms: string[];
@@ -142,7 +142,7 @@ export function InstallPrompt() {
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<p className="text-gray-600 text-sm">
-						Install {env.NEXT_PUBLIC_STORE_NAME} for a better shopping
+						Install {process.env.NEXT_PUBLIC_STORE_NAME} for a better shopping
 						experience with faster access and offline support.
 					</p>
 
