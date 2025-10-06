@@ -40,17 +40,37 @@ export async function buyNowAction(formData: FormData): Promise<never> {
     utmCampaign,
   });
 
-  // Enhanced validation
+  // Enhanced validation (IDs are optional for REST draft orders)
   if (!productId) {
-    const error = new Error("Product ID is required");
-    console.error("[buyNowAction] Validation error:", error.message);
-    throw error;
+    console.warn(
+      "[buyNowAction] No productId provided; proceeding without product linkage."
+    );
   }
   if (!variantId) {
-    const error = new Error("Variant ID is required");
-    console.error("[buyNowAction] Validation error:", error.message);
-    throw error;
+    console.warn(
+      "[buyNowAction] No variantId provided; proceeding without variant linkage."
+    );
   }
+
+  // For debugging only: compute GID formats when IDs are present (not required for REST)
+  const shopifyVariantId = variantId
+    ? String(variantId).startsWith("gid://")
+      ? String(variantId)
+      : `gid://shopify/ProductVariant/${variantId}`
+    : undefined;
+
+  const shopifyProductId = productId
+    ? String(productId).startsWith("gid://")
+      ? String(productId)
+      : `gid://shopify/Product/${productId}`
+    : undefined;
+
+  console.log("[buyNowAction] GID formats (if provided):", {
+    originalProductId: productId || null,
+    originalVariantId: variantId || null,
+    shopifyProductId: shopifyProductId || null,
+    shopifyVariantId: shopifyVariantId || null,
+  });
   if (!Number.isFinite(price) || price <= 0) {
     const error = new Error("Valid price is required");
     console.error("[buyNowAction] Validation error:", error.message);
@@ -77,38 +97,48 @@ export async function buyNowAction(formData: FormData): Promise<never> {
   const invoiceNumber = generateInvoiceNumber();
   console.log("[buyNowAction] Generated invoice number:", invoiceNumber);
 
-  // Prepare the payload for the /api/draft-orders endpoint
-  const payload = {
-    lineItems: [
-      {
-        title: invoiceNumber, // Use generated invoice number as title (matching PHP)
-        variantId: variantId,
-        productId: productId,
-        price: price,
-        quantity: quantity,
-      },
-    ],
-    customerEmail: customerEmail || undefined,
-    tags: `${utmSource},${utmMedium},${utmCampaign}`, // Combine UTMs into tags
-  };
+  // Prepare Shopify REST Admin API payload (match PHP implementation)
+  const shopifyPayload = {
+    draft_order: {
+      line_items: [
+        {
+          title: invoiceNumber, // Use invoice number as line item title (matching PHP)
+          price: price.toFixed(2),
+          quantity: quantity,
+        },
+      ],
+      use_customer_default_address: true,
+    },
+  } as const;
 
-  console.log("[buyNowAction] Calling draft-orders API with payload:", {
-    lineItemsCount: payload.lineItems.length,
-    hasCustomerEmail: !!payload.customerEmail,
-    tags: payload.tags,
-  });
+  console.log(
+    "[buyNowAction] Creating Shopify draft order (REST) with payload:",
+    {
+      lineItemsCount: shopifyPayload.draft_order.line_items.length,
+      price: price.toFixed(2),
+      quantity,
+    }
+  );
 
-  // Call the API to create draft order
-  let draftOrder;
+  // Call Shopify REST API to create draft order
+  let invoiceUrl: string | undefined;
   try {
+    const shop = process.env.SHOPIFY_SHOP;
+    const token = process.env.SHOPIFY_ACCESS_TOKEN;
+    if (!shop || !token) {
+      throw new Error(
+        "Missing SHOPIFY_SHOP or SHOPIFY_ACCESS_TOKEN environment variables"
+      );
+    }
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL}/api/draft-orders`,
+      `https://${shop}/admin/api/2024-01/draft_orders.json`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Shopify-Access-Token": token,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(shopifyPayload),
       }
     );
 
@@ -119,10 +149,26 @@ export async function buyNowAction(formData: FormData): Promise<never> {
 
     if (!response.ok) {
       let errorMessage = "Failed to create draft order via API.";
+      let errorDetails = {};
+
       try {
         const errorData = JSON.parse(responseText);
         errorMessage = errorData.error || errorMessage;
-        console.error("[buyNowAction] API error response:", errorData);
+        errorDetails = errorData;
+
+        console.error("[buyNowAction] API error response:", {
+          status: response.status,
+          error: errorData,
+          sentPayload: {
+            variantId,
+            productId,
+            shopifyVariantId,
+            shopifyProductId,
+            price,
+            quantity,
+            invoiceNumber,
+          },
+        });
       } catch (parseError) {
         // If response is not JSON, show the text
         errorMessage = `API returned non-JSON response (${
@@ -132,12 +178,23 @@ export async function buyNowAction(formData: FormData): Promise<never> {
           "[buyNowAction] Failed to parse error response:",
           parseError
         );
+        console.error(
+          "[buyNowAction] Raw error response:",
+          responseText.substring(0, 500)
+        );
       }
 
       logError(new Error(errorMessage), {
         context: "buyNowAction - API call failed",
         formData: Object.fromEntries(formData.entries()),
         responseStatus: response.status,
+        errorDetails,
+        sentIds: {
+          variantId,
+          productId,
+          shopifyVariantId,
+          shopifyProductId,
+        },
       });
 
       throw new Error(errorMessage);
@@ -164,11 +221,11 @@ export async function buyNowAction(formData: FormData): Promise<never> {
       throw error;
     }
 
-    draftOrder = responseData.draftOrder;
+    invoiceUrl = responseData?.draft_order?.invoice_url;
 
-    if (!draftOrder?.invoiceUrl) {
+    if (!invoiceUrl) {
       console.error("[buyNowAction] No invoice URL in response:", responseData);
-      const error = new Error("No invoice URL returned from draft order API.");
+      const error = new Error("No invoice URL returned from Shopify REST API.");
 
       logError(error, {
         context: "buyNowAction - No invoice URL",
@@ -179,9 +236,8 @@ export async function buyNowAction(formData: FormData): Promise<never> {
       throw error;
     }
 
-    console.log("[buyNowAction] Draft order created successfully:", {
-      draftOrderId: draftOrder.id,
-      hasInvoiceUrl: !!draftOrder.invoiceUrl,
+    console.log("[buyNowAction] Draft order created successfully (REST):", {
+      hasInvoiceUrl: !!invoiceUrl,
     });
   } catch (error) {
     // Log the error with full context
@@ -203,7 +259,7 @@ export async function buyNowAction(formData: FormData): Promise<never> {
   }
 
   // Append all tracking parameters to the invoice URL (matching PHP implementation)
-  const finalUrl = new URL(draftOrder.invoiceUrl);
+  const finalUrl = new URL(String(invoiceUrl));
 
   // UTM parameters
   finalUrl.searchParams.set("utm_source", utmSource);

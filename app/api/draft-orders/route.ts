@@ -130,82 +130,96 @@ function toGid(
 
 // Map our REST-like input to Shopify GraphQL DraftOrderInput
 function toGraphqlDraftOrderInput(input: DraftOrderInput) {
-	const lineItems = (input.line_items || []).map((li) => ({
-		...(li.variant_id
-			? { variantId: toGid("ProductVariant", li.variant_id) }
-			: {}),
-		quantity: li.quantity,
-		...(li.title ? { title: li.title } : {}),
-		...(li.price !== undefined ? { originalUnitPrice: String(li.price) } : {}),
-	}));
+  const lineItems = (input.line_items || []).map((li) => {
+    const variantGid = li.variant_id
+      ? toGid("ProductVariant", li.variant_id)
+      : undefined;
 
-	const customer = input.customer
-		? {
-				...(input.customer.email ? { email: input.customer.email } : {}),
-				...(input.customer.first_name
-					? { firstName: input.customer.first_name }
-					: {}),
-				...(input.customer.last_name
-					? { lastName: input.customer.last_name }
-					: {}),
-				...(input.customer.phone ? { phone: input.customer.phone } : {}),
-			}
-		: undefined;
+    // Log the conversion for debugging
+    if (li.variant_id) {
+      console.log("[toGraphqlDraftOrderInput] Converting variant ID:", {
+        original: li.variant_id,
+        converted: variantGid,
+      });
+    }
 
-	const shippingAddress = input.shipping_address
-		? toShopifyAddress(input.shipping_address)
-		: undefined;
+    return {
+      ...(variantGid ? { variantId: variantGid } : {}),
+      quantity: li.quantity,
+      ...(li.title ? { title: li.title } : {}),
+      ...(li.price !== undefined
+        ? { originalUnitPrice: String(li.price) }
+        : {}),
+    };
+  });
 
-	const billingAddress = input.billing_address
-		? toShopifyAddress(input.billing_address)
-		: undefined;
+  const customer = input.customer
+    ? {
+        ...(input.customer.email ? { email: input.customer.email } : {}),
+        ...(input.customer.first_name
+          ? { firstName: input.customer.first_name }
+          : {}),
+        ...(input.customer.last_name
+          ? { lastName: input.customer.last_name }
+          : {}),
+        ...(input.customer.phone ? { phone: input.customer.phone } : {}),
+      }
+    : undefined;
 
-	return {
-		lineItems,
-		...(customer ? { customer } : {}),
-		...(shippingAddress ? { shippingAddress } : {}),
-		...(billingAddress ? { billingAddress } : {}),
-		...(input.email ? { email: input.email } : {}),
-		...(input.note ? { note: input.note } : {}),
-		useCustomerDefaultAddress: Boolean(input.use_customer_default_address),
-		...(input.tags
-			? {
-					tags: input.tags
-						.split(",")
-						.map((t) => t.trim())
-						.filter(Boolean),
-				}
-			: {}),
-	};
+  const shippingAddress = input.shipping_address
+    ? toShopifyAddress(input.shipping_address)
+    : undefined;
+
+  const billingAddress = input.billing_address
+    ? toShopifyAddress(input.billing_address)
+    : undefined;
+
+  return {
+    lineItems,
+    ...(customer ? { customer } : {}),
+    ...(shippingAddress ? { shippingAddress } : {}),
+    ...(billingAddress ? { billingAddress } : {}),
+    ...(input.email ? { email: input.email } : {}),
+    ...(input.note ? { note: input.note } : {}),
+    useCustomerDefaultAddress: Boolean(input.use_customer_default_address),
+    ...(input.tags
+      ? {
+          tags: input.tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+        }
+      : {}),
+  };
 }
 
 async function shopifyFetch(query: string, variables: Record<string, unknown>) {
-	const { shopDomain, accessToken } = getShopifyConfig();
-	const apiUrl = `https://${shopDomain}/admin/api/2024-01/graphql.json`;
+  const { shopDomain, accessToken } = getShopifyConfig();
+  const apiUrl = `https://${shopDomain}/admin/api/2024-01/graphql.json`;
 
-	const response = await fetch(apiUrl, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			"X-Shopify-Access-Token": accessToken,
-		},
-		body: JSON.stringify({ query, variables }),
-	});
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Shopify-Access-Token": accessToken,
+    },
+    body: JSON.stringify({ query, variables }),
+  });
 
-	if (!response.ok) {
-		const errorBody = await response.text();
-		throw new Error(
-			`Shopify API request failed: ${response.status} ${response.statusText} - ${errorBody}`,
-		);
-	}
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(
+      `Shopify API request failed: ${response.status} ${response.statusText} - ${errorBody}`
+    );
+  }
 
-	return response.json();
+  return response.json();
 }
 
 // Draft order creation function using fetch
 async function createDraftOrder(orderData: DraftOrderInput) {
-	try {
-		const query = `
+  try {
+    const query = `
       mutation draftOrderCreate($input: DraftOrderInput!) {
         draftOrderCreate(input: $input) {
           draftOrder {
@@ -227,32 +241,57 @@ async function createDraftOrder(orderData: DraftOrderInput) {
       }
     `;
 
-		const variables = { input: toGraphqlDraftOrderInput(orderData) };
+    const graphqlInput = toGraphqlDraftOrderInput(orderData);
+    const variables = { input: graphqlInput };
 
-		const response = await shopifyFetch(query, variables);
+    // Log the GraphQL input for debugging
+    console.log("[createDraftOrder] Sending to Shopify:", {
+      lineItems: graphqlInput.lineItems,
+      hasCustomer: !!graphqlInput.customer,
+      tags: graphqlInput.tags,
+    });
 
-		const draftOrderCreate = response.data?.draftOrderCreate;
+    const response = await shopifyFetch(query, variables);
 
-		if (!draftOrderCreate) {
-			const errors = response.errors || response.extensions;
-			throw new Error(
-				`Shopify draftOrderCreate returned no data: ${JSON.stringify(errors)}`,
-			);
-		}
+    const draftOrderCreate = response.data?.draftOrderCreate;
 
-		if (draftOrderCreate.userErrors && draftOrderCreate.userErrors.length > 0) {
-			throw new Error(
-				`Shopify API errors: ${draftOrderCreate.userErrors.map((e: ShopifyUserError) => e.message).join(", ")}`,
-			);
-		}
+    if (!draftOrderCreate) {
+      const errors = response.errors || response.extensions;
+      console.error("[createDraftOrder] Shopify returned no data:", {
+        errors,
+        fullResponse: response,
+      });
+      throw new Error(
+        `Shopify draftOrderCreate returned no data: ${JSON.stringify(errors)}`
+      );
+    }
 
-		return draftOrderCreate.draftOrder;
-	} catch (error) {
-		console.error("Error creating draft order:", error);
-		throw new Error(
-			`Failed to create draft order: ${error instanceof Error ? error.message : "Unknown error"}`,
-		);
-	}
+    if (draftOrderCreate.userErrors && draftOrderCreate.userErrors.length > 0) {
+      console.error("[createDraftOrder] Shopify user errors:", {
+        userErrors: draftOrderCreate.userErrors,
+        sentInput: graphqlInput,
+      });
+      throw new Error(
+        `Shopify API errors: ${draftOrderCreate.userErrors
+          .map((e: ShopifyUserError) => e.message)
+          .join(", ")}`
+      );
+    }
+
+    console.log("[createDraftOrder] Draft order created successfully:", {
+      draftOrderId: draftOrderCreate.draftOrder?.id,
+      hasInvoiceUrl: !!draftOrderCreate.draftOrder?.invoiceUrl,
+    });
+
+    return draftOrderCreate.draftOrder;
+  } catch (error) {
+    console.error("Error creating draft order:", error);
+    throw new Error(
+      `Failed to create draft order: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
 }
 
 // Send invoice function using fetch
