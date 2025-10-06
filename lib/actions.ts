@@ -270,8 +270,12 @@ export async function buyNowAction(formData: FormData): Promise<never> {
   if (productTitle) {
     finalUrl.searchParams.set("product_title", productTitle);
   }
-  if (productImage) {
-    finalUrl.searchParams.set("product_image", productImage);
+  // Ensure product_image is a URL-like string; avoid "[object Object]"
+  const safeProductImage =
+    productImage && /^https?:\/\//i.test(productImage) ? productImage : "";
+
+  if (safeProductImage) {
+    finalUrl.searchParams.set("product_image", safeProductImage);
   }
 
   console.log(

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ApiProduct, ApiProductVariant } from "@/lib/types";
-import { toast } from "sonner";
 import { buyNowAction } from "@/lib/actions";
 import { mergeUtmParams, UTMParams } from "@/lib/utils";
 
@@ -29,41 +28,43 @@ export function BuyNowButton({
   utmParams,
   disabled = false,
 }: BuyNowButtonProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const mergedUtm = mergeUtmParams({ ...utmParams });
 
-  const handleError = (error?: unknown) => {
-    setIsLoading(false);
-    toast.dismiss("buy-now-processing");
-    const errorMessage =
-      error instanceof Error ? error.message : "An unexpected error occurred";
-    toast.error("Failed to process order", {
-      description: errorMessage,
-    });
-  };
+  // Normalize product image to a URL string (avoid [object Object])
+  const rawImage: unknown =
+    (variant as any)?.featured_image ??
+    variant?.featured_image ??
+    product.images?.[0]?.src ??
+    "";
+  const productImageUrl =
+    typeof rawImage === "string"
+      ? rawImage
+      : rawImage && typeof (rawImage as any).src === "string"
+      ? (rawImage as any).src
+      : "";
 
-  const handleSuccess = () => {
-    setIsLoading(false);
-    toast.dismiss("buy-now-processing");
-    toast.success("Added to checkout", {
-      description: `${product.title} is ready in the checkout flow`,
-    });
-  };
-
-  const handleAction = async (formData: FormData) => {
-    setIsLoading(true);
-    toast.loading("Processing your order...", {
-      id: "buy-now-processing",
-      description: `Adding ${product.title} to checkout`,
-    });
-
-    try {
-      await buyNowAction(formData);
-      handleSuccess();
-    } catch (error) {
-      handleError(error);
-    }
-  };
+  // Use a nested submit component so Next.js can handle redirects from server actions
+  function Submit() {
+    const { pending } = useFormStatus();
+    const isDisabled = disabled || pending;
+    return (
+      <Button
+        type="submit"
+        disabled={isDisabled}
+        variant={variantMap[style]}
+        className={className}
+        size={size}
+        data-style={style}
+      >
+        {pending ? (
+          <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+        ) : (
+          <ShoppingBag className="mr-2 w-4 h-4" />
+        )}
+        {pending ? "Processing..." : "Buy Now"}
+      </Button>
+    );
+  }
 
   const variantMap = {
     default: "buy-now-default",
@@ -73,7 +74,7 @@ export function BuyNowButton({
 
   return (
     <form
-      action={handleAction}
+      action={buyNowAction}
       className={style === "full-width" ? "w-full" : ""}
     >
       <input
@@ -89,32 +90,14 @@ export function BuyNowButton({
       />
       <input type="hidden" name="quantity" value={quantity} />
       <input type="hidden" name="productTitle" value={product.title} />
-      <input
-        type="hidden"
-        name="productImage"
-        value={variant?.featured_image || product.images?.[0]?.src || ""}
-      />
+      <input type="hidden" name="productImage" value={productImageUrl} />
 
       {/* UTM Parameters */}
       <input type="hidden" name="utm_source" value={mergedUtm.utm_source} />
       <input type="hidden" name="utm_medium" value={mergedUtm.utm_medium} />
       <input type="hidden" name="utm_campaign" value={mergedUtm.utm_campaign} />
 
-      <Button
-        type="submit"
-        disabled={disabled || isLoading || !product.in_stock || !variant}
-        variant={variantMap[style]}
-        className={className}
-        size={size}
-        data-style={style}
-      >
-        {isLoading ? (
-          <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-        ) : (
-          <ShoppingBag className="mr-2 w-4 h-4" />
-        )}
-        {isLoading ? "Processing..." : "Buy Now"}
-      </Button>
+      <Submit />
     </form>
   );
 }
