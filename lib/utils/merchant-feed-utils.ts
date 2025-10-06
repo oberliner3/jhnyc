@@ -140,12 +140,25 @@ export function calculateVariantPricing(
  * // Returns: "https://cdn.example.com/variant-image.jpg"
  * ```
  */
+type FlexibleApiProductVariant = Omit<ApiProductVariant, 'featured_image'> & {
+  featured_image?: string | { src: string };
+};
+
 export function getVariantImageUrl(
   variant: ApiProductVariant,
   product: ApiProduct,
   fallbackUrl: string
 ): string {
-  return variant.featured_image || product.images?.[0]?.src || fallbackUrl;
+  const flexVariant = variant as FlexibleApiProductVariant;
+  const featuredImage = flexVariant.featured_image;
+
+  if (featuredImage && typeof featuredImage === 'object' && featuredImage.src) {
+    return featuredImage.src;
+  }
+  if (typeof featuredImage === 'string') {
+    return featuredImage;
+  }
+  return product.images?.[0]?.src || fallbackUrl;
 }
 
 /**
@@ -229,6 +242,9 @@ export function generateMerchantFeedXmlItem(
 
   return `
     <item>
+      <title><![CDATA[${data.title}]]></title>
+      <link>${escapeXml(data.link)}</link>
+      <description><![CDATA[${data.description}]]></description>
       <g:id>${escapeXml(data.id)}</g:id>
       <g:title><![CDATA[${data.title}]]></g:title>
       <g:description><![CDATA[${data.description}]]></g:description>
