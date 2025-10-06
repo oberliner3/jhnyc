@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { SITE_CONFIG } from "@/lib/constants";
-import { fetchAllProducts } from "@/lib/utils/product-utils";
+import { fetchAllProducts } from "@/lib/utils/product-server-utils";
 import {
   processProductVariants,
   generateMerchantFeedXml,
