@@ -3,7 +3,7 @@
 import { useFormStatus } from "react-dom";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { ApiProduct, ApiProductVariant } from "@/lib/types";
+import type { ApiProduct, ApiProductImage, ApiProductVariant } from "@/lib/types";
 import { buyNowAction } from "@/lib/actions";
 import { mergeUtmParams, UTMParams } from "@/lib/utils";
 
@@ -32,15 +32,12 @@ export function BuyNowButton({
 
   // Normalize product image to a URL string (avoid [object Object])
   const rawImage: unknown =
-    (variant as any)?.featured_image ??
-    variant?.featured_image ??
-    product.images?.[0]?.src ??
-    "";
+    variant?.featured_image ?? product.images?.[0] ?? "";
   const productImageUrl =
     typeof rawImage === "string"
       ? rawImage
-      : rawImage && typeof (rawImage as any).src === "string"
-      ? (rawImage as any).src
+      : rawImage && typeof (rawImage as ApiProductImage).src === "string"
+      ? (rawImage as ApiProductImage).src
       : "";
 
   // Use a nested submit component so Next.js can handle redirects from server actions
