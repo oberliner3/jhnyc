@@ -16,6 +16,7 @@ interface BuyNowButtonProps {
   style?: "default" | "minimal" | "full-width";
   size?: "sm" | "lg";
   utmParams?: UTMParams;
+  disabled?: boolean;
 }
 
 export function BuyNowButton({
@@ -26,6 +27,7 @@ export function BuyNowButton({
   style = "default",
   size = "lg",
   utmParams,
+  disabled = false,
 }: BuyNowButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const mergedUtm = mergeUtmParams({ ...utmParams });
@@ -100,7 +102,7 @@ export function BuyNowButton({
 
       <Button
         type="submit"
-        disabled={isLoading || !product.in_stock || !variant}
+        disabled={disabled || isLoading || !product.in_stock || !variant}
         variant={variantMap[style]}
         className={className}
         size={size}

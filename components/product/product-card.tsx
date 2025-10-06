@@ -103,9 +103,9 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      <footer className="p-4 pt-0 space-y-3">
-        {hasVariants && (
-          <div>
+      <footer className="p-4 pt-0">
+        <div className="grid grid-cols-2 gap-2">
+          {hasVariants ? (
             <Select
               onValueChange={(value) => {
                 const variant = product.variants?.find((v) => v.id === value);
@@ -113,7 +113,7 @@ export function ProductCard({ product }: ProductCardProps) {
               }}
               defaultValue={selectedVariant?.id}
             >
-              <SelectTrigger>
+              <SelectTrigger className="col-span-2">
                 <SelectValue placeholder="Select a variant" />
               </SelectTrigger>
               <SelectContent>
@@ -124,25 +124,27 @@ export function ProductCard({ product }: ProductCardProps) {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-        )}
-        <div className="flex gap-2">
+          ) : null}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAddToCart}
+            aria-label="Add to cart"
+            disabled={hasVariants && !selectedVariant}
+            className="w-full"
+          >
+            <ShoppingCart className="w-4 h-4 mr-2" />
+            Add to Cart
+          </Button>
           <BuyNowButton
             product={product}
             variant={selectedVariant}
             quantity={1}
             style="minimal"
             size="sm"
-            className="flex-1"
+            disabled={hasVariants && !selectedVariant}
+            className="w-full"
           />
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleAddToCart}
-            aria-label="Add to cart"
-          >
-            <ShoppingCart className="w-4 h-4" />
-          </Button>
         </div>
       </footer>
     </article>
