@@ -33,7 +33,7 @@ export function AnnouncementBar() {
 						animate={{ y: 0 }}
 						exit={{ y: "-100%" }}
 						transition={{ duration: 0.5, ease: "easeInOut" }}
-						className="min-w-full font-medium text-sm text-center"
+						className="min-w-full font-medium text-base text-center"
 					>
 						{ANNOUNCEMENTS[currentIndex]}
 					</motion.div>

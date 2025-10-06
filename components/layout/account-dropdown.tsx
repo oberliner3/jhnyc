@@ -23,8 +23,7 @@ export function AccountDropdown() {
 	if (!user) {
 		return (
 			<Button variant="ghost" size="icon" asChild>
-				<Link href="/account">
-					<User className="w-5 h-5" />
+<User className="w-6 h-6" />
 					<span className="sr-only">Sign In</span>
 				</Link>
 			</Button>

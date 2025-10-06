@@ -39,6 +39,7 @@ export function Hero() {
           className="object-cover"
           priority
         />
+        <div className="absolute inset-0 bg-black/30"></div>
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
       </div>
@@ -74,7 +75,6 @@ export function Hero() {
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <SecondaryCTA
-                    variant="outline"
                     className="px-8 text-base lg:text-lg"
                   >
                     <Play className="mr-2 w-5 h-5" />

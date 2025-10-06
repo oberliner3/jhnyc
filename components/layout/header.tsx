@@ -53,7 +53,7 @@ export function Header() {
             onClick={() => setIsSearchOpen(!isSearchOpen)}
             aria-label="Open search bar"
           >
-            <Search className="w-5 h-5" />
+            <Search className="w-6 h-6" />
             <span className="sr-only">Search</span>
           </IconButton>
 
@@ -68,7 +68,7 @@ export function Header() {
             onClick={toggleCart}
             aria-label="Open cart"
           >
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className="w-6 h-6" />
             {cartItemCount > 0 && (
               <Badge
                 variant="destructive"
