@@ -369,7 +369,6 @@ export function getGoogleCategory(category: string | undefined): string {
     "literas": "4579",
     "armarios infantiles": "4196",
     "cunas": "4579",
-    "alfombras": "4196",
     "comodas infantiles": "4196",
     "colchones infantiles": "4579",
     "estanterias infantiles": "4196",
