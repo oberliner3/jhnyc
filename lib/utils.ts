@@ -91,5 +91,54 @@ export function generateImage({
 	});
 }
 
+/**
+ * Safely normalize product tags to a consistent array format
+ *
+ * Handles multiple input formats:
+ * - Comma-separated string: "tag1, tag2, tag3" → ["tag1", "tag2", "tag3"]
+ * - Array: ["tag1", "tag2"] → ["tag1", "tag2"]
+ * - null/undefined → []
+ * - Empty string → []
+ *
+ * This prevents runtime crashes when tags are in unexpected formats.
+ *
+ * @param tags - Product tags in any supported format
+ * @returns Array of trimmed, non-empty tag strings
+ *
+ * @example
+ * ```typescript
+ * normalizeProductTags("tag1, tag2, tag3") // ["tag1", "tag2", "tag3"]
+ * normalizeProductTags(["tag1", "tag2"]) // ["tag1", "tag2"]
+ * normalizeProductTags(null) // []
+ * normalizeProductTags("") // []
+ * ```
+ */
+export function normalizeProductTags(
+	tags: string | string[] | null | undefined
+): string[] {
+	// Handle null/undefined
+	if (!tags) return [];
+
+	// Handle array format
+	if (Array.isArray(tags)) {
+		return tags.map((tag) => tag.trim()).filter(Boolean);
+	}
+
+	// Handle string format
+	if (typeof tags === "string") {
+		// Empty string check
+		if (tags.trim() === "") return [];
+
+		// Split by comma and clean up
+		return tags
+			.split(",")
+			.map((tag) => tag.trim())
+			.filter(Boolean);
+	}
+
+	// Fallback for unexpected types
+	return [];
+}
+
 // Re-export from xml-utils for backward compatibility
 export { stripHtml, escapeXml } from "./utils/xml-utils";
