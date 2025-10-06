@@ -308,11 +308,12 @@ export function processProductVariants(
   product: ApiProduct | ApiProductWithRaw,
   siteUrl: string,
   siteName: string,
-  shippingConfig?: {
+  shippingConfig: {
     country: string;
     service: string;
     price: string;
-  }
+  } | undefined,
+  generateItemXml: (data: MerchantFeedItemData) => string
 ): ProcessProductVariantsResult {
   const items: string[] = [];
   const errors: FeedGenerationError[] = [];
@@ -336,7 +337,7 @@ export function processProductVariants(
           siteName
         );
 
-        const xmlItem = generateMerchantFeedXmlItem(itemData, shippingConfig);
+        const xmlItem = generateItemXml(itemData);
         items.push(xmlItem);
       } catch (variantError) {
         errors.push({
