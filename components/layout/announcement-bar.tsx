@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Play, Pause } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const ANNOUNCEMENTS = [
@@ -13,13 +13,17 @@ const ANNOUNCEMENTS = [
 export function AnnouncementBar() {
 	const [isVisible, setIsVisible] = useState(true);
 	const [currentIndex, setCurrentIndex] = useState(0);
+	const [isPaused, setIsPaused] = useState(false);
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-			setCurrentIndex((prevIndex) => (prevIndex + 1) % ANNOUNCEMENTS.length);
-		}, 5000);
+		let interval: NodeJS.Timeout;
+		if (!isPaused) {
+			interval = setInterval(() => {
+				setCurrentIndex((prevIndex) => (prevIndex + 1) % ANNOUNCEMENTS.length);
+			}, 5000);
+		}
 		return () => clearInterval(interval);
-	}, []);
+	}, [isPaused]);
 
 	if (!isVisible) return null;
 
@@ -39,6 +43,15 @@ export function AnnouncementBar() {
 					</motion.div>
 				</AnimatePresence>
 			</div>
+			{/* Pause/Play Button */}
+			<button
+				type="button"
+				onClick={() => setIsPaused(!isPaused)}
+				className="top-1/2 left-2 absolute hover:bg-primary-foreground/20 p-1 rounded-sm -translate-y-1/2"
+				aria-label={isPaused ? "Play announcements" : "Pause announcements"}
+			>
+				{isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+			</button>
 			<button
 				type="button"
 				onClick={() => setIsVisible(false)}

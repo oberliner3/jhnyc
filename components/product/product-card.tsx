@@ -139,6 +139,7 @@ export function ProductCard({ product }: ProductCardProps) {
             size="sm"
             variant="outline"
             onClick={handleAddToCart}
+            aria-label="Add to cart"
           >
             <ShoppingCart className="w-4 h-4" />
           </Button>

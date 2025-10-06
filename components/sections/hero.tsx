@@ -104,7 +104,7 @@ export function Hero() {
             </div>
 
             {/* Social Proof */}
-            <motion.div
+            <motion.ul
               ref={ref}
               className="flex items-center gap-6 pt-6"
               initial="hidden"
@@ -122,7 +122,7 @@ export function Hero() {
                 },
               }}
             >
-              <motion.div
+              <motion.li
                 className="text-center"
                 variants={{
                   hidden: { opacity: 0, y: 20 },
@@ -141,11 +141,11 @@ export function Hero() {
                 <div className="text-sm text-muted-foreground">
                   Happy Customers
                 </div>
-              </motion.div>
+              </motion.li>
 
               <div className="h-8 w-px bg-border" />
 
-              <motion.div
+              <motion.li
                 className="text-center"
                 variants={{
                   hidden: { opacity: 0, y: 20 },
@@ -164,11 +164,11 @@ export function Hero() {
                 <div className="text-sm text-muted-foreground">
                   Average Rating
                 </div>
-              </motion.div>
+              </motion.li>
 
               <div className="h-8 w-px bg-border" />
 
-              <motion.div
+              <motion.li
                 className="text-center"
                 variants={{
                   hidden: { opacity: 0, y: 20 },
@@ -187,8 +187,8 @@ export function Hero() {
                 <div className="text-sm text-muted-foreground">
                   Premium Brands
                 </div>
-              </motion.div>
-            </motion.div>
+              </motion.li>
+            </motion.ul>
           </div>
         </div>
       </div>
