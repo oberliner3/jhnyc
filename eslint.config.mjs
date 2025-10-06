@@ -34,9 +34,15 @@ const eslintConfig = [{
   },
 }, {
   // Allow server-side files to import server-side modules
+  // This includes:
+  // - API routes (app/api/**/route.ts)
+  // - Route Handlers (app/**/route.ts) - sitemaps, feeds, etc.
+  // - Server-side utilities and data fetchers
   files: [
     "app/api/**/*.ts",
     "app/api/**/*.tsx",
+    "app/**/route.ts",        // Route Handlers (sitemaps, feeds, etc.)
+    "app/**/route.tsx",       // Route Handlers (JSX)
     "lib/api/**/*.ts",
     "lib/utils/*-server-utils.ts",
     "lib/data/**/*.ts",
