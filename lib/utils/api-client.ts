@@ -56,7 +56,7 @@ export async function apiClient<T>(
   let lastError: Error = new Error("API request failed.");
 
   const buildUrl = () => {
-    const base = env.COSMOS_API_BASE_URL?.replace(/\/$/, "") ?? "";
+    const base = env.NEXT_PUBLIC_COSMOS_API_BASE_URL?.replace(/\/$/, "") ?? "";
     const normalised = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
     const path = normalised.startsWith("/cosmos")
       ? normalised

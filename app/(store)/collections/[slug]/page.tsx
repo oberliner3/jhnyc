@@ -105,8 +105,6 @@ async function CollectionProducts({
         products = Array.isArray(collectionProducts)
           ? collectionProducts
           : [];
-        // Force all products to in_stock: true (as per your existing logic)
-        products = products.map((p: ApiProduct) => ({ ...p, in_stock: true }));
 
         // For collections, we don't have meta directly from getCollectionByHandle, so we'll estimate
         totalProducts = products.length;

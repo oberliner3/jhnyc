@@ -10,10 +10,10 @@ export async function GET(request: Request) {
 		// Test environment variables
 
 		const envInfo = {
-      hasApiUrl: !!env.COSMOS_API_BASE_URL,
+      hasApiUrl: !!env.NEXT_PUBLIC_COSMOS_API_BASE_URL,
       hasApiKey: !!env.COSMOS_API_KEY,
       apiUrl:
-        env.COSMOS_API_BASE_URL?.replace(/(^https?:\/\/[^/]+).*/, "$1/***") ||
+        env.NEXT_PUBLIC_COSMOS_API_BASE_URL?.replace(/(^https?:\/\/[^/]+).*/, "$1/***") ||
         "undefined",
       keyLength: env.COSMOS_API_KEY?.length || 0,
     };

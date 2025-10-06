@@ -30,7 +30,7 @@ function getServerConfig() {
   const { env } = require("@/lib/env-validation");
 
   return {
-    baseUrl: env.COSMOS_API_BASE_URL,
+        baseUrl: env.NEXT_PUBLIC_COSMOS_API_BASE_URL,
     apiKey: env.COSMOS_API_KEY,
   };
 }

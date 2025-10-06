@@ -27,9 +27,9 @@ export async function getProducts({
   });
 
   try {
-    // If search query provided, use search endpoint
+    let response;
     if (search) {
-      const response = await cosmosClient.searchProducts(
+      response = await cosmosClient.searchProducts(
         search,
         { limit, page },
         {
@@ -37,15 +37,13 @@ export async function getProducts({
           revalidate: 300,
         }
       );
-      return response.products || [];
+    } else {
+      response = await cosmosClient.getProducts(
+        { limit, page },
+        { cache: context === "ssr" ? "force-cache" : "default", revalidate: 300 }
+      );
     }
-
-    // Otherwise use regular products endpoint
-    const response = await cosmosClient.getProducts(
-      { limit, page },
-      { cache: context === "ssr" ? "force-cache" : "default", revalidate: 300 }
-    );
-    return response.products || [];
+    return (response.products || []).map((p: ApiProduct) => ({ ...p, in_stock: true }));
   } catch (error) {
     logger.error("Error fetching products", error);
     return [];
@@ -70,7 +68,13 @@ export async function getProductByHandle(
       cache: context === "ssr" ? "force-cache" : "default",
       revalidate: 300,
     });
-    return response.product || null;
+    if (!response.product) {
+      return null;
+    }
+    return {
+      ...response.product,
+      in_stock: true,
+    };
   } catch (error) {
     logger.error("Error fetching product by handle", error, { handle });
     return null;
@@ -95,7 +99,13 @@ export async function getProductById(
       cache: context === "ssr" ? "force-cache" : "default",
       revalidate: 300,
     });
-    return response.product || null;
+    if (!response.product) {
+      return null;
+    }
+    return {
+      ...response.product,
+      in_stock: true,
+    };
   } catch (error) {
     logger.error("Error fetching product by ID", error, { id });
     return null;
@@ -123,7 +133,7 @@ export async function searchProducts(
       { limit, page },
       { cache: context === "ssr" ? "force-cache" : "default", revalidate: 180 }
     );
-    return response.products || [];
+    return (response.products || []).map((p: ApiProduct) => ({ ...p, in_stock: true }));
   } catch (error) {
     logger.error("Error searching products", error, { query });
     return [];
@@ -158,7 +168,7 @@ export async function getCollectionByHandle(
       { limit, page, fields },
       { cache: context === "ssr" ? "force-cache" : "default", revalidate: 600 }
     );
-    return response.products || [];
+    return (response.products || []).map((p: ApiProduct) => ({ ...p, in_stock: true }));
   } catch (error) {
     logger.error("Error fetching collection by handle", error, { handle });
     return [];
