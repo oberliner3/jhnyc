@@ -18,7 +18,7 @@ import { CountUp } from "@/components/common/count-up";
 export function Hero() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const controls = useAnimation();
-	const ref = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLUListElement | null>(null);
 	const isInView = useInView(ref, { once: true, amount: 0.1 });
 
 	useEffect(() => {

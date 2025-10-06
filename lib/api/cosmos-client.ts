@@ -207,13 +207,13 @@ export async function searchProducts(
 export async function getProduct(
   key: string,
   options: CosmosRequestOptions = {}
-): Promise<{ product: ApiProduct }> {
+): Promise<ApiProduct> {
   const queryParams = new URLSearchParams({
     ...(options.format && { format: options.format }),
   });
 
   const query = queryParams.toString() ? `?${queryParams}` : "";
-  return cosmosRequest<{ product: ApiProduct }>(
+  return cosmosRequest<ApiProduct>(
     `/products/${key}${query}`,
     options
   );

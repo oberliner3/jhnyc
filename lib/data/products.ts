@@ -64,15 +64,15 @@ export async function getProductByHandle(
   logger.debug("Fetching product by handle", { handle, context });
 
   try {
-    const response = await cosmosClient.getProduct(handle, {
+    const product = await cosmosClient.getProduct(handle, {
       cache: context === "ssr" ? "force-cache" : "default",
       revalidate: 300,
     });
-    if (!response.product) {
+    if (!product) {
       return null;
     }
     return {
-      ...response.product,
+      ...product,
       in_stock: true,
     };
   } catch (error) {
@@ -95,15 +95,15 @@ export async function getProductById(
   logger.debug("Fetching product by ID", { id, context });
 
   try {
-    const response = await cosmosClient.getProduct(id, {
+    const product = await cosmosClient.getProduct(id, {
       cache: context === "ssr" ? "force-cache" : "default",
       revalidate: 300,
     });
-    if (!response.product) {
+    if (!product) {
       return null;
     }
     return {
-      ...response.product,
+      ...product,
       in_stock: true,
     };
   } catch (error) {
