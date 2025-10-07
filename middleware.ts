@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
     newUrl.hostname = TARGET_HOST;
     newUrl.pathname = "/p" + pathname;
 
-    // Optional: show loading page for 1s before redirect
+    // Optional: simple loading page before redirect
     const html = `
       <!DOCTYPE html>
       <html lang="en">
@@ -28,19 +28,12 @@ export function middleware(request: NextRequest) {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Loading...</title>
-        <style>
-          body { font-family: system-ui,sans-serif; display:flex;justify-content:center;align-items:center;height:100vh;margin:0; }
-          .spinner { width:48px;height:48px;border:4px solid #ccc;border-top-color:#111;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:1rem; }
-          @keyframes spin { to { transform: rotate(360deg); } }
-          p { font-size:1rem;color:#444; }
-        </style>
         <script>
-          setTimeout(()=>{ window.location.href=${JSON.stringify(newUrl.toString())}; }, 1000);
+          setTimeout(()=>{ window.location.href=${JSON.stringify(newUrl.toString())}; }, 500);
         </script>
       </head>
       <body>
-        <div class="spinner"></div>
-        <p>Loading...</p>
+        <p>Redirecting...</p>
       </body>
       </html>
     `;
