@@ -78,14 +78,11 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   // Proxy all Shopify images via /cdn
-  const proxiedImages =
-    product.images?.map((img) => ({
-      ...img,
-      src: img.src.replace(
-        "https://cdn.shopify.com",
-        "https://jhuangnyc.com/cdn"
-      ),
-    })) || [];
+ const proxiedImages = product.images?.map(img => ({
+  ...img,
+  src: img.src.replace("https://cdn.shopify.com", "https://jhuangnyc.com/cdn"),
+})) || [];
+
 
   const currentImage = proxiedImages[currentImageIndex]?.src || "/og.png";
   const currentImageAlt =
@@ -180,6 +177,7 @@ export function ProductCard({ product }: ProductCardProps) {
               className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               loading="lazy"
+              unoptimized={true}
             />
 
             <div className="top-2 left-2 z-10 absolute flex flex-col gap-2">

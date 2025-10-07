@@ -122,8 +122,8 @@ export const SUCCESS_MESSAGES = {
   SUBSCRIPTION_CONFIRMED: "Subscription confirmed",
 } as const;
 
-export const buildEmail = (handle: string, ltd: string = SITE_CONFIG.domain) =>
-  `${handle}@${ltd}`;
+export const buildEmail = (handle: string) =>
+  `${handle}@jhuangnyc.com`;
 
 export const buildPhone = (ext: number, callSign: string, zone?: number) => {
   // Normalize and format to "+<ext> (AAA) BBB-CCCC" when possible (NANP)
