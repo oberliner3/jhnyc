@@ -1,0 +1,54 @@
+[ ] NAME:Current Task List DESCRIPTION:Root task for conversation __NEW_AGENT__
+-[ ] NAME:Next.js Refactor: Originz (Master Plan) DESCRIPTION:Master task covering the 7-phase comprehensive refactoring project for the Originz Next.js app. Tracks overall progress and approvals. Do not mark complete until all phases are completed and reviewed.
+--[x] NAME:Phase 1: Project Analysis & Architecture Review (HIGH) DESCRIPTION:Analyze current structure, routes, components, hooks, and utilities. Identify DRY/KISS/YAGNI/SOLID violations. Produce an Architecture Review and Refactor Plan document for approval before any code changes.
+---[x] NAME:P1.1 Investigate/Triage/Understand the problem DESCRIPTION:Deep-dive discovery to map the current system: routes, components, hooks, utilities, and data sources. Define scope and constraints. Deliver a concise discovery report.
+---[x] NAME:P1.2 Inventory routes and identify all data-fetching pages DESCRIPTION:List all app/ routes, segments, and route groups. For each page, note server vs client component, data sources, and fetch caching/ISR settings.
+---[x] NAME:P1.3 Audit components and categorize: shadcn/ui vs custom DESCRIPTION:Scan components/ to catalog which are shadcn/ui and which are custom; note candidates for blocks migration and duplication hotspots.
+---[x] NAME:P1.4 Audit hooks/utils/libs for duplication and complexity DESCRIPTION:Identify repeated logic across hooks and lib/utils; flag complex files violating SRP/SOLID and opportunities to extract utilities.
+---[x] NAME:P1.5 Identify DRY/KISS/YAGNI/SOLID violations DESCRIPTION:Produce a list of concrete violations with file paths and suggested remedies, prioritized by impact and effort.
+---[x] NAME:P1.6 Produce Architecture Review + Refactor Plan for approval DESCRIPTION:Write an Architecture Review and detailed Refactor Plan (sequence, risks, codemods, verification). Share for approval before changes.
+---[x] NAME:P1.7 Stakeholder review & approvals DESCRIPTION:Walkthrough plan, capture decisions/clarifications, and lock scope for Phase 2.
+--[ ] NAME:Phase 2: Code Cleanup & Optimization (HIGH) DESCRIPTION:Remove unused/imports/files, consolidate duplicated logic, simplify complex components while preserving behavior, and enforce DRY/KISS/YAGNI/SOLID.
+---[x] NAME:P2.1 Lint/type-check baseline and rule alignment DESCRIPTION:Run eslint and tsc; align rules (without adding new deps). Fix obvious issues; document exceptions requiring code changes.
+---[/] NAME:P2.2 Remove unused imports, variables, functions, components, and files DESCRIPTION:Use eslint autofix + manual review to prune dead code safely; keep a deletion log.
+---[ ] NAME:P2.3 Consolidate duplicated logic into utilities/hooks DESCRIPTION:Extract shared helpers into lib/utils/* and reusable hooks; update callsites minimally.
+---[ ] NAME:P2.4 Simplify overly complex components DESCRIPTION:Split large components into smaller presentational/container pieces; improve SRP and testability.
+---[ ] NAME:P2.5 Validate with type checks and smoke build DESCRIPTION:Ensure next build passes; run type checks; no functional changes expected.
+---[ ] NAME:P2.6 Document cleanup changes and risks DESCRIPTION:Summarize what changed, why, and any follow-ups.
+--[ ] NAME:Phase 3: Component Organization – Preserve shadcn/ui, migrate to components/blocks (MEDIUM) DESCRIPTION:Keep components/ui untouched. Move other custom components to components/blocks organized by feature/use-case. Update imports safely.
+---[ ] NAME:P3.1 Create components/blocks structure and feature groups DESCRIPTION:Create components/blocks and decide feature groupings (account, admin, cart, checkout, product, layout, sections, pwa, chat, common, icons, examples).
+---[ ] NAME:P3.2 Plan and execute component moves (exclude components/ui) DESCRIPTION:Move custom components into blocks groups, preserving index barrels and relative imports where possible.
+---[ ] NAME:P3.3 Update imports via codemod + add path aliases DESCRIPTION:Introduce @blocks/* and @ui/* aliases in tsconfig; run codemod to rewrite import paths safely.
+---[ ] NAME:P3.4 Consolidate skeleton patterns DESCRIPTION:Standardize skeletons usage and location (per-feature or shared primitives) and update callsites.
+---[ ] NAME:P3.5 Verify build and pages after migration DESCRIPTION:Run type checks and a local build to ensure no regressions from moves.
+---[ ] NAME:P3.0 Review prepared custom blocks for refactor & integration DESCRIPTION:Audit user-prepared custom blocks, note DRY/SOLID issues, and prioritize fixes before migration to components/blocks.
+--[ ] NAME:Phase 4: Data Fetching & Loading States – Suspense + Streaming (MEDIUM) DESCRIPTION:Audit pages that fetch data. Implement Suspense boundaries with skeletons and adopt Next.js streaming patterns.
+---[ ] NAME:P4.1 Audit data-fetching pages and APIs DESCRIPTION:Identify all pages/components using fetch, server actions, or client hooks that call APIs; document data dependencies and current caching.
+---[ ] NAME:P4.2 Add Suspense boundaries with proper fallbacks DESCRIPTION:Introduce Suspense at segment or component level; use skeletons as fallbacks aligned with streaming patterns.
+---[ ] NAME:P4.3 Adopt Next.js streaming patterns DESCRIPTION:Implement segment-level streaming in app/ routes where it improves TTFB; ensure server components handle partial render.
+---[ ] NAME:P4.4 Correct fetch caching/ISR semantics DESCRIPTION:Set appropriate cache/revalidate/no-store for each data path; align with SEO and freshness requirements.
+---[ ] NAME:P4.5 Verify UX under throttled network DESCRIPTION:Manual QA under slow 3G; confirm skeletons and progressive hydration behave correctly.
+--[ ] NAME:Phase 5: UI/UX Revamp – Modern Minimalist (MEDIUM-LOW) DESCRIPTION:Define visual system, improve layouts, unify styles, and ensure consistent design language across pages.
+---[ ] NAME:P5.1 Establish minimalist design tokens and typography DESCRIPTION:Define Tailwind tokens (colors, spacing, radius) and typography scale using Geist; align with shadcn/ui.
+---[ ] NAME:P5.2 Create layout shells and section wrappers DESCRIPTION:Introduce consistent page layouts, containers, grids, and spacing primitives for reuse.
+---[ ] NAME:P5.3 Harmonize components for consistency DESCRIPTION:Normalize paddings, margins, radii, and interaction states across blocks; keep components/ui intact.
+---[ ] NAME:P5.4 Add Next/Image blur placeholders where beneficial DESCRIPTION:Use blurDataURL for hero and product images to improve perceived performance.
+---[ ] NAME:P5.5 Accessibility pass DESCRIPTION:Ensure landmarks, aria-attributes, focus states, and color contrast meet baseline a11y.
+---[ ] NAME:P5.0 Analyze reference sites and extract design tokens DESCRIPTION:From the provided references, derive color palettes, typography scales, spacing, radii, shadows, and motion tokens.
+--[ ] NAME:Phase 6: Routing & Project Structure – App Router best practices + MDX prep (MEDIUM) DESCRIPTION:Reorganize routes and folders using route groups, optimize layouts, prepare MDX support, and standardize linking/navigation.
+---[ ] NAME:P6.1 Review and reorganize route groups DESCRIPTION:Evaluate current app/(store), app/(checkout), and other segments; introduce additional groups (e.g., (marketing), (account), (admin)) where beneficial.
+---[ ] NAME:P6.2 Optimize layouts and providers DESCRIPTION:Simplify app/layout.tsx and nested layouts; ensure providers are placed at the narrowest common ancestor segment.
+---[ ] NAME:P6.3 Prepare MDX support for static pages (approval required) DESCRIPTION:Add MDX pipeline for static pages; choose @next/mdx or next-mdx-remote; set up content folders and route mapping. Approval received to proceed during execution; will request permission before installing dependencies.
+---[ ] NAME:P6.4 Organize static/marketing pages with MDX DESCRIPTION:Place static content under appropriate groups with MDX and ensure layouts and metadata are correct.
+---[ ] NAME:P6.5 Standardize linking/navigation patterns DESCRIPTION:Use next/link consistently with prefetch where appropriate; replace custom anchors; audit navigation components.
+---[ ] NAME:P6.6 Migrate legal pages to MDX from content/policies DESCRIPTION:Convert privacy-policy, terms-of-service, refund, returns-exchange, shipping-delivery, cookie, etc. to MDX routes using the content folder.
+--[ ] NAME:Phase 7: Performance Optimization – Streaming, Prefetch, Merchant Center Feed (LOW) DESCRIPTION:Introduce streaming where appropriate, add prefetching, and optimize Merchant Center Feed (full output vs pagination, caching).
+---[ ] NAME:P7.1 Identify slow pages/sections and opportunities for streaming DESCRIPTION:Profile route load times; find slow data dependencies and SSR/RSC bottlenecks.
+---[ ] NAME:P7.2 Add prefetching for key navigations DESCRIPTION:Enable next/link prefetch for PDPs from PLP, cart/checkout links, and high-traffic flows where helpful.
+---[ ] NAME:P7.3 Merchant Center Feed optimization DESCRIPTION:Locate/implement the feed route; choose full export vs pagination; add caching/ISR; ensure schema compatibility.
+----[ ] NAME:P7.3.1 Design feed pagination strategy DESCRIPTION:Define pagination parameters (page, limit), XML structure per page, and compatibility notes for Merchant Center ingestion.
+----[ ] NAME:P7.3.2 Implement paginated feed output DESCRIPTION:Extend feed route to support page/limit query params or create segmented routes; return partial XML with headers.
+----[ ] NAME:P7.3.3 Add caching/ISR for feed pages DESCRIPTION:Set appropriate Cache-Control and revalidate behavior for paginated feed endpoints.
+----[ ] NAME:P7.3.4 Validate feed at scale DESCRIPTION:Smoke test with large product catalogs; verify Google/Bing ingestion behavior and performance.
+---[ ] NAME:P7.4 Analyze bundle and route metrics DESCRIPTION:Run build analyze to inspect route and shared chunk sizes; plan reductions where needed.
+---[ ] NAME:P7.5 Apply targeted optimizations DESCRIPTION:Introduce streaming, memoization, and code-splitting where impact is clear; verify improvements.
