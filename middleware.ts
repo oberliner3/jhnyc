@@ -8,18 +8,21 @@ export function middleware(request: NextRequest) {
   const hostname = nextUrl.hostname;
   const pathname = nextUrl.pathname;
 
-  // Skip if already on target host
+  // 🚫 If already on target domain, do nothing
   if (hostname === TARGET_HOST) {
     return NextResponse.next();
   }
 
-  // Redirect old hosts → new domain with /p prefix
+  // 🚀 Only redirect old domains to new /p-prefixed URLs
   if (OLD_HOSTS.includes(hostname) && !pathname.startsWith("/p/")) {
     const newUrl = new URL(request.url);
     newUrl.hostname = TARGET_HOST;
     newUrl.pathname = "/p" + pathname;
 
-    // 🕓 Serve a fake "Loading" page for 1s, then redirect
+    // ✅ Add query flag so next request won't re-trigger middleware
+    newUrl.searchParams.set("_r", "1");
+
+    // Serve a temporary "Loading..." screen
     const html = `
       <!DOCTYPE html>
       <html lang="en">
@@ -54,6 +57,7 @@ export function middleware(request: NextRequest) {
             p { font-size: 1rem; color: #444; }
           </style>
           <script>
+            // Redirect after short delay
             setTimeout(() => {
               window.location.href = ${JSON.stringify(newUrl.toString())};
             }, 1000);
@@ -72,10 +76,15 @@ export function middleware(request: NextRequest) {
     });
   }
 
+  // ✅ If it's from the target host or already marked as redirected, skip
+  if (nextUrl.searchParams.has("_r")) {
+    return NextResponse.next();
+  }
+
   return NextResponse.next();
 }
 
-// ✅ Match all routes except internal or static assets
+// ✅ Skip internal and static assets
 export const config = {
   matcher: ["/((?!api|_next|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|txt|xml)).*)"],
 };
