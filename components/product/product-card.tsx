@@ -142,7 +142,24 @@ export function ProductCard({ product }: ProductCardProps) {
       onMouseEnter={() => hasMultipleImages && setCurrentImageIndex(1)}
       onMouseLeave={() => hasMultipleImages && setCurrentImageIndex(0)}
       aria-label={`${product.title} product card`}
+      itemScope
+      itemType="https://schema.org/Product"
     >
+      <meta itemProp="name" content={product.title} />
+      <meta
+        itemProp="sku"
+        content={
+          selectedVariant?.sku || product.variants?.[0]?.sku || product.id
+        }
+      />
+      <meta itemProp="category" content={product.product_type} />
+      <meta itemProp="brand" content={product.vendor} />
+      <meta
+        itemProp="description"
+        content={
+          g ? `${shortDescription}...` : shortDescription
+        }
+      />
       {/* Product Image Header */}
       <header className="relative">
         <Link
@@ -224,12 +241,16 @@ export function ProductCard({ product }: ProductCardProps) {
             <Link
               href={`/products/${product.handle}`}
               className="focus:outline-none focus-visible:underline"
+              itemProp="name"
             >
               {product.title}
             </Link>
           </h3>
           {shortDescription && (
-            <p className="text-muted-foreground text-sm line-clamp-2">
+            <p
+              className="text-muted-foreground text-sm line-clamp-2"
+              itemProp="description"
+            >
               {shortDescription}
               {isDescriptionTruncated ? "..." : ""}
             </p>
@@ -294,6 +315,8 @@ export function ProductCard({ product }: ProductCardProps) {
                     value={variant.id}
                     disabled={!variant.available}
                   >
+                    <meta itemProp="sku" content={variant.sku || ""} />
+                    <meta itemProp="priceCurrency" content="USD" />
                     {variant.title}
                     {!variant.available && " (Unavailable)"}
                   </SelectItem>
