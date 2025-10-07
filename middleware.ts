@@ -1,32 +1,77 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const OLD_HOSTS = ["jhuangnyc.com", "www.jhuangnyc.com"];
-const TARGET_HOST = "www.vohovintage.shop";
+const OLD_HOSTS = ["jhuangnyc.com", "www.jhuangnyc.com"]; // old domain
+const TARGET_HOST = "www.vohovintage.shop";                // Shopify domain (with Worker)
 
-export function middleware(request: NextRequest) {
-  const { nextUrl } = request;
+function isStaticAsset(path: string) {
+  return (
+    path.startsWith("/_next") ||
+    path.startsWith("/api") ||
+    path.match(/\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|woff2?|ttf|txt|xml|json)$/i)
+  );
+}
+
+export function middleware(req: NextRequest) {
+  const { nextUrl, headers } = req;
   const hostname = nextUrl.hostname;
   const pathname = nextUrl.pathname;
 
-  // 🚫 Prevent redirect loops — if already on target host, skip
-  if (hostname === TARGET_HOST) {
-    return NextResponse.next();
-  }
+  // Skip assets and internal routes
+  if (isStaticAsset(pathname)) return NextResponse.next();
 
-  // 🚀 Redirect old domains to new with /p prefix (except paths already under /p/)
-  if (OLD_HOSTS.includes(hostname) && !pathname.startsWith("/p/")) {
-    const newUrl = new URL(request.url);
+  // Skip already proxied requests
+  if (headers.get("x-proxied") === "1") return NextResponse.next();
 
-    newUrl.hostname = TARGET_HOST;
-    newUrl.pathname = "/p" + pathname; // add /p prefix
+  // Skip pages already under /p/
+  if (pathname.startsWith("/p/")) return NextResponse.next();
 
-    return NextResponse.redirect(newUrl, 308);
+  // If on the old domain, or on the new domain without /p/, show the redirect HTML
+  if (OLD_HOSTS.includes(hostname) || hostname === TARGET_HOST) {
+    const oldHostChecks = [...OLD_HOSTS, TARGET_HOST]
+      .map(h => `window.location.hostname === "${h}"`)
+      .join(" || ");
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Redirecting...</title>
+  <style>
+    body { font-family: system-ui, sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; margin:0; background:#fff; color:#111; }
+    .spinner { width:40px; height:40px; border:4px solid #ccc; border-top-color:#111; border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:1rem; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="spinner"></div>
+  <p>Redirecting to new domain...</p>
+
+  <script>
+    (function() {
+      if (${oldHostChecks}) {
+        if (!window.location.pathname.startsWith("/p/")) {
+          var pathWithSearch = window.location.pathname + window.location.search + window.location.hash;
+          var newURL = "https://${TARGET_HOST}/p" + pathWithSearch;
+          window.location.replace(newURL);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>`;
+
+    return new NextResponse(html, {
+      status: 200,
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  // ✅ Match all routes except Next.js internals and static assets
-  matcher: ["/((?!api|_next|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico)).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|woff2?|ttf|txt|xml|json)$).*)",
+  ],
 };
