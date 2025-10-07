@@ -14,5 +14,18 @@
 	"Codegeex.RepoIndex": true,
 	"[json]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"zencoder.mcpServers": {
+		"ShadCN_Tweak": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"shadcn@canary",
+				"registry:mcp"
+			],
+			"env": {
+				"REGISTRY_URL": "https://tweakcn.com/r/themes/registry.json"
+			}
+		}
 	}
 }
