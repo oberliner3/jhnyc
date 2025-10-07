@@ -40,6 +40,24 @@ export default async function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content={env.NEXT_PUBLIC_STORE_NAME} />
         <meta name="msapplication-TileColor" content="hsl(var(--primary))" />
+        <link rel="dns-prefetch" href="//cdn.shopify.com" />
+        <link rel="dns-prefetch" href="//checkout.shopify.com" />
+        <link rel="dns-prefetch" href="//www.vohovintage.com" />
+        <link
+          rel="preconnect"
+          href="https://cdn.shopify.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://checkout.shopify.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://www.vohovintage.com"
+          crossOrigin="anonymous"
+        />
 
         <WebsiteSchema />
       </head>
