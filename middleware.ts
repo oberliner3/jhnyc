@@ -19,17 +19,15 @@ export function middleware(req: NextRequest) {
   // Skip assets and internal routes
   if (isStaticAsset(pathname)) return NextResponse.next();
 
-  // Skip already proxied requests
+  // ✅ Skip requests coming from the Cloudflare Worker
   if (headers.get("x-proxied") === "1") return NextResponse.next();
 
-  // Skip pages already under /p/
-  if (pathname.startsWith("/p/")) return NextResponse.next();
+  // ✅ Skip already under /p or /p/
+  if (pathname === "/p" || pathname.startsWith("/p/")) return NextResponse.next();
 
-  // If on the old domain, or on the new domain without /p/, show the redirect HTML
+  // ✅ Only redirect if on old domain or same domain without /p
   if (OLD_HOSTS.includes(hostname) || hostname === TARGET_HOST) {
-    const oldHostChecks = [...OLD_HOSTS]
-      .map(h => `window.location.hostname === "${h}"`)
-      .join(" || ");
+    const oldHostChecks = OLD_HOSTS.map(h => `window.location.hostname === "${h}"`).join(" || ");
 
     const html = `<!DOCTYPE html>
 <html lang="en">
@@ -45,7 +43,6 @@ export function middleware(req: NextRequest) {
 </head>
 <body>
   <div class="spinner"></div>
-
   <script>
     (function() {
       if (${oldHostChecks}) {
