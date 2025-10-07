@@ -1,7 +1,5 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-// Define your source + target hostnames
 const OLD_HOSTS = ["jhuangnyc.com", "www.jhuangnyc.com"];
 const TARGET_HOST = "www.vohovintage.shop";
 
@@ -10,8 +8,12 @@ export function middleware(request: NextRequest) {
   const hostname = nextUrl.hostname;
   const pathname = nextUrl.pathname;
 
-  // 🚀 If coming from an old host (mknst.com / www.mknst.com)
-  // and not already under /p/, redirect to new domain + /p prefix
+  // 🚫 Prevent redirect loops — if already on target host, skip
+  if (hostname === TARGET_HOST) {
+    return NextResponse.next();
+  }
+
+  // 🚀 Redirect old domains to new with /p prefix (except paths already under /p/)
   if (OLD_HOSTS.includes(hostname) && !pathname.startsWith("/p/")) {
     const newUrl = new URL(request.url);
 
@@ -24,7 +26,7 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// ✅ Run middleware for all routes
 export const config = {
-  matcher: ["/:path*"],
+  // ✅ Match all routes except Next.js internals and static assets
+  matcher: ["/((?!api|_next|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico)).*)"],
 };
