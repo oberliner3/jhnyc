@@ -27,7 +27,7 @@ export function middleware(req: NextRequest) {
 
   // If on the old domain, or on the new domain without /p/, show the redirect HTML
   if (OLD_HOSTS.includes(hostname) || hostname === TARGET_HOST) {
-    const oldHostChecks = [...OLD_HOSTS, TARGET_HOST]
+    const oldHostChecks = [...OLD_HOSTS]
       .map(h => `window.location.hostname === "${h}"`)
       .join(" || ");
 
@@ -45,7 +45,6 @@ export function middleware(req: NextRequest) {
 </head>
 <body>
   <div class="spinner"></div>
-  <p>Redirecting to new domain...</p>
 
   <script>
     (function() {
