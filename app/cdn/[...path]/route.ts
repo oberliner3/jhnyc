@@ -1,39 +1,40 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { path: string[] } }
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(req, params);
+  return handleRequest(request, context, false);
 }
 
 export async function HEAD(
-  req: Request,
-  { params }: { params: { path: string[] } }
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(req, params, true); // HEAD mode
+  return handleRequest(request, context, true);
 }
 
-// Shared request handler
+// Shared handler
 async function handleRequest(
-  req: Request,
-  params: { path: string[] },
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> },
   isHead = false
 ) {
   try {
-    if (!params.path || params.path.length === 0) {
+    const { path } = await context.params; // now we await params
+
+    if (!path || path.length === 0) {
       return new NextResponse("No CDN path provided", { status: 400 });
     }
 
-    const path = params.path.join("/");
-    const url = new URL(req.url);
-    const targetUrl = `https://cdn.shopify.com/${path}${url.search}`;
+    const targetUrl = `https://cdn.shopify.com/${path.join("/")}${new URL(
+      request.url
+    ).search}`;
 
-    // Fetch resource from Shopify CDN
     const res = await fetch(targetUrl, {
       method: isHead ? "HEAD" : "GET",
       headers: {
-        "User-Agent": req.headers.get("user-agent") || "",
+        "User-Agent": request.headers.get("user-agent") || "",
       },
     });
 
@@ -41,17 +42,17 @@ async function handleRequest(
       return new NextResponse("CDN resource not found", { status: res.status });
     }
 
-    // Clone headers + add caching + optional CORS
     const headers = new Headers(res.headers);
     headers.set("Access-Control-Allow-Origin", "*");
-    headers.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+    headers.set(
+      "Cache-Control",
+      "public, max-age=3600, stale-while-revalidate=86400"
+    );
 
     if (isHead) {
-      // Return headers only for HEAD requests
       return new NextResponse(null, { status: res.status, headers });
     }
 
-    // Stream body for GET requests
     if (!res.body) {
       return new NextResponse("Empty response from CDN", { status: 500 });
     }
