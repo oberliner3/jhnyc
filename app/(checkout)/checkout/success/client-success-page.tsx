@@ -1,4 +1,3 @@
-// app/checkout/success/ClientSuccessPage.tsx
 "use client";
 
 import {
@@ -28,7 +27,7 @@ export function ClientSuccessPage({ orderId }: ClientSuccessPageProps) {
   } | null>(null);
 
   useEffect(() => {
-    // TODO: In a real app, you'd fetch order details from your API
+    // TODO: Implement Real world order tracking (using supabase)
     setOrderDetails({
       id: orderId,
       status: "Confirmed",

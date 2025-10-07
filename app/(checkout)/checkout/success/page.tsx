@@ -1,5 +1,3 @@
-// app/(checkout)/checkout/success/page.tsx
-
 import { notFound } from "next/navigation";
 import { ClientSuccessPage } from "./client-success-page";
 
@@ -15,7 +13,7 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
 
   // Optional: Validate or fetch server-side data here
   if (!orderId) {
-    notFound(); // Or return <div>Invalid order.</div>;
+    notFound();
   }
 
   return <ClientSuccessPage orderId={orderId} />;

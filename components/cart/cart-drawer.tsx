@@ -28,7 +28,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/cart-context";
-import { checkoutCartAction } from "@/lib/actions";
+import { checkoutCartAction } from "@/lib/buy-now-actions";
 
 export default function CartDrawer() {
 	const {

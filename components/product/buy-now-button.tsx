@@ -4,7 +4,7 @@ import { useFormStatus } from "react-dom";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ApiProduct, ApiProductImage, ApiProductVariant } from "@/lib/types";
-import { buyNowAction } from "@/lib/actions";
+import { buyNowAction } from "@/lib/buy-now-actions";
 import { mergeUtmParams, UTMParams } from "@/lib/utils";
 
 interface BuyNowButtonProps {

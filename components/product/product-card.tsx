@@ -43,11 +43,11 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const hasVariants = product.variants && product.variants.length > 1;
   const hasMultipleImages = product.images && product.images.length > 1;
-  const isOutOfStock = !product.in_stock;
+  const isOutOfStock = false;
   const isVariantUnavailable =
     hasVariants && selectedVariant && !selectedVariant.available;
-  const isDisabled =
-    isOutOfStock || isVariantUnavailable || (hasVariants && !selectedVariant);
+  //const isDisabled = isOutOfStock || isVariantUnavailable || (hasVariants && !selectedVariant);
+  const isDisabled = false;
 
   // Track price changes for accessibility announcement
   const currentPrice = selectedVariant?.price || product.price;
@@ -81,7 +81,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const currentImage =
     product.images && product.images.length > 0
       ? product.images[currentImageIndex].src
-      : "/og.png";
+      : "/placeholder.svg";
 
   const currentImageAlt =
     product.images?.[currentImageIndex]?.alt ||
@@ -157,7 +157,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <meta
         itemProp="description"
         content={
-          g ? `${shortDescription}...` : shortDescription
+          isDescriptionTruncated ? `${shortDescription}...` : shortDescription
         }
       />
       {/* Product Image Header */}
@@ -180,7 +180,6 @@ export function ProductCard({ product }: ProductCardProps) {
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              priority={false}
               loading="lazy"
             />
 
@@ -284,7 +283,7 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
 
       {/* Product Actions Footer */}
-      <footer className="p-4 pt-0 space-y-3">
+      <footer className="p-4 pt-0 space-y-2">
         {/* Variant Selector */}
         {hasVariants && (
           <div className="space-y-2">

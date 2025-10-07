@@ -11,7 +11,7 @@ import { CartSkeleton } from "@/components/skeletons/cart-skeleton";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/cart-context";
-import { checkoutCartAction } from "@/lib/actions";
+import { checkoutCartAction } from "@/lib/buy-now-actions";
 import { getProductPlaceholder } from "@/lib/placeholder";
 import { formatPrice } from "@/lib/utils";
 
