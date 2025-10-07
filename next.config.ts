@@ -32,18 +32,23 @@ const nextConfig: NextConfig = {
       // ✅ Allow images when proxied through your main domains
       { protocol: "https", hostname: "**.jhuangnyc.com" },
       { protocol: "https", hostname: "**.vohovintage.shop" },
+       {
+        protocol: "https",
+        hostname: "jhuangnyc.com",
+        pathname: "/cdn/**",
+      },
     ],
   },
 
   // ✅ REWRITES — Make /p/... act as internal alias for normal pages
-  async rewrites() {
-    return [
-      {
-        source: "/p/:path*",
-        destination: "/:path*", // Maps /p/... internally → /...
-      },
-    ];
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/p/:path*",
+  //       destination: "/:path*", // Maps /p/... internally → /...
+  //     },
+  //   ];
+  // },
 
   // ✅ REDIRECTS — Your original ones (unchanged)
   async redirects() {

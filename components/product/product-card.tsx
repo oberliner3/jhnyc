@@ -8,7 +8,6 @@ import { BuyNowButton } from "@/components/product/buy-now-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
-
 import type { ApiProduct } from "@/lib/types";
 import { formatPrice, stripHtml } from "@/lib/utils";
 import {
@@ -18,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { useProductVariants } from "@/hooks/use-product-variants";
 
 interface ProductCardProps {
@@ -43,23 +41,24 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const hasVariants = product.variants && product.variants.length > 1;
   const hasMultipleImages = product.images && product.images.length > 1;
-  const isOutOfStock = false;
+  const isOutOfStock = false; // can integrate real stock logic
   const isVariantUnavailable =
     hasVariants && selectedVariant && !selectedVariant.available;
-  //const isDisabled = isOutOfStock || isVariantUnavailable || (hasVariants && !selectedVariant);
-  const isDisabled = false;
+  const isDisabled = false; // placeholder, replace with real logic if needed
 
-  // Track price changes for accessibility announcement
+  // Track price changes for accessibility
   const currentPrice = selectedVariant?.price || product.price;
   useEffect(() => {
-    if (previousPrice !== null && previousPrice !== currentPrice) {
-      // Price changed, the aria-live region will announce it
-      if (priceRef.current) {
-        priceRef.current.classList.add("price-updated");
-        setTimeout(() => {
-          priceRef.current?.classList.remove("price-updated");
-        }, 600);
-      }
+    if (
+      previousPrice !== null &&
+      previousPrice !== currentPrice &&
+      priceRef.current
+    ) {
+      priceRef.current.classList.add("price-updated");
+      setTimeout(
+        () => priceRef.current?.classList.remove("price-updated"),
+        600
+      );
     }
     setPreviousPrice(currentPrice);
   }, [currentPrice, previousPrice]);
@@ -71,20 +70,26 @@ export function ProductCard({ product }: ProductCardProps) {
     setIsAddingToCart(true);
     try {
       await addItem(product, selectedVariant, 1);
-    } catch (error) {
-      console.error("Error adding to cart:", error);
+    } catch (err) {
+      console.error("Error adding to cart:", err);
     } finally {
       setIsAddingToCart(false);
     }
   };
 
-  const currentImage =
-    product.images && product.images.length > 0
-      ? product.images[currentImageIndex].src
-      : "/placeholder.svg";
+  // Proxy all Shopify images via /cdn
+  const proxiedImages =
+    product.images?.map((img) => ({
+      ...img,
+      src: img.src.replace(
+        "https://cdn.shopify.com",
+        "https://jhuangnyc.com/cdn"
+      ),
+    })) || [];
 
+  const currentImage = proxiedImages[currentImageIndex]?.src || "/og.png";
   const currentImageAlt =
-    product.images?.[currentImageIndex]?.alt ||
+    proxiedImages[currentImageIndex]?.alt ||
     `${product.title}${
       selectedVariant?.title && selectedVariant.title !== "Default Title"
         ? ` - ${selectedVariant.title}`
@@ -95,26 +100,21 @@ export function ProductCard({ product }: ProductCardProps) {
   const shortDescription = fullDescription.slice(0, 100);
   const isDescriptionTruncated = fullDescription.length > 100;
 
-  // Keyboard navigation for image gallery
   const handleImageNavigation = useCallback(
     (direction: "next" | "prev") => {
       if (!hasMultipleImages) return;
-
-      setCurrentImageIndex((prev) => {
-        if (direction === "next") {
-          return prev < product.images.length - 1 ? prev + 1 : 0;
-        } else {
-          return prev > 0 ? prev - 1 : product.images.length - 1;
-        }
-      });
+      setCurrentImageIndex((prev) =>
+        direction === "next"
+          ? (prev + 1) % proxiedImages.length
+          : (prev - 1 + proxiedImages.length) % proxiedImages.length
+      );
     },
-    [hasMultipleImages, product.images?.length]
+    [hasMultipleImages, proxiedImages.length]
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (!hasMultipleImages) return;
-
       if (e.key === "ArrowRight") {
         e.preventDefault();
         handleImageNavigation("next");
@@ -126,19 +126,17 @@ export function ProductCard({ product }: ProductCardProps) {
     [hasMultipleImages, handleImageNavigation]
   );
 
-  // Get disabled reason for better UX
   const getDisabledReason = () => {
     if (isOutOfStock) return "This product is currently out of stock";
     if (isVariantUnavailable) return "This variant is currently unavailable";
     if (hasVariants && !selectedVariant) return "Please select a variant";
     return undefined;
   };
-
   const disabledReason = getDisabledReason();
 
   return (
     <article
-      className="group relative bg-card hover:shadow-xl border rounded-lg overflow-hidden text-card-foreground transition-all duration-300 flex flex-col focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+      className="group relative flex flex-col bg-card hover:shadow-xl border rounded-lg focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 overflow-hidden text-card-foreground transition-all duration-300"
       onMouseEnter={() => hasMultipleImages && setCurrentImageIndex(1)}
       onMouseLeave={() => hasMultipleImages && setCurrentImageIndex(0)}
       aria-label={`${product.title} product card`}
@@ -160,7 +158,8 @@ export function ProductCard({ product }: ProductCardProps) {
           isDescriptionTruncated ? `${shortDescription}...` : shortDescription
         }
       />
-      {/* Product Image Header */}
+
+      {/* Product Image */}
       <header className="relative">
         <Link
           href={`/products/${product.handle}`}
@@ -183,8 +182,7 @@ export function ProductCard({ product }: ProductCardProps) {
               loading="lazy"
             />
 
-            {/* Badges */}
-            <div className="absolute top-2 left-2 z-10 flex flex-col gap-2">
+            <div className="top-2 left-2 z-10 absolute flex flex-col gap-2">
               {discountPercentage > 0 && (
                 <Badge
                   variant="destructive"
@@ -203,19 +201,16 @@ export function ProductCard({ product }: ProductCardProps) {
               )}
             </div>
 
-            {/* Image navigation indicator */}
             {hasMultipleImages && (
               <div
-                className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1"
+                className="bottom-2 left-1/2 absolute flex gap-1 -translate-x-1/2"
                 aria-hidden="true"
               >
-                {product.images.map((_, index) => (
+                {proxiedImages.map((_, idx) => (
                   <div
-                    key={index}
+                    key={idx}
                     className={`w-1.5 h-1.5 rounded-full transition-all ${
-                      index === currentImageIndex
-                        ? "bg-white w-4"
-                        : "bg-white/50"
+                      idx === currentImageIndex ? "bg-white w-4" : "bg-white/50"
                     }`}
                   />
                 ))}
@@ -223,40 +218,34 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
         </Link>
-
         {hasMultipleImages && (
           <span className="sr-only">
-            Use arrow keys to navigate through {product.images.length} product
-            images. Currently showing image {currentImageIndex + 1} of{" "}
-            {product.images.length}.
+            Use arrow keys to navigate {proxiedImages.length} images. Currently
+            showing {currentImageIndex + 1} of {proxiedImages.length}.
           </span>
         )}
       </header>
 
-      {/* Product Information */}
-      <div className="p-4 space-y-3 flex-grow">
-        <div className="space-y-1">
-          <h3 className="font-semibold text-base group-hover:text-primary line-clamp-1 transition-colors">
-            <Link
-              href={`/products/${product.handle}`}
-              className="focus:outline-none focus-visible:underline"
-              itemProp="name"
-            >
-              {product.title}
-            </Link>
-          </h3>
-          {shortDescription && (
-            <p
-              className="text-muted-foreground text-sm line-clamp-2"
-              itemProp="description"
-            >
-              {shortDescription}
-              {isDescriptionTruncated ? "..." : ""}
-            </p>
-          )}
-        </div>
-
-        {/* Price with aria-live for accessibility */}
+      {/* Product Info */}
+      <div className="flex-grow space-y-3 p-4">
+        <h3 className="font-semibold group-hover:text-primary text-base line-clamp-1 transition-colors">
+          <Link
+            href={`/products/${product.handle}`}
+            className="focus:outline-none focus-visible:underline"
+            itemProp="name"
+          >
+            {product.title}
+          </Link>
+        </h3>
+        {shortDescription && (
+          <p
+            className="text-muted-foreground text-sm line-clamp-2"
+            itemProp="description"
+          >
+            {shortDescription}
+            {isDescriptionTruncated ? "..." : ""}
+          </p>
+        )}
         <div
           className="flex items-center gap-2"
           aria-live="polite"
@@ -282,22 +271,22 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Product Actions Footer */}
-      <footer className="p-4 pt-0 space-y-2">
-        {/* Variant Selector */}
+      {/* Footer Actions */}
+      <footer className="space-y-2 p-4 pt-0">
         {hasVariants && (
           <div className="space-y-2">
             <label
               htmlFor={`variant-select-${product.id}`}
-              className="text-sm font-medium text-foreground"
+              className="font-medium text-foreground text-sm"
             >
               Select Variant
             </label>
             <Select
-              onValueChange={(value) => {
-                const variant = product.variants?.find((v) => v.id === value);
-                setSelectedVariant(variant);
-              }}
+              onValueChange={(value) =>
+                setSelectedVariant(
+                  product.variants?.find((v) => v.id === value)
+                )
+              }
               defaultValue={selectedVariant?.id}
             >
               <SelectTrigger
@@ -325,8 +314,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="gap-2 grid grid-cols-2">
           <Button
             size="sm"
             variant="outline"
@@ -338,13 +326,13 @@ export function ProductCard({ product }: ProductCardProps) {
           >
             {isAddingToCart ? (
               <Loader2
-                className="w-4 h-4 mr-2 animate-spin"
+                className="mr-2 w-4 h-4 animate-spin"
                 aria-hidden="true"
               />
             ) : (
-              <ShoppingCart className="w-4 h-4 mr-2" aria-hidden="true" />
+              <ShoppingCart className="mr-2 w-4 h-4" aria-hidden="true" />
             )}
-            <span>{isAddingToCart ? "Adding..." : "Add to Cart"}</span>
+            {isAddingToCart ? "Adding..." : "Add to Cart"}
           </Button>
           <BuyNowButton
             product={product}
