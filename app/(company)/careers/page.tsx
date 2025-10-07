@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { H2, H4, Lead, List, P } from "@/components/ui/typography";
 
 export const metadata: Metadata = {
   title: "Careers | Join Our Team",
@@ -211,10 +213,10 @@ export default function CareersPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-muted-foreground">{job.description}</p>
+                  <P className="text-muted-foreground">{job.description}</P>
                   <div>
-                    <h4 className="mb-2 font-medium">Requirements:</h4>
-                    <ul className="space-y-1 text-muted-foreground text-sm">
+                    <H4 className="mb-2 font-medium">Requirements:</H4>
+                    <List className="space-y-1 text-muted-foreground text-sm">
                       {job.requirements.map((req) => (
                         <li
                           key={`req-${req
@@ -227,7 +229,7 @@ export default function CareersPage() {
                           {req}
                         </li>
                       ))}
-                    </ul>
+                    </List>
                   </div>
                 </CardContent>
               </Card>
@@ -237,27 +239,27 @@ export default function CareersPage() {
 
         {/* Application Process */}
         <div className="bg-muted/50 p-8 rounded-lg text-center">
-          <h2 className="mb-4 font-bold text-2xl">
+          <H2 className="mb-4 font-bold text-2xl">
             Don&apos;t See a Perfect Fit?
-          </h2>
-          <p className="mx-auto mb-6 max-w-2xl text-muted-foreground">
+          </H2>
+          <Lead className="mx-auto mb-6 max-w-2xl text-muted-foreground">
             We&apos;re always looking for talented people to join our team. Send
             us your resume and let us know how you&apos;d like to contribute to
             our mission.
-          </p>
+          </Lead>
           <div className="space-x-4">
-            <a
-              href="mailto:careers@example.com"
+            <Link
+              href="mailto:careers@jhuangnyc.com"
               className="inline-block bg-primary hover:bg-primary/90 px-6 py-2 rounded-md text-primary-foreground transition-colors"
             >
               Send Resume
-            </a>
-            <a
+            </Link>
+            <Link
               href="/contact"
               className="inline-block bg-background hover:bg-accent px-6 py-2 border border-input rounded-md transition-colors"
             >
               Contact Us
-            </a>
+            </Link>
           </div>
         </div>
       </div>

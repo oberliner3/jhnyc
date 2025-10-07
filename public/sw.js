@@ -1,6 +1,6 @@
-// Service Worker for Originz PWA
-const STATIC_CACHE = "originz-static-v1";
-const DYNAMIC_CACHE = "originz-dynamic-v1";
+// Service Worker for Jhuangnyc PWA
+const STATIC_CACHE = "jhuangnyc-static-v1";
+const DYNAMIC_CACHE = "jhuangnyc-dynamic-v1";
 
 
 // Assets to cache on install
@@ -236,7 +236,7 @@ self.addEventListener("push", (event) => {
 	console.log("Push notification received:", event);
 
 	const options = {
-		body: event.data ? event.data.text() : "New notification from Originz",
+		body: event.data ? event.data.text() : "New notification from Jhuangnyc",
 		icon: "/icons/icon-192x192.png",
 		badge: "/icons/badge-72x72.png",
 		vibrate: [100, 50, 100],
@@ -258,7 +258,7 @@ self.addEventListener("push", (event) => {
 		],
 	};
 
-	event.waitUntil(self.registration.showNotification("Originz", options));
+	event.waitUntil(self.registration.showNotification("Jhuangnyc", options));
 });
 
 // Notification click handling

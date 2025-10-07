@@ -57,7 +57,7 @@ export default function ShippingDeliveryPage() {
 
       <ArticleSection
         title={"Contact Us"}
-        first={`If you have any questions about shipping or delivery, please contact us at ${APP_CONTACTS.email.shipping}.`}
+        first={`If you have any questions about shipping or delivery, please contact us at ${APP_CONTACTS.email.getInTouch}.`}
       />
     </ArticleWrapper>
   );

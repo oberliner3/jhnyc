@@ -54,7 +54,7 @@ export default function TermsOfServicePage() {
             <h2 className="mb-4 font-bold text-2xl">Contact Information</h2>
             <p className="text-muted-foreground">
               Questions about the Terms of Service should be sent to us at{" "}
-              {APP_CONTACTS.email.legal}.
+              {APP_CONTACTS.email.getInTouch}.
             </p>
           </section>
         </div>

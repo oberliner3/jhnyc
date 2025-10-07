@@ -47,7 +47,7 @@ export default function ReturnsExchangePage() {
             </h2>
             <p className="text-muted-foreground">
               To initiate a return or exchange, please contact our customer
-              service team at {APP_CONTACTS.email.support}
+              service team at {APP_CONTACTS.email.getInTouch}
               with your order number and reason for return. We will provide you
               with instructions and a return shipping label.
             </p>
@@ -77,7 +77,7 @@ export default function ReturnsExchangePage() {
             <h2 className="mb-4 font-bold text-2xl">Contact Us</h2>
             <p className="text-muted-foreground">
               If you have any questions about our Returns & Exchange Policy,
-              please contact us at {APP_CONTACTS.email.support}.
+              please contact us at {APP_CONTACTS.email.getInTouch}.
             </p>
           </section>
         </div>

@@ -65,7 +65,7 @@ export default function RewardsTermsPage() {
             <h2 className="mb-4 font-bold text-2xl">Contact Us</h2>
             <p className="text-muted-foreground">
               If you have any questions about the Rewards Program, please
-              contact us at {APP_CONTACTS.email.rewards}.
+              contact us at {APP_CONTACTS.email.getInTouch}.
             </p>
           </section>
         </div>

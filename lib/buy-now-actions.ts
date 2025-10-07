@@ -171,9 +171,7 @@ export async function buyNowAction(formData: FormData): Promise<never> {
         });
       } catch (parseError) {
         // If response is not JSON, show the text
-        errorMessage = `API returned non-JSON response (${
-          response.status
-        }): ${responseText.substring(0, 200)}`;
+        errorMessage = `API returned non-JSON response (${response.status}): ${responseText.substring(0, 200)}`;
         console.error(
           "[buyNowAction] Failed to parse error response:",
           parseError
@@ -302,125 +300,152 @@ export async function checkoutCartAction(
     campaign?: string;
   }
 ): Promise<never> {
+  let finalUrl: URL;
+
   try {
-    // Validate cart items
+    // 1. Validate cart items
     if (!cartItems || cartItems.length === 0) {
       throw new Error("Cart is empty. Please add items before checkout.");
     }
 
-    // Validate each cart item
     for (const item of cartItems) {
-      if (!item.product?.id) {
-        throw new Error("Invalid product in cart");
-      }
       if (!item.variant?.id) {
-        throw new Error("Invalid variant in cart");
-      }
-      if (!Number.isFinite(item.variant.price) || item.variant.price <= 0) {
-        throw new Error(`Invalid price for ${item.product.title}`);
+        throw new Error(
+          `Invalid variant in cart for product: ${item.product?.title}`
+        );
       }
       if (
         !Number.isFinite(item.quantity) ||
-        item.quantity < LIMITS.MIN_QUANTITY_PER_ITEM ||
-        item.quantity > LIMITS.MAX_QUANTITY_PER_ITEM
+        item.quantity < LIMITS.MIN_QUANTITY_PER_ITEM
       ) {
         throw new Error(
-          `Invalid quantity for ${item.product.title}. Must be between ${LIMITS.MIN_QUANTITY_PER_ITEM} and ${LIMITS.MAX_QUANTITY_PER_ITEM}`
+          `Invalid quantity for ${item.product.title}. Must be at least ${LIMITS.MIN_QUANTITY_PER_ITEM}.`
         );
       }
     }
 
-    // Extract UTM parameters with defaults
+    // 2. Prepare data for Shopify REST API
     const utmSource = utmParams?.source || "cart";
     const utmMedium = utmParams?.medium || "checkout";
     const utmCampaign = utmParams?.campaign || "cart-checkout";
-
-    // Generate invoice number
     const invoiceNumber = generateInvoiceNumber();
 
-    // Prepare line items for the draft order
-    const lineItems = cartItems.map((item) => ({
-      productTitle: item.product.title,
-      variantId: item.variant.id,
-      productId: item.product.id,
-      price: item.variant.price,
+    const line_items = cartItems.map((item) => ({
+      title: item.product.title,
+      price: item.variant.price.toFixed(2),
       quantity: item.quantity,
     }));
 
-    // Prepare the payload for the /api/draft-orders endpoint
-    const payload = {
-      lineItems,
-      tags: `${utmSource},${utmMedium},${utmCampaign},${invoiceNumber}`,
+    const shopifyPayload = {
+      draft_order: {
+        line_items,
+        tags: `${utmSource},${utmMedium},${utmCampaign},${invoiceNumber}`,
+        use_customer_default_address: true,
+      },
     };
 
+    // 3. Call Shopify REST API
+    let invoiceUrl: string | undefined;
+    const shop = process.env.SHOPIFY_SHOP;
+    const token = process.env.SHOPIFY_ACCESS_TOKEN;
+
+    if (!shop || !token) {
+      throw new Error(
+        "Missing SHOPIFY_SHOP or SHOPIFY_ACCESS_TOKEN environment variables"
+      );
+    }
+
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL}/api/draft-orders`,
+      `https://${shop}/admin/api/2024-01/draft_orders.json`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Shopify-Access-Token": token,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(shopifyPayload),
       }
     );
 
-    // Read response body as text first (can only read once)
     const responseText = await response.text();
 
     if (!response.ok) {
-      let errorMessage = "Failed to create draft order via API.";
+      let errorMessage = "Failed to create draft order via Shopify REST API.";
       try {
         const errorData = JSON.parse(responseText);
-        errorMessage = errorData.error || errorMessage;
-      } catch (parseError) {
-        console.log(parseError);
-        // If response is not JSON, show the text
-        errorMessage = `API returned non-JSON response (${
-          response.status
-        }): ${responseText.substring(0, 200)}`;
+        errorMessage = errorData.errors ? JSON.stringify(errorData.errors) : errorMessage;
+      } catch (e) {
+        errorMessage = `API returned non-JSON response (${response.status}): ${responseText.substring(0, 200)}`;
       }
+       logError(new Error(errorMessage), {
+        context: "checkoutCartAction - API Error",
+        itemCount: cartItems.length,
+        payload: shopifyPayload,
+        response: responseText,
+      });
       throw new Error(errorMessage);
     }
-
-    // Parse the successful response
+    
     let responseData;
     try {
       responseData = JSON.parse(responseText);
     } catch (parseError) {
-      console.log(parseError);
+       logError(new Error("Failed to parse success response from Shopify"), {
+        context: "checkoutCartAction - JSON Parse Error",
+        itemCount: cartItems.length,
+        response: responseText,
+      });
       throw new Error(
         `API returned invalid JSON response: ${responseText.substring(0, 200)}`
       );
     }
 
-    const draftOrder = responseData.draftOrder;
+    invoiceUrl = responseData.draft_order?.invoice_url;
 
-    if (!draftOrder?.invoiceUrl) {
-      throw new Error("No invoice URL returned from draft order API.");
+    if (!invoiceUrl) {
+      logError(new Error("No invoice URL in Shopify response"), {
+        context: "checkoutCartAction - No Invoice URL",
+        itemCount: cartItems.length,
+        response: responseData,
+      });
+      throw new Error("No invoice URL returned from Shopify.");
     }
 
-    // Append tracking parameters to the invoice URL
-    const finalUrl = new URL(draftOrder.invoiceUrl);
-
-    // UTM parameters
+    // 4. Append tracking parameters
+    finalUrl = new URL(invoiceUrl);
     finalUrl.searchParams.set("utm_source", utmSource);
     finalUrl.searchParams.set("utm_medium", utmMedium);
     finalUrl.searchParams.set("utm_campaign", utmCampaign);
-
-    // Add invoice number for tracking
     finalUrl.searchParams.set("invoice", invoiceNumber);
 
-    // Redirect to the invoice URL for payment
-    redirect(finalUrl.toString());
+    // Add product info for the first item, similar to buyNowAction
+    const firstItem = cartItems[0];
+    if (firstItem) {
+      finalUrl.searchParams.set("product_title", firstItem.product.title);
+      if (firstItem.product.images && firstItem.product.images.length > 0) {
+        const safeProductImage =
+          firstItem.product.images[0].src &&
+          /^https?:\/\//i.test(firstItem.product.images[0].src)
+            ? firstItem.product.images[0].src
+            : "";
+        if (safeProductImage) {
+          finalUrl.searchParams.set("product_image", safeProductImage);
+        }
+      }
+    }
+    
   } catch (error) {
     logError(error instanceof Error ? error : new Error("Unknown error"), {
       context: "checkoutCartAction",
       itemCount: cartItems?.length || 0,
     });
 
-    // Re-throw with user-friendly message
+    // Re-throw with a user-friendly message
     throw new Error(
       error instanceof Error ? error.message : ERROR_MESSAGES.SERVER_ERROR
     );
   }
+
+  // CRITICAL: redirect() must be called OUTSIDE try-catch
+  redirect(finalUrl.toString());
 }

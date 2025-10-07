@@ -97,7 +97,7 @@ export default function PrivacyPolicyPage() {
         <h2 className="mb-4 font-bold text-2xl">Contact Us</h2>
         <p className="text-muted-foreground">
           If you have any questions about this Privacy Policy, please contact us
-          at {APP_CONTACTS.email.privacy}.
+          at {APP_CONTACTS.email.getInTouch}.
         </p>
       </section>
     </ArticleWrapper>

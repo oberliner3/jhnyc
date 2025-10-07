@@ -20,7 +20,7 @@ export function Header() {
   const cartItemCount = getTotalItems();
 
   return (
-    <header className="top-0 z-50 sticky bg-white/55 supports-backdrop-filter:bg-white/60 shadow-sm backdrop-blur w-full">
+    <header className="top-0 z-50 sticky bg-white/55 supports-backdrop-filter:bg-white/60 shadow-sm backdrop-blur w-full px-2">
       <div className="flex justify-between items-center px-4 h-16 container">
         {/* Mobile menu */}
         <MobileNav />
@@ -36,7 +36,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="font-medium text-gray-700 hover:text-primary text-sm transition-colors"
+              className="font-semibold text-primary hover:text-primary-hover text-md transition-colors"
             >
               {item.name}
             </Link>
@@ -44,7 +44,7 @@ export function Header() {
         </nav>
 
         {/* Actions */}
-        <div className="flex flex-1 justify-end items-center space-x-3">
+        <div className="flex justify-end items-center space-x-1">
           {/* Search */}
           <IconButton
             variant="ghost"

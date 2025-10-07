@@ -3,7 +3,7 @@ import { SITE_CONFIG } from "@/lib/constants";
 import { env } from "@/lib/env-validation";
 
 export default function manifest(): MetadataRoute.Manifest {
-	return {
+  return {
     name: SITE_CONFIG.name,
     short_name: env.NEXT_PUBLIC_STORE_NAME,
     background_color: "#ffffff",
@@ -15,7 +15,7 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait-primary",
     start_url: "/",
     scope: "/",
-    id: "originz-store",
+    id: "jhuangnyc-store",
 
     icons: [
       {

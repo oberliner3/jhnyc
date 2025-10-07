@@ -144,16 +144,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	const loadCart = useCallback(async () => {
 		if (!user) {
-			const savedCart = localStorage.getItem("originz-cart");
-			if (savedCart) {
-				try {
-					const cartItems = JSON.parse(savedCart);
-					dispatch({ type: "LOAD_CART", payload: cartItems });
-				} catch (e) {
-					console.error("Error loading cart from localStorage:", e);
-					localStorage.removeItem("originz-cart");
-				}
-			}
+			const savedCart = localStorage.getItem("jhuangnyc-cart");
+      if (savedCart) {
+        try {
+          const cartItems = JSON.parse(savedCart);
+          dispatch({ type: "LOAD_CART", payload: cartItems });
+        } catch (e) {
+          console.error("Error loading cart from localStorage:", e);
+          localStorage.removeItem("jhuangnyc-cart");
+        }
+      }
 			return;
 		}
 
@@ -203,7 +203,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	useEffect(() => {
 		if (!user) {
-			localStorage.setItem("originz-cart", JSON.stringify(state.items));
+			localStorage.setItem("jhuangnyc-cart", JSON.stringify(state.items));
 		}
 	}, [state.items, user]);
 

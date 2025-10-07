@@ -1,4 +1,6 @@
+import { H2, P } from "@/components/ui/typography";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Billing Terms and Conditions",
@@ -69,26 +71,26 @@ export default function BillingTermsPage() {
             </p>
 
             <h2>Subscription Services</h2>
-            <p>
+            <P>
               For recurring subscription services, you authorize us to charge
               your payment method on a recurring basis. You may cancel
               subscriptions at any time through your account dashboard.
-            </p>
+            </P>
 
-            <h2>Contact Information</h2>
+            <H2>Contact Information</H2>
             <p>
               If you have questions about billing or need assistance with
               payment issues, please contact our support team at{" "}
-              <a
+              <Link
                 href="mailto:billing@example.com"
                 className="text-primary hover:underline"
               >
                 billing@example.com
-              </a>{" "}
+              </Link>{" "}
               or visit our{" "}
-              <a href="/contact" className="text-primary hover:underline">
+              <Link href="/contact" className="text-primary hover:underline">
                 contact page
-              </a>
+              </Link>
               .
             </p>
           </div>

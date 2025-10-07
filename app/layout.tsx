@@ -42,7 +42,7 @@ export default async function RootLayout({
         <meta name="msapplication-TileColor" content="hsl(var(--primary))" />
         <link rel="dns-prefetch" href="//cdn.shopify.com" />
         <link rel="dns-prefetch" href="//checkout.shopify.com" />
-        <link rel="dns-prefetch" href="//www.vohovintage.com" />
+        <link rel="dns-prefetch" href="//www.jhuangnyc.com" />
         <link
           rel="preconnect"
           href="https://cdn.shopify.com"
@@ -55,7 +55,7 @@ export default async function RootLayout({
         />
         <link
           rel="preconnect"
-          href="https://www.vohovintage.com"
+          href="https://www.jhuangnyc.com"
           crossOrigin="anonymous"
         />
 
