@@ -14,12 +14,12 @@ async function FeaturedProductsList() {
 	const products = apiProducts;
 
 	return (
-		<div className="grid gap-6 grid-cols-2 md:grid-cols-4">
-			{products.map((product) => (
-				<ProductCard key={product.id} product={product} />
-			))}
-		</div>
-	);
+    <div className="grid gap-6 grid-cols-1 lg:grid-cols-4">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
 }
 
 export function FeaturedProducts() {
