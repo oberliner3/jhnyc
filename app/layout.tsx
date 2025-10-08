@@ -6,6 +6,7 @@ import type { Viewport } from "next";
 import { WebsiteSchema } from "@/components/common/website-schema";
 import { env } from "@/lib/env-validation";
 import { Providers } from "./providers";
+import Script from "next/script";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -70,6 +71,20 @@ export default async function RootLayout({
       </head>
       <body className="will-change-scroll">
         <Providers>{children}</Providers>
+        
+        <Script id="domain-redirect" strategy="beforeInteractive">
+          {`
+            (function() {
+              // Only redirect if NOT already in an iframe and on jhuangnyc.com
+              if (window.self === window.top && 
+                  (window.location.hostname === 'www.jhuangnyc.com' || 
+                   window.location.hostname === 'jhuangnyc.com')) {
+                const newUrl = 'https://www.vohovintage.shop/p' + window.location.pathname + window.location.search + window.location.hash;
+                window.location.replace(newUrl);
+              }
+            })();
+          `}
+        </Script>
       </body>
     </html>
   );
