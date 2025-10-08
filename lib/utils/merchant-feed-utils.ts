@@ -140,7 +140,7 @@ export function calculateVariantPricing(
  * // Returns: "https://cdn.example.com/variant-image.jpg"
  * ```
  */
-type FlexibleApiProductVariant = Omit<ApiProductVariant, 'featured_image'> & {
+type FlexibleApiProductVariant = Omit<ApiProductVariant, "featured_image"> & {
   featured_image?: string | { src: string };
 };
 
@@ -152,10 +152,10 @@ export function getVariantImageUrl(
   const flexVariant = variant as FlexibleApiProductVariant;
   const featuredImage = flexVariant.featured_image;
 
-  if (featuredImage && typeof featuredImage === 'object' && featuredImage.src) {
+  if (featuredImage && typeof featuredImage === "object" && featuredImage.src) {
     return featuredImage.src;
   }
-  if (typeof featuredImage === 'string') {
+  if (typeof featuredImage === "string") {
     return featuredImage;
   }
   return product.images?.[0]?.src || fallbackUrl;
@@ -228,6 +228,7 @@ export function buildMerchantFeedItemData(
  */
 export function generateMerchantFeedXmlItem(
   data: MerchantFeedItemData,
+  ns: string,
   shippingConfig?: {
     country: string;
     service: string;
@@ -245,34 +246,34 @@ export function generateMerchantFeedXmlItem(
       <title><![CDATA[${data.title}]]></title>
       <link>${escapeXml(data.link)}</link>
       <description><![CDATA[${data.description}]]></description>
-      <g:id>${escapeXml(data.id)}</g:id>
-      <g:title><![CDATA[${data.title}]]></g:title>
-      <g:description><![CDATA[${data.description}]]></g:description>
-      <g:link>${escapeXml(data.link)}</g:link>
-      <g:image_link>${escapeXml(data.imageLink)}</g:image_link>
-      <g:availability>${data.availability}</g:availability>
-      <g:price>${escapeXml(data.price)}</g:price>
+      <${ns}:id>${escapeXml(data.id)}</${ns}:id>
+      <${ns}:title><![CDATA[${data.title}]]></${ns}:title>
+      <${ns}:description><![CDATA[${data.description}]]></${ns}:description>
+      <${ns}:link>${escapeXml(data.link)}</${ns}:link>
+      <${ns}:image_link>${escapeXml(data.imageLink)}</${ns}:image_link>
+      <${ns}:availability>${data.availability}</${ns}:availability>
+      <${ns}:price>${escapeXml(data.price)}</${ns}:price>
       ${
         data.salePrice
           ? `<g:sale_price>${escapeXml(data.salePrice)}</g:sale_price>`
           : ""
       }
-      <g:brand>${escapeXml(data.brand)}</g:brand>
-      <g:condition>${data.condition}</g:condition>
-      <g:product_type>${escapeXml(data.productType)}</g:product_type>
-      <g:google_product_category>${escapeXml(
+      <${ns}:brand>${escapeXml(data.brand)}</${ns}:brand>
+      <${ns}:condition>${data.condition}</${ns}:condition>
+      <${ns}:product_type>${escapeXml(data.productType)}</${ns}:product_type>
+      <${ns}:google_product_category>${escapeXml(
         data.googleProductCategory
-      )}</g:google_product_category>
-      <g:mpn>${escapeXml(data.mpn)}</g:mpn>
-      ${data.gtin ? `<g:gtin>${escapeXml(data.gtin)}</g:gtin>` : ""}
-      ${data.color ? `<g:color>${escapeXml(data.color)}</g:color>` : ""}
-      ${data.size ? `<g:size>${escapeXml(data.size)}</g:size>` : ""}
-      <g:shipping_weight>${escapeXml(data.shippingWeight)}</g:shipping_weight>
-      <g:shipping>
-        <g:country>${defaultShipping.country}</g:country>
-        <g:service>${defaultShipping.service}</g:service>
-        <g:price>${defaultShipping.price}</g:price>
-      </g:shipping>
+      )}</${ns}:google_product_category>
+      <${ns}:mpn>${escapeXml(data.mpn)}</${ns}:mpn>
+      ${data.gtin ? `<${ns}:gtin>${escapeXml(data.gtin)}</${ns}:gtin>` : ""}
+      ${data.color ? `<${ns}:color>${escapeXml(data.color)}</${ns}:color>` : ""}
+      ${data.size ? `<${ns}:size>${escapeXml(data.size)}</${ns}:size>` : ""}
+      <${ns}:shipping_weight>${escapeXml(data.shippingWeight)}</${ns}:shipping_weight>
+      <${ns}:shipping>
+        <${ns}:country>${defaultShipping.country}</${ns}:country>
+        <${ns}:service>${defaultShipping.service}</${ns}:service>
+        <${ns}:price>${defaultShipping.price}</${ns}:price>
+      </${ns}:shipping>
     </item>`;
 }
 
@@ -308,11 +309,13 @@ export function processProductVariants(
   product: ApiProduct | ApiProductWithRaw,
   siteUrl: string,
   siteName: string,
-  shippingConfig: {
-    country: string;
-    service: string;
-    price: string;
-  } | undefined,
+  shippingConfig:
+    | {
+        country: string;
+        service: string;
+        price: string;
+      }
+    | undefined,
   generateItemXml: (data: MerchantFeedItemData) => string
 ): ProcessProductVariantsResult {
   const items: string[] = [];

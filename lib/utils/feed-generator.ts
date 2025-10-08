@@ -3,7 +3,7 @@ import type { MerchantFeedItemData } from "./merchant-feed-utils";
 
 export type MerchantFeedType = "google" | "bing";
 
-function getXmlNamespace(feedType: MerchantFeedType): string {
+export function getXmlNamespace(feedType: MerchantFeedType): string {
   switch (feedType) {
     case "google":
       return 'xmlns:g="http://base.google.com/ns/1.0"';
