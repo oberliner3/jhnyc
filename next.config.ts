@@ -15,64 +15,54 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // ✅ IMAGE SETTINGS (expanded for proxy + Shopify + original site)
+  // ✅ IMAGE SETTINGS (Shopify + CDN + local dev)
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
-      // Common external sources
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "via.placeholder.com" },
       { protocol: "https", hostname: "placeholdit.com" },
       { protocol: "https", hostname: "cdn.shopify.com" },
       { protocol: "https", hostname: "moritotabi.com" },
       { hostname: "localhost" },
-
-      // ✅ Allow images when proxied through your main domains
       { protocol: "https", hostname: "**.jhuangnyc.com" },
       { protocol: "https", hostname: "**.vohovintage.shop" },
-       {
-        protocol: "https",
-        hostname: "jhuangnyc.com",
-        pathname: "/cdn/**",
-      },
+      { protocol: "https", hostname: "jhuangnyc.com", pathname: "/cdn/**" },
     ],
   },
 
-  // ✅ REWRITES — Make /p/... act as internal alias for normal pages
-  // async rewrites() {
-  //   return [
-  //     {
-  //       source: "/p/:path*",
-  //       destination: "/:path*", // Maps /p/... internally → /...
-  //     },
-  //   ];
-  // },
-
-  // ✅ REDIRECTS — Your original ones (unchanged)
-  async redirects() {
+  // ✅ REWRITES: allow /p/... to map to internal pages
+  async rewrites() {
     return [
       {
-        source: "/products",
-        destination: "/collections/all",
-        permanent: true,
-      },
-      {
-        source: "/collections",
-        destination: "/collections/all",
-        permanent: true,
+        source: "/p/:path*",
+        destination: "/:path*", // internally maps /p/... → /...
       },
     ];
   },
 
-  // ✅ HEADERS — Kept same as before for security
+  // ✅ REDIRECTS: keep existing ones
+  async redirects() {
+    return [
+      { source: "/products", destination: "/collections/all", permanent: true },
+      { source: "/collections", destination: "/collections/all", permanent: true },
+    ];
+  },
+
+  // ✅ HEADERS: iframe embedding + security
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: [
-          { key: "X-Frame-Options", value: "DENY" },
+          // Allow embedding in vohovintage.shop iframe
+          {
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self' https://www.vohovintage.shop",
+          },
+          // Other security headers
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
