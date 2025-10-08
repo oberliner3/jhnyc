@@ -71,3 +71,30 @@ export function buildSelfClosingElement(
   return `<${tag}${attrString} />`;
 }
 
+/**
+ * Build an XML tag with a namespace, handling optional values and CDATA.
+ */
+export function buildNamespacedTag(
+  ns: string,
+  tagName: string,
+  value: string | null | undefined,
+  cdata: boolean = false
+): string {
+  if (value === null || value === undefined || value === "") return "";
+  const content = cdata ? createCDATA(value) : escapeXml(value);
+  return `<${ns}:${tagName}>${content}</${ns}:${tagName}>`;
+}
+
+/**
+ * Build a standard RSS XML tag, handling optional values and CDATA.
+ */
+export function buildRssTag(
+  tagName: string,
+  value: string | null | undefined,
+  cdata: boolean = false
+): string {
+  if (value === null || value === undefined || value === "") return "";
+  const content = cdata ? createCDATA(value) : escapeXml(value);
+  return `<${tagName}>${content}</${tagName}>`;
+}
+
