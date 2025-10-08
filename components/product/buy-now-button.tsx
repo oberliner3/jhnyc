@@ -45,12 +45,19 @@ export function BuyNowButton({
   } as const;
 
   async function handleSubmit(formData: FormData) {
+    console.log('[BuyNow] Form submitted');
+    
     // Call server action
     const invoiceUrl = await buyNowAction(formData);
+    console.log('[BuyNow] Invoice URL received:', invoiceUrl);
 
-    // Send message to overlay iframe
-    window.parent.postMessage(
-      {
+    // Check if we're in an iframe
+    const isInIframe = window.self !== window.top;
+    console.log('[BuyNow] Running in iframe:', isInIframe);
+
+    if (isInIframe) {
+      // Send message to parent window (vohovintage.shop)
+      const message = {
         type: "checkout",
         checkoutUrl: invoiceUrl,
         utm: mergedUtm,
@@ -58,9 +65,19 @@ export function BuyNowButton({
           product_title: formData.get("productTitle"),
           product_image: formData.get("productImage"),
         },
-      },
-      "*"
-    );
+      };
+      
+      console.log('[BuyNow] Sending message to parent:', message);
+      
+      window.parent.postMessage(
+        message,
+        "https://www.vohovintage.shop"
+      );
+    } else {
+      // Not in iframe, redirect directly
+      console.log('[BuyNow] Not in iframe, redirecting to:', invoiceUrl);
+      window.location.href = invoiceUrl;
+    }
   }
 
   function SubmitButton() {

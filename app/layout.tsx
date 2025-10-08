@@ -6,7 +6,6 @@ import type { Viewport } from "next";
 import { WebsiteSchema } from "@/components/common/website-schema";
 import { env } from "@/lib/env-validation";
 import { Providers } from "./providers";
-import Script from "next/script";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -60,7 +59,8 @@ export default async function RootLayout({
           rel="preconnect"
           href="https://www.jhuangnyc.com"
           crossOrigin="anonymous"
-        /> <link
+        />
+        <link
           rel="preconnect"
           href="https://www.vohovintage.shop"
           crossOrigin="anonymous"
@@ -70,78 +70,6 @@ export default async function RootLayout({
       </head>
       <body className="will-change-scroll">
         <Providers>{children}</Providers>
-         <Script id="checkout-iframe-handler" strategy="afterInteractive">
-        {`
-          // This script runs after the page is interactive.
-          // It intercepts checkout clicks to communicate with theparent iframe wrapper.
-          (function() {
-            // Helper function to find the checkout URL from abutton/link element
-            function getCheckoutUrl(element) {
-              // Priority 1: Check for an href attribute
-              if (element.href) {
-                return element.href;
-              }
-              // Priority 2: Check for an onclick attribute (common inolder themes)
-              const onclickAttr = element.getAttribute('onclick');
-              if (onclickAttr && onclickAttr.includes('window.location')) {
-                const match =onclickAttr.match(/window\\.location\\s*=\\s*['"](.*?)['"]/);
-                if (match && match[1]) {
-                  return match[1];
-                }
-              }
-              // Priority 3: Check for a data attribute
-              const dataUrl = element.getAttribute('data-checkout-url');
-              if (dataUrl) {
-                return dataUrl;
-              }
-              return null;
-            }
-
-            // Main function to attach event listeners
-            function attachCheckoutListeners() {
-              // A comprehensive selector to find various types ofcheckout buttons/links
-              const checkoutSelectors = [
-                'a[href*="checkout"]',
-                'button[onclick*="checkout"]',
-                '.checkout-button',
-                '#checkout-button',
-                '[data-checkout-url]'
-              ].join(', ');
-
-              document.querySelectorAll(checkoutSelectors).forEach(button => {
-                // Avoid adding the listener multiple times
-                if (button.dataset.iframeListenerAttached) return;
-
-                button.addEventListener('click', function(event) {
-                  const checkoutUrl = getCheckoutUrl(button);
-                  if (!checkoutUrl) return; // No URL found, do nothing
-
-                  // Check if the site is running inside an iframe
-                  if (window.parent !== window) {
-                    event.preventDefault(); // Stop the default navigation
-
-                    // Send the checkout URL to the parent window
-                    window.parent.postMessage({
-                      type: 'checkout',
-                      checkoutUrl: checkoutUrl
-                    }, 'https://www.jhuangnyc.com'); // IMPORTANT:Specify the target origin for security
-                  }
-                  // If NOT in an iframe, do nothing and let thebutton work normally.
-                });
-
-                // Mark the button as processed
-                button.dataset.iframeListenerAttached = 'true';
-              });
-            }
-
-            // Run the script when the DOM is fully loaded
-            document.addEventListener('DOMContentLoaded',attachCheckoutListeners);
-
-            // Also run after a short delay to catch buttons loaded byother scripts
-            setTimeout(attachCheckoutListeners, 1000);
-          })();
-        `}
-      </Script>
       </body>
     </html>
   );
