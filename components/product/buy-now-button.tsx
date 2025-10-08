@@ -16,11 +16,6 @@ interface BuyNowButtonProps {
   disabled?: boolean;
 }
 
-/**
- * BuyNowButton:
- * - Progressive enhancement: submits form to server action if Worker iframe is not present
- * - If Worker overlay is available, opens iframe checkout seamlessly
- */
 export function BuyNowButton({
   product,
   variant,
@@ -32,26 +27,15 @@ export function BuyNowButton({
   disabled = false,
 }: BuyNowButtonProps) {
   const mergedUtm = mergeUtmParams(utmParams || {});
-
-  // Normalize product image URL
   const rawImage = variant?.featured_image ?? product.images?.[0];
   const productImage =
-    typeof rawImage === "string"
-      ? rawImage
-      : rawImage && "src" in rawImage
-      ? rawImage.src
-      : "";
+    typeof rawImage === "string" ? rawImage : rawImage && "src" in rawImage ? rawImage.src : "";
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    // Detect if Worker overlay exists
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     const overlay = window.parent.document.getElementById("checkout-overlay");
     if (overlay) {
       e.preventDefault();
-
-      // Build checkout URL (proxied via /p/)
       const checkoutUrl = `/p/checkout?productId=${variant?.id || product.id}&quantity=${quantity}`;
-
-      // Send message to Worker iframe overlay
       window.parent.postMessage(
         {
           type: "checkout",
@@ -65,12 +49,11 @@ export function BuyNowButton({
         "*"
       );
     }
-    // else: fallback to normal form submission (Next.js server action)
   };
 
   return (
     <form
-      action="/api/buy-now" // your original Next.js server action
+      action="/api/buy-now"
       method="POST"
       className={style === "full-width" ? "w-full" : ""}
     >
@@ -80,20 +63,11 @@ export function BuyNowButton({
       <input type="hidden" name="quantity" value={quantity} />
       <input type="hidden" name="productTitle" value={product.title} />
       <input type="hidden" name="productImage" value={productImage} />
-
-      {/* UTM Parameters */}
       <input type="hidden" name="utm_source" value={mergedUtm.utm_source} />
       <input type="hidden" name="utm_medium" value={mergedUtm.utm_medium} />
       <input type="hidden" name="utm_campaign" value={mergedUtm.utm_campaign} />
 
-      <Button
-        type="submit"
-        onClick={handleClick}
-        disabled={disabled}
-        className={className}
-        data-style={style}
-        size={size}
-      >
+      <Button type="submit" onClick={handleClick} className={className} data-style={style} size={size} disabled={disabled}>
         Buy Now
       </Button>
     </form>
