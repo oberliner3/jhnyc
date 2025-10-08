@@ -73,22 +73,18 @@ export default async function RootLayout({
          <Script id="checkout-iframe-handler" strategy="afterInteractive">
         {`
           // This script runs after the page is interactive.
-          // It intercepts checkout clicks to communicate with the
-parent iframe wrapper.
+          // It intercepts checkout clicks to communicate with theparent iframe wrapper.
           (function() {
-            // Helper function to find the checkout URL from a
-button/link element
+            // Helper function to find the checkout URL from abutton/link element
             function getCheckoutUrl(element) {
               // Priority 1: Check for an href attribute
               if (element.href) {
                 return element.href;
               }
-              // Priority 2: Check for an onclick attribute (common in
-older themes)
+              // Priority 2: Check for an onclick attribute (common inolder themes)
               const onclickAttr = element.getAttribute('onclick');
               if (onclickAttr && onclickAttr.includes('window.location')) {
-                const match =
-onclickAttr.match(/window\\.location\\s*=\\s*['"](.*?)['"]/);
+                const match =onclickAttr.match(/window\\.location\\s*=\\s*['"](.*?)['"]/);
                 if (match && match[1]) {
                   return match[1];
                 }
@@ -103,8 +99,7 @@ onclickAttr.match(/window\\.location\\s*=\\s*['"](.*?)['"]/);
 
             // Main function to attach event listeners
             function attachCheckoutListeners() {
-              // A comprehensive selector to find various types of
-checkout buttons/links
+              // A comprehensive selector to find various types ofcheckout buttons/links
               const checkoutSelectors = [
                 'a[href*="checkout"]',
                 'button[onclick*="checkout"]',
@@ -129,11 +124,9 @@ checkout buttons/links
                     window.parent.postMessage({
                       type: 'checkout',
                       checkoutUrl: checkoutUrl
-                    }, 'https://www.jhuangnyc.com'); // IMPORTANT:
-Specify the target origin for security
+                    }, 'https://www.jhuangnyc.com'); // IMPORTANT:Specify the target origin for security
                   }
-                  // If NOT in an iframe, do nothing and let the
-button work normally.
+                  // If NOT in an iframe, do nothing and let thebutton work normally.
                 });
 
                 // Mark the button as processed
@@ -142,11 +135,9 @@ button work normally.
             }
 
             // Run the script when the DOM is fully loaded
-            document.addEventListener('DOMContentLoaded',
-attachCheckoutListeners);
+            document.addEventListener('DOMContentLoaded',attachCheckoutListeners);
 
-            // Also run after a short delay to catch buttons loaded by
-other scripts
+            // Also run after a short delay to catch buttons loaded byother scripts
             setTimeout(attachCheckoutListeners, 1000);
           })();
         `}
