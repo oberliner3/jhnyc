@@ -27,5 +27,8 @@
 				"REGISTRY_URL": "https://tweakcn.com/r/themes/registry.json"
 			}
 		}
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	}
 }
