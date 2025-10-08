@@ -30,7 +30,7 @@ export function Hero() {
 	return (
     <section className="relative h-screen overflow-hidden scroll-snap-align-start" role="banner" aria-label="Hero section showcasing premium flash sales">
       {/* Background Image with Gradient Overlay */}
-      <div className="absolute inset-0 z-0">
+      <div className="z-0 absolute inset-0">
         <Image
           src="https://images.unsplash.com/photo-1530738472658-404f693bd4b2?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.1.0"
           alt="Premium designer products and luxury brands on sale"
@@ -38,31 +38,32 @@ export function Hero() {
           sizes="(min-width: 1024px) 100vw, 100vw"
           className="object-cover"
           priority
+          unoptimized
         />
         <div className="absolute inset-0 bg-black/60"></div>
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
       </div>
 
-      <div className="container relative z-10 flex items-center h-full px-4 py-2 lg:py-4">
-        <div className="grid items-center gap-10 lg:grid-cols-12 w-full">
+      <div className="z-10 relative flex items-center px-4 py-2 lg:py-4 h-full container">
+        <div className="items-center gap-10 grid lg:grid-cols-12 w-full">
           {/* Text Content */}
-          <header className="lg:col-span-6 space-y-8 animate-fade-in">
+          <header className="space-y-8 lg:col-span-6 animate-fade-in">
             <div className="space-y-5">
-              <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs tracking-wide uppercase text-foreground/70" role="status" aria-label="Current promotion">
+              <div className="inline-flex items-center px-3 py-1 border rounded-full text-foreground/70 text-xs uppercase tracking-wide" role="status" aria-label="Current promotion">
                 🔥 Limited Time Flash Sale
               </div>
-              <h1 className="text-4xl lg:text-6xl font-semibold tracking-tight text-foreground">
+              <h1 className="font-semibold text-foreground text-4xl lg:text-6xl tracking-tight">
                 Premium Designer Brands at Unbeatable Flash Sale Prices
               </h1>
-              <p className="max-w-xl text-lg text-foreground/80">
+              <p className="max-w-xl text-foreground/80 text-lg">
                 Discover exclusive flash sales on luxury fashion, electronics, and lifestyle products. Save up to 70% on premium brands with our curated limited-time deals and member-only promotions.
               </p>
             </div>
 
-            <nav className="flex flex-col sm:flex-row gap-4" role="navigation" aria-label="Primary actions">
+            <nav className="flex sm:flex-row flex-col gap-4" role="navigation" aria-label="Primary actions">
               <PrimaryCTA
-                className="px-8 text-base lg:text-lg hover:text-primary"
+                className="px-8 hover:text-primary text-base lg:text-lg"
                 asChild
               >
                 <Link href="/collections/all" aria-label="Browse all flash sale products">
@@ -131,7 +132,7 @@ export function Hero() {
                 }}
               >
                 <motion.div
-                  className="text-2xl font-semibold"
+                  className="font-semibold text-2xl"
                   variants={{
                     hidden: { opacity: 0, scale: 0.95 },
                     visible: { opacity: 1, scale: 1 },
@@ -139,12 +140,12 @@ export function Hero() {
                 >
                   <CountUp end={25} suffix="K+" />
                 </motion.div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                   Satisfied Customers
                 </div>
               </motion.div>
 
-              <div className="h-8 w-px bg-border" aria-hidden="true" />
+              <div className="bg-border w-px h-8" aria-hidden="true" />
 
               <motion.div
                 className="text-center"
@@ -154,7 +155,7 @@ export function Hero() {
                 }}
               >
                 <motion.div
-                  className="text-2xl font-semibold"
+                  className="font-semibold text-2xl"
                   variants={{
                     hidden: { opacity: 0, scale: 0.95 },
                     visible: { opacity: 1, scale: 1 },
@@ -162,12 +163,12 @@ export function Hero() {
                 >
                   <CountUp end={4.8} decimals={1} />
                 </motion.div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                   Trust Score
                 </div>
               </motion.div>
 
-              <div className="h-8 w-px bg-border" aria-hidden="true" />
+              <div className="bg-border w-px h-8" aria-hidden="true" />
 
               <motion.div
                 className="text-center"
@@ -177,7 +178,7 @@ export function Hero() {
                 }}
               >
                 <motion.div
-                  className="text-2xl font-semibold"
+                  className="font-semibold text-2xl"
                   variants={{
                     hidden: { opacity: 0, scale: 0.95 },
                     visible: { opacity: 1, scale: 1 },
@@ -185,7 +186,7 @@ export function Hero() {
                 >
                   <CountUp end={70} suffix="%" />
                 </motion.div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                   Average Savings
                 </div>
               </motion.div>

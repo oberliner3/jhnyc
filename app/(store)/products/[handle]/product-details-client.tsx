@@ -84,6 +84,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                 src={currentImage.src}
                 alt={currentImage.alt || product.title}
                 fill
+                unoptimized
                 loading="lazy"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="w-full h-auto object-cover transition-transform duration-300"
@@ -146,6 +147,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                       fill
                       className="object-cover"
                       sizes="80px"
+                      unoptimized
                     />
                   </button>
                 ))}
@@ -170,7 +172,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
               <div className="space-y-2">
                 <label
                   htmlFor={`variant-select-${product.id}`}
-                  className="text-sm font-medium text-foreground"
+                  className="font-medium text-foreground text-sm"
                 >
                   Select Variant
                 </label>

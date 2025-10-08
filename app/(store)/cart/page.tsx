@@ -74,7 +74,7 @@ function CartContent() {
               width={80}
               height={80}
               className="rounded-md w-20 h-20 object-cover"
-              unoptimized={!item.image}
+              unoptimized
             />
             <div className="flex-1">
               <h3 className="font-semibold">{item.name}</h3>

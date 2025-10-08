@@ -500,7 +500,7 @@ export default function CheckoutPage() {
 													fill
 													className="object-cover"
 													sizes="64px"
-													unoptimized={!item.image}
+													unoptimized
 												/>
 											</div>
 											<div className="-top-1 -right-1 z-10 absolute flex justify-center items-center bg-gray-800 border border-white rounded-full w-5 h-5 text-white text-xs">

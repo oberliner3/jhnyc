@@ -177,7 +177,7 @@ export function ProductCard({ product }: ProductCardProps) {
               className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               loading="lazy"
-              unoptimized={true}
+              unoptimized
             />
 
             <div className="top-2 left-2 z-10 absolute flex flex-col gap-2">
