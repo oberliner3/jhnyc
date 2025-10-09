@@ -48,7 +48,7 @@ const invoiceUrl = await buyNowAction(formData);
             product_image: formData.get("productImage"),
           },
         },
-        "https://www.vohovintage.shop"
+        "*"
       );
     } else {
       window.location.href = invoiceUrl;
