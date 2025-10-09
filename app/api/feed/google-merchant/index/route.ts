@@ -73,6 +73,4 @@ export async function GET() {
   }
 }
 
-export const revalidate = FEED_PAGINATION_CONFIG.DEFAULT_CACHE_MAX_AGE;
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const revalidate = 3600

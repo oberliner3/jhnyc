@@ -97,6 +97,4 @@ export async function GET(request: NextRequest, context: Context) {
     );
   }
 }
-export const revalidate = FEED_PAGINATION_CONFIG.DEFAULT_CACHE_MAX_AGE;
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const revalidate = 3600
