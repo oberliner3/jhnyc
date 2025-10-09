@@ -76,11 +76,7 @@
       const path =
         window.location.pathname === "/" ? "/" : window.location.pathname;
 
-      const newUrl = `https://${REDIRECT_TARGET_DOMAIN}/p${path}${window.location.search}${window.location.hash}`;
-
-      // Examples of the fix:
-      // jhuangnyc.com/  -->  path = '/', newUrl = https://www.vohovintage.shop/p/
-      // jhuangnyc.com/about --> path = '/about', newUrl = https://www.vohovintage.shop/p/about
+      const newUrl = `https://${REDIRECT_TARGET_DOMAIN}/p${path}${window.location.search}${window.location.hash}`; // Examples of the fix: // jhuangnyc.com/  -->  path = '/', newUrl = https://www.vohovintage.shop/p/ // jhuangnyc.com/about --> path = '/about', newUrl = https://www.vohovintage.shop/p/about
 
       window.location.replace(newUrl);
       return; // Stop further execution

@@ -18,7 +18,6 @@ interface BuyNowButtonProps {
   disabled?: boolean;
 }
 
-
 export function BuyNowButton({
   product,
   variant,
@@ -32,12 +31,10 @@ export function BuyNowButton({
   const mergedUtm = mergeUtmParams({ ...utmParams });
 
   const productImage =
-    variant?.featured_image ||
-    product.images?.[0]?.src ||
-    "";
+    variant?.featured_image || product.images?.[0]?.src || "";
 
   async function handleSubmit(formData: FormData) {
-const invoiceUrl = await buyNowAction(formData);
+    const invoiceUrl = await buyNowAction(formData);
 
     const isInIframe = window.self !== window.top;
 
@@ -61,21 +58,35 @@ const invoiceUrl = await buyNowAction(formData);
 
   return (
     <form action={handleSubmit}>
-      <input type="hidden" name="productId" value={variant?.product_id || product.id} />
+      
+      <input
+        type="hidden"
+        name="productId"
+        value={variant?.product_id || product.id}
+      />
       <input type="hidden" name="variantId" value={variant?.id || ""} />
-      <input type="hidden" name="price" value={variant?.price || product.price} />
+      
+      <input
+        type="hidden"
+        name="price"
+        value={variant?.price || product.price}
+      />
       <input type="hidden" name="quantity" value={quantity} />
       <input type="hidden" name="productTitle" value={product.title} />
       <input type="hidden" name="productImage" value={productImage} />
-
       <input type="hidden" name="utm_source" value={mergedUtm.utm_source} />
       <input type="hidden" name="utm_medium" value={mergedUtm.utm_medium} />
       <input type="hidden" name="utm_campaign" value={mergedUtm.utm_campaign} />
-
-      <Button type="submit" disabled={disabled}>
-        <ShoppingBag className="mr-2 w-4 h-4" />
-        Buy Now
+      
+      <Button
+        type="submit"
+        disabled={disabled}
+        id="buy-now-button"
+        className={className}
+      >
+        <ShoppingBag className="mr-2 w-4 h-4" />Buy Now
       </Button>
+      
     </form>
   );
 }

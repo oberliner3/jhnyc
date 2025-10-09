@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -23,17 +22,19 @@ export function middleware(req: NextRequest) {
 
   if (isProxied && xProxyToken !== PROXY_SECRET_TOKEN) {
     return new NextResponse("Unauthorized proxy", { status: 403 });
-  }
+  } // Optional: restrict _next and API access to allowed referers or proxy
 
-  // Optional: restrict _next and API access to allowed referers or proxy
   if (pathname.startsWith("/_next/") || pathname.startsWith("/api/")) {
-    const validAccess = isProxied || ALLOWED_PROXY_DOMAINS.some((d) => referer.includes(d) || origin.includes(d));
+    const validAccess =
+      isProxied ||
+      ALLOWED_PROXY_DOMAINS.some(
+        (d) => referer.includes(d) || origin.includes(d)
+      );
     if (!validAccess) {
       return new NextResponse("Forbidden", { status: 403 });
     }
-  }
+  } // CSP headers (frame-ancestors: *)
 
-  // CSP headers (frame-ancestors: *)
   const response = NextResponse.next();
   response.headers.set("Content-Security-Policy", "frame-ancestors *;");
 

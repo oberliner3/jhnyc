@@ -23,9 +23,8 @@ export async function buyNowAction(formData: FormData): Promise<string> {
     const utmMedium = String(formData.get("utm_medium") || "cpc").trim();
     const utmCampaign = String(
       formData.get("utm_campaign") || "buy-now"
-    ).trim();
+    ).trim(); // Basic validations
 
-    // Basic validations
     if (!Number.isFinite(price) || price <= 0)
       throw new Error("Valid price required");
     if (
@@ -38,9 +37,8 @@ export async function buyNowAction(formData: FormData): Promise<string> {
       );
     }
 
-    const invoiceNumber = generateInvoiceNumber();
+    const invoiceNumber = generateInvoiceNumber(); // Prepare Shopify REST API draft order payload
 
-    // Prepare Shopify REST API draft order payload
     const lineItems = [
       {
         title: productTitle || `Product ${productId}`,
@@ -59,9 +57,8 @@ export async function buyNowAction(formData: FormData): Promise<string> {
 
     const shop = process.env.SHOPIFY_SHOP;
     const token = process.env.SHOPIFY_ACCESS_TOKEN;
-    if (!shop || !token) throw new Error("Missing Shopify credentials");
+    if (!shop || !token) throw new Error("Missing Shopify credentials"); // Call Shopify REST API
 
-    // Call Shopify REST API
     const response = await fetch(
       `https://${shop}/admin/api/2024-01/draft_orders.json`,
       {
@@ -106,9 +103,8 @@ export async function buyNowAction(formData: FormData): Promise<string> {
     }
 
     const invoiceUrl = responseData?.draft_order?.invoice_url;
-    if (!invoiceUrl) throw new Error("No invoice URL returned from Shopify");
+    if (!invoiceUrl) throw new Error("No invoice URL returned from Shopify"); // Append UTM + product info
 
-    // Append UTM + product info
     const finalUrl = new URL(invoiceUrl);
     finalUrl.searchParams.set("utm_source", utmSource);
     finalUrl.searchParams.set("utm_medium", utmMedium);
@@ -142,9 +138,8 @@ export async function checkoutCartAction(
   try {
     if (!cartItems || cartItems.length === 0) {
       throw new Error("Cart is empty. Please add items before checkout.");
-    }
+    } // Validate each cart item
 
-    // Validate each cart item
     for (const item of cartItems) {
       if (!item.variant?.id) {
         throw new Error(
@@ -182,9 +177,8 @@ export async function checkoutCartAction(
 
     const shop = process.env.SHOPIFY_SHOP;
     const token = process.env.SHOPIFY_ACCESS_TOKEN;
-    if (!shop || !token) throw new Error("Missing Shopify credentials");
+    if (!shop || !token) throw new Error("Missing Shopify credentials"); // Call Shopify API
 
-    // Call Shopify API
     const response = await fetch(
       `https://${shop}/admin/api/2024-01/draft_orders.json`,
       {
@@ -228,9 +222,8 @@ export async function checkoutCartAction(
     }
 
     const invoiceUrl = responseData?.draft_order?.invoice_url;
-    if (!invoiceUrl) throw new Error("No invoice URL returned from Shopify");
+    if (!invoiceUrl) throw new Error("No invoice URL returned from Shopify"); // Append UTM & first product info
 
-    // Append UTM & first product info
     const finalUrl = new URL(invoiceUrl);
     finalUrl.searchParams.set("utm_source", utmSource);
     finalUrl.searchParams.set("utm_medium", utmMedium);
