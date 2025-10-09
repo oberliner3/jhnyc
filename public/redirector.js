@@ -18,7 +18,6 @@
     const hostname = window.location.hostname;
     return ALLOWED_DOMAINS.some((domain) => hostname.includes(domain));
   } // 2. Check if running in iframe
-
   function isInIframe() {
     try {
       return window.self !== window.top;
@@ -27,7 +26,6 @@
       return true;
     }
   } // 3. Verify parent domain if in iframe
-
   function isLegitimateParent() {
     try {
       const referrer = document.referrer;
@@ -41,11 +39,10 @@
       return false;
     }
   } // 4. Check for proxy token in URL (from Cloudflare Worker)
-
   function hasValidProxyToken() {
     const params = new URLSearchParams(window.location.search);
-    const token = params.get("proxy_token"); // This should match your PROXY_SECRET_TOKEN
-    return token === "your-secret-token-here";
+    const token = params.get("proxy_token");
+    return token === "your-secret-token-here"; // NOTE: This must match your PROXY_SECRET_TOKEN in CF Worker/Middleware
   } // 5. Main protection logic
 
   function protectDomain() {
@@ -61,26 +58,45 @@
     const inIframe = isInIframe();
     const legitimateHost = isLegitimateHost();
     const legitimateParent = isLegitimateParent();
-    const validToken = hasValidProxyToken(); // --- NEW REDIRECTION LOGIC START (FIXED) ---
+    const validToken = hasValidProxyToken();
+
+    // Check current host state for proxy
+    const isVohovintage =
+      window.location.hostname === "vohovintage.shop" ||
+      window.location.hostname === "www.vohovintage.shop";
+    const isProxiedProductPath = window.location.pathname.startsWith("/p/");
+
+    // --- CRITICAL REDIRECTION LOOP FIX START ---
+    // If the window is on the target (vohovintage.shop), is inside an iframe, AND has the /p/ prefix,
+    // assume a successful proxied session and immediately bail out of all redirect logic.
+    if (inIframe && isVohovintage && isProxiedProductPath) {
+      console.log(
+        "[Domain Protection] Proxy session confirmed. Bailing out of redirect checks."
+      );
+      return;
+    } // --- JHUANGNYC -> VOHOVINTAGE REDIRECTION LOGIC (Prevents direct access to the origin) ---
+    // --- CRITICAL REDIRECTION LOOP FIX END ---
 
     const isJhuangnyc =
       window.location.hostname === "jhuangnyc.com" ||
       window.location.hostname === "www.jhuangnyc.com";
-    const isProductPath = window.location.pathname.startsWith("/p/"); // Redirection rule: // If on jhuangnyc.com AND not in an iframe AND the path does NOT start with /p/
 
-    if (isJhuangnyc && !inIframe && !isProductPath) {
+    // If on jhuangnyc.com AND not in an iframe AND the path does NOT start with /p/ (i.e., direct public access)
+    if (isJhuangnyc && !inIframe && !isProxiedProductPath) {
       console.warn(
         "[Domain Protection] Non-product path on jhuangnyc detected, redirecting to vohovintage.shop..."
-      ); // FIX: If the path is the root '/', set 'path' to '/' so the target is /p/ // Otherwise, use the existing pathname.
+      );
 
       const path =
         window.location.pathname === "/" ? "/" : window.location.pathname;
 
-      const newUrl = `https://${REDIRECT_TARGET_DOMAIN}/p${path}${window.location.search}${window.location.hash}`; // Examples of the fix: // jhuangnyc.com/  -->  path = '/', newUrl = https://www.vohovintage.shop/p/ // jhuangnyc.com/about --> path = '/about', newUrl = https://www.vohovintage.shop/p/about
+      const newUrl = `https://${REDIRECT_TARGET_DOMAIN}/p${path}${window.location.search}${window.location.hash}`;
 
       window.location.replace(newUrl);
-      return; // Stop further execution
-    } // --- NEW REDIRECTION LOGIC END ---
+      return;
+    }
+    // --- JHUANGNYC REDIRECTION LOGIC END ---
+
     console.log("[Domain Protection] Status:", {
       inIframe,
       legitimateHost,
@@ -88,8 +104,10 @@
       validToken,
       hostname: window.location.hostname,
       referrer: document.referrer,
-    }); // Case 1: Not in iframe but on wrong domain
+    });
 
+    // Case 1: Not in iframe but on wrong domain (Generic unauthorized domain breakout)
+    // NOTE: This handles domains other than jhuangnyc.com trying to serve content outside an iframe
     if (!inIframe && !legitimateHost) {
       console.warn(
         "[Domain Protection] Unauthorized domain detected, redirecting..."
@@ -98,12 +116,14 @@
         "https://" + LEGITIMATE_DOMAIN + window.location.pathname
       );
       return;
-    } // Case 2: In iframe but parent is not authorized
+    }
 
+    // Case 2: In iframe but parent is not authorized (Security breakout)
+    // This catches attempts to iframe jhuangnyc.com content from malicious origins.
     if (inIframe && !legitimateParent && !validToken) {
       console.warn(
         "[Domain Protection] Unauthorized iframe parent, breaking out..."
-      ); // Try to break out of the iframe
+      );
       try {
         if (window.top) {
           window.top.location.href = window.location.href;
@@ -115,10 +135,13 @@
         );
       }
       return;
-    } // Case 3: Valid embedding from vohovintage.shop
+    }
 
+    // Case 3: Valid embedding (Allow normal operation and set up messaging)
     if (inIframe && (legitimateParent || validToken)) {
-      console.log("[Domain Protection] Legitimate iframe embedding detected"); // Enable postMessage communication
+      console.log("[Domain Protection] Legitimate iframe embedding detected");
+
+      // Enable postMessage communication
       window.addEventListener("message", function (event) {
         // Verify origin
         if (!ALLOWED_DOMAINS.some((domain) => event.origin.includes(domain))) {
@@ -135,7 +158,6 @@
       });
     }
   } // 6. Additional protection: Monitor for DOM manipulation
-
   function monitorForAttacks() {
     // Detect if someone tries to remove this script
     const observer = new MutationObserver(function (mutations) {
