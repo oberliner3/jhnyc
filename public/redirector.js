@@ -40,9 +40,9 @@
     }
   } // 4. Check for proxy token in URL (from Cloudflare Worker)
   function hasValidProxyToken() {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search); // NOTE: Ensure this token matches your Cloudflare Worker/Middleware token
     const token = params.get("proxy_token");
-    return token === "your-secret-token-here"; // NOTE: This must match your PROXY_SECRET_TOKEN in CF Worker/Middleware
+    return token === "your-secret-token-here";
   } // 5. Main protection logic
 
   function protectDomain() {
@@ -67,13 +67,15 @@
     const isProxiedProductPath = window.location.pathname.startsWith("/p/");
 
     // --- CRITICAL REDIRECTION LOOP FIX START ---
-    // If the window is on the target (vohovintage.shop), is inside an iframe, AND has the /p/ prefix,
-    // assume a successful proxied session and immediately bail out of all redirect logic.
-    if (inIframe && isVohovintage && isProxiedProductPath) {
-      console.log(
-        "[Domain Protection] Proxy session confirmed. Bailing out of redirect checks."
-      );
-      return;
+    // If we are on the target domain, inside an iframe, and on the proxy path (/p/),
+    // we are in a successful session. Do not run any redirect logic.
+    if (isVohovintage && isProxiedProductPath) {
+      if (inIframe) {
+        console.log(
+          "[Domain Protection] Successful proxy session detected. Bailing out of redirect checks."
+        );
+        return;
+      }
     } // --- JHUANGNYC -> VOHOVINTAGE REDIRECTION LOGIC (Prevents direct access to the origin) ---
     // --- CRITICAL REDIRECTION LOOP FIX END ---
 
@@ -107,7 +109,6 @@
     });
 
     // Case 1: Not in iframe but on wrong domain (Generic unauthorized domain breakout)
-    // NOTE: This handles domains other than jhuangnyc.com trying to serve content outside an iframe
     if (!inIframe && !legitimateHost) {
       console.warn(
         "[Domain Protection] Unauthorized domain detected, redirecting..."
@@ -119,7 +120,6 @@
     }
 
     // Case 2: In iframe but parent is not authorized (Security breakout)
-    // This catches attempts to iframe jhuangnyc.com content from malicious origins.
     if (inIframe && !legitimateParent && !validToken) {
       console.warn(
         "[Domain Protection] Unauthorized iframe parent, breaking out..."
