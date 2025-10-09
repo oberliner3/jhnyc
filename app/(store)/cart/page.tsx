@@ -14,6 +14,8 @@ import { useCart } from "@/contexts/cart-context";
 import { checkoutCartAction } from "@/lib/buy-now-actions";
 import { getProductPlaceholder } from "@/lib/placeholder";
 import { formatPrice } from "@/lib/utils";
+import { CartCheckoutButton } from "@/components/product/checkout-cart";
+
 
 export const dynamic = "force-dynamic";
 
@@ -142,14 +144,11 @@ function CartContent() {
             <span>{formatPrice(total)}</span>
           </div>
         </div>
-        <Button
+        <CartCheckoutButton
           className="mt-6 w-full"
-          size="lg"
-          onClick={handleCheckout}
           disabled={isCheckingOut}
-        >
-          {isCheckingOut ? "Processing..." : "Proceed to Checkout"}
-        </Button>
+          cartItems={items}
+        />
         <p className="mt-2 text-muted-foreground text-xs text-center">
           Shipping calculated at checkout
         </p>
