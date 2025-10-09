@@ -59,7 +59,7 @@
       const path =
         window.location.pathname === "/" ? "" : window.location.pathname;
 
-      const proxyUrl = `https://${PROXY_DOMAIN}/p${path}${window.location.search}${window.location.hash}`;
+      const proxyUrl = `https://${PROXY_DOMAIN}/p/${path}${window.location.search}${window.location.hash}`;
 
       console.log("[Redirector] Redirecting to:", proxyUrl);
 
