@@ -1,46 +1,56 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const ALLOWED_PROXY_DOMAINS = [
+const PROXY_DOMAINS = [
   "vohovintage.shop",
   "www.vohovintage.shop",
-  "jhuangnyc.com",
-  "www.jhuangnyc.com",
-  "localhost",
 ];
-
-const PROXY_SECRET_TOKEN = process.env.PROXY_SECRET_TOKEN;
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const host = req.headers.get("host") || "";
   const referer = req.headers.get("referer") || "";
-  const origin = req.headers.get("origin") || "";
-  const xProxyToken = req.headers.get("x-proxy-token") || "";
 
-  const isProxied = !!xProxyToken;
+  // Skip on localhost
+  if (host.includes("localhost")) {
+    return NextResponse.next();
+  }
 
-  if (isProxied && xProxyToken !== PROXY_SECRET_TOKEN) {
-    return new NextResponse("Unauthorized proxy", { status: 403 });
-  } // Optional: restrict _next and API access to allowed referers or proxy
+  // Check if request is coming from the proxy (iframe)
+  const isFromProxy = PROXY_DOMAINS.some(domain => referer.includes(domain));
 
-  if (pathname.startsWith("/_next/") || pathname.startsWith("/api/")) {
-    const validAccess =
-      isProxied ||
-      ALLOWED_PROXY_DOMAINS.some(
-        (d) => referer.includes(d) || origin.includes(d)
-      );
-    if (!validAccess) {
-      return new NextResponse("Forbidden", { status: 403 });
-    }
-  } // CSP headers (frame-ancestors: *)
+  console.log("[Origin Middleware]", {
+    host,
+    pathname,
+    isFromProxy,
+    referer: referer.substring(0, 50),
+  });
 
   const response = NextResponse.next();
-  response.headers.set("Content-Security-Policy", "frame-ancestors *;");
+
+  if (isFromProxy) {
+    // Request is from iframe on vohovintage.shop - allow embedding
+    response.headers.set(
+      "Content-Security-Policy",
+      "frame-ancestors https://vohovintage.shop https://www.vohovintage.shop;"
+    );
+    response.headers.delete("X-Frame-Options");
+    
+    // Add header to indicate we're in iframe mode
+    response.headers.set("X-Iframe-Mode", "true");
+  } else {
+    // Direct access - let redirector handle it
+    response.headers.set(
+      "Content-Security-Policy",
+      "frame-ancestors 'none';"
+    );
+  }
 
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

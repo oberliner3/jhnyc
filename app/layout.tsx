@@ -47,6 +47,8 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="//www.jhuangnyc.com" />
         <link rel="dns-prefetch" href="//www.vohovintage.shop" />
         <link rel="dns-prefetch" href="//vohovintage.shop" />
+        <link rel="dns-prefetch" href="//maa7ha-jh.myshopify.com" />
+        <link rel="preconnect" href="https://maa7ha-jh.myshopify.com" />
         <link
           rel="preconnect"
           href="https://cdn.shopify.com"

@@ -1,22 +1,10 @@
-// public/redirector.js - CORRECTED
+// public/redirector.js
+// Domain protection script for jhuangnyc.com
 (function () {
   "use strict";
 
-  const ALLOWED_DOMAINS = [
-    "jhuangnyc.com",
-    "www.jhuangnyc.com",
-    "vohovintage.shop",
-    "www.vohovintage.shop",
-    "localhost",
-  ];
+  const PROXY_DOMAIN = "www.vohovintage.shop";
 
-  const LEGITIMATE_DOMAIN = "jhuangnyc.com";
-  const REDIRECT_TARGET_DOMAIN = "www.vohovintage.shop";
-
-  function isLegitimateHost() {
-    const hostname = window.location.hostname;
-    return ALLOWED_DOMAINS.some((domain) => hostname.includes(domain));
-  }
   function isInIframe() {
     try {
       return window.self !== window.top;
@@ -24,124 +12,130 @@
       return true;
     }
   }
+
   function isLegitimateParent() {
     try {
       const referrer = document.referrer;
       if (!referrer) return false;
       const referrerUrl = new URL(referrer);
-      return ALLOWED_DOMAINS.some((domain) =>
-        referrerUrl.hostname.includes(domain)
-      );
+      return referrerUrl.hostname.includes("vohovintage.shop");
     } catch (e) {
-      console.warn("[Domain Protection] Could not verify parent domain:", e);
       return false;
     }
   }
-  function hasValidProxyToken() {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("proxy_token");
-    return token === "your-secret-token-here";
-  }
 
   function protectDomain() {
-    // --- CHANGE HIGHLIGHT: Primary check to prevent execution on the proxy domain ---
-    const isProxyDomain = window.location.hostname.includes("vohovintage.shop");
+    const hostname = window.location.hostname;
 
-    if (isProxyDomain) {
-      console.log(
-        "[Domain Protection] Running on proxy domain. Halting execution."
-      );
-      return; // Exit immediately
+    // Skip on localhost
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      console.log("[Redirector] Development mode - skipping");
+      return;
     }
 
-    if (
-      window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1"
-    ) {
-      console.log("[Domain Protection] Development mode - skipping checks");
+    // This should only run on jhuangnyc.com
+    if (!hostname.includes("jhuangnyc.com")) {
+      console.log("[Redirector] Not on origin domain - skipping");
       return;
     }
 
     const inIframe = isInIframe();
-    const isJhuangnyc = window.location.hostname.includes("jhuangnyc.com");
+    const legitimateParent = isLegitimateParent();
 
-    // --- CHANGE HIGHLIGHT: Simplified and more robust redirect logic ---
-    // If on the origin domain (jhuangnyc.com) and not in a legitimate iframe context, redirect.
-    if (isJhuangnyc && !inIframe) {
+    console.log("[Redirector] Status:", {
+      hostname,
+      inIframe,
+      legitimateParent,
+      pathname: window.location.pathname,
+      referrer: document.referrer.substring(0, 50),
+    });
+
+    // Case 1: Direct access (not in iframe) - redirect to proxy
+    if (!inIframe) {
       console.warn(
-        "[Domain Protection] Direct access on jhuangnyc.com detected, redirecting to proxy..."
+        "[Redirector] Direct access detected - redirecting to proxy"
       );
+
       const path =
         window.location.pathname === "/" ? "" : window.location.pathname;
-      const newUrl = `https://${REDIRECT_TARGET_DOMAIN}/p${path}${window.location.search}${window.location.hash}`;
-      window.location.replace(newUrl);
+
+      const proxyUrl = `https://${PROXY_DOMAIN}/p${path}${window.location.search}${window.location.hash}`;
+
+      console.log("[Redirector] Redirecting to:", proxyUrl);
+
+      // Use replace to prevent back-button loops
+      window.location.replace(proxyUrl);
       return;
     }
 
-    // The rest of this logic primarily handles unauthorized iframe embedding.
-    const legitimateHost = isLegitimateHost();
-    const legitimateParent = isLegitimateParent();
-    const validToken = hasValidProxyToken();
+    // Case 2: In legitimate iframe (from vohovintage.shop)
+    if (inIframe && legitimateParent) {
+      console.log("[Redirector] In legitimate iframe - allowed");
+      // This is expected - do nothing
+      return;
+    }
 
-    console.log("[Domain Protection] Status:", {
-      inIframe,
-      legitimateHost,
-      legitimateParent,
-      validToken,
-      hostname: window.location.hostname,
-    });
+    // Case 3: In unauthorized iframe - break out
+    if (inIframe && !legitimateParent) {
+      console.warn("[Redirector] Unauthorized iframe detected - breaking out");
 
-    // Case: In iframe but parent is not authorized (Security breakout)
-    if (inIframe && !legitimateParent && !validToken) {
-      console.warn(
-        "[Domain Protection] Unauthorized iframe parent, breaking out..."
-      );
+      const path = window.location.pathname;
+      const breakoutUrl = `https://${PROXY_DOMAIN}/p${path}${window.location.search}`;
+
       try {
+        // Try to redirect the top window
         if (window.top) {
-          window.top.location.href = window.location.href;
+          window.top.location.href = breakoutUrl;
         }
       } catch (e) {
-        window.location.replace(
-          "https://" + LEGITIMATE_DOMAIN + window.location.pathname
-        );
+        // If we can't access top, redirect our frame
+        window.location.replace(breakoutUrl);
       }
+      return;
     }
   }
 
-  // Monitor for DOM manipulation (unchanged)
+  // Monitor for attempts to remove this script
   function monitorForAttacks() {
     const observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
         mutation.removedNodes.forEach(function (node) {
-          if (node.id === "domain-redirect") {
+          if (
+            node.id === "domain-redirect" ||
+            (node.tagName === "SCRIPT" &&
+              node.src &&
+              node.src.includes("redirector"))
+          ) {
             console.error(
-              "[Domain Protection] Protection script removed! Re-running checks..."
+              "[Redirector] Protection script removed - re-running checks"
             );
             protectDomain();
           }
         });
       });
     });
+
     observer.observe(document.documentElement, {
       childList: true,
       subtree: true,
     });
   }
 
-  // Run protection logic
+  // Initialize immediately
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", protectDomain);
   } else {
     protectDomain();
   }
 
+  // Start monitoring for tampering
   monitorForAttacks();
 
-  // Clear any existing intervals to prevent loops from old code, then set a new one.
+  // Periodic re-check (every 5 seconds)
   if (window.domainProtectInterval) {
     clearInterval(window.domainProtectInterval);
   }
   window.domainProtectInterval = setInterval(protectDomain, 5000);
 
-  console.log("[Domain Protection] Initialized");
+  console.log("[Redirector] Protection initialized");
 })();
