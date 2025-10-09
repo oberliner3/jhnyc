@@ -1,9 +1,10 @@
+// app/layout.tsx
 import "@/app/globals.css";
-
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Viewport } from "next";
 import { WebsiteSchema } from "@/components/common/website-schema";
+import { DomainCheck } from "@/components/common/domain-check"; // Add this
 import { env } from "@/lib/env-validation";
 import { Providers } from "./providers";
 import Script from "next/script";
@@ -70,6 +71,7 @@ export default async function RootLayout({
         <WebsiteSchema />
       </head>
       <body className="will-change-scroll">
+        <DomainCheck /> {/* Add this component */}
         <Providers>{children}</Providers>
         
         <Script id="domain-redirect" strategy="beforeInteractive" src="/redirector.js" />
