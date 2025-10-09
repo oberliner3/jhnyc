@@ -5,21 +5,25 @@ import { Loader2, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buyNowAction } from "@/lib/buy-now-actions";
 import { mergeUtmParams, UTMParams } from "@/lib/utils";
+import { ApiProduct, ApiProductVariant } from "@/lib/types";
 
 interface BuyNowButtonProps {
-  product: any;
-  variant?: any;
+  product: ApiProduct;
+  variant?: ApiProductVariant;
   quantity?: number;
+  className?: string; // ✅ allow className
   style?: "default" | "minimal" | "full-width";
   size?: "sm" | "lg";
   utmParams?: UTMParams;
   disabled?: boolean;
 }
 
+
 export function BuyNowButton({
   product,
   variant,
   quantity = 1,
+  className, // ✅ accept className
   style = "default",
   size = "lg",
   utmParams,
@@ -28,7 +32,7 @@ export function BuyNowButton({
   const mergedUtm = mergeUtmParams({ ...utmParams });
 
   const productImage =
-    variant?.featured_image?.src ||
+    variant?.featured_image ||
     product.images?.[0]?.src ||
     "";
 
