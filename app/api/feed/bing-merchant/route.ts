@@ -14,6 +14,7 @@ export async function GET(){
      batchSize: FEED_PAGINATION_CONFIG.PRODUCTS_PER_PAGE,
   });
 
+
   return new Response(stream, {
     headers: {
       "Content-Type": "application/xml;charset=utf-8",
@@ -21,6 +22,3 @@ export async function GET(){
     },
   });
 }
-export const revalidate = 3600;
-export const dynamic = "force-dynamic";
-export const runtime = "edge";
