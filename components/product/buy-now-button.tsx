@@ -45,38 +45,70 @@ export function BuyNowButton({
   } as const;
 
   async function handleSubmit(formData: FormData) {
-    console.log('[BuyNow] Form submitted');
-    
-    // Call server action
-    const invoiceUrl = await buyNowAction(formData);
-    console.log('[BuyNow] Invoice URL received:', invoiceUrl);
+    console.log("[BuyNow] Form submitted");
 
-    // Check if we're in an iframe
-    const isInIframe = window.self !== window.top;
-    console.log('[BuyNow] Running in iframe:', isInIframe);
+    try {
+      // 1️⃣ Create draft order on server
+      const invoiceUrl = await buyNowAction(formData);
+      console.log("[BuyNow] Invoice URL received:", invoiceUrl);
 
-    if (isInIframe) {
-      // Send message to parent window (vohovintage.shop)
-      const message = {
-        type: "checkout",
-        checkoutUrl: invoiceUrl,
-        utm: mergedUtm,
-        product: {
-          product_title: formData.get("productTitle"),
-          product_image: formData.get("productImage"),
-        },
-      };
-      
-      console.log('[BuyNow] Sending message to parent:', message);
-      
-      window.parent.postMessage(
-        message,
-        "https://www.vohovintage.shop"
-      );
-    } else {
-      // Not in iframe, redirect directly
-      console.log('[BuyNow] Not in iframe, redirecting to:', invoiceUrl);
-      window.location.href = invoiceUrl;
+      if (!invoiceUrl) {
+        console.error("[BuyNow] No invoice URL returned from server action.");
+        alert("Something went wrong. Please try again.");
+        return;
+      }
+
+      // 2️⃣ Detect iframe context
+      const isInIframe = window.self !== window.top;
+      console.log("[BuyNow] Running in iframe:", isInIframe);
+
+      const parentOrigin = "https://www.vohovintage.shop";
+
+      if (isInIframe) {
+        const message = {
+          type: "checkout",
+          checkoutUrl: invoiceUrl,
+          utm: mergedUtm,
+          token: formData.get("utm_source") || "", // Optional token for validation
+          product: {
+            product_title: formData.get("productTitle"),
+            product_image: formData.get("productImage"),
+          },
+        };
+
+        console.log("[BuyNow] Sending message to parent:", message);
+
+        try {
+          window.parent.postMessage(message, parentOrigin);
+
+          // 3️⃣ Fallback: If parent blocks postMessage or CSP blocks frame
+          const timeout = setTimeout(() => {
+            console.warn(
+              "[BuyNow] No response from parent window. Redirecting directly..."
+            );
+            window.location.href = invoiceUrl;
+          }, 1500);
+
+          // Optional listener for confirmation from parent
+          const listener = (event: MessageEvent) => {
+            if (event.origin === parentOrigin && event.data === "checkout:received") {
+              clearTimeout(timeout);
+              window.removeEventListener("message", listener);
+            }
+          };
+          window.addEventListener("message", listener);
+        } catch (err) {
+          console.error("[BuyNow] postMessage failed, redirecting directly:", err);
+          window.location.href = invoiceUrl;
+        }
+      } else {
+        // 4️⃣ Not in iframe, redirect directly
+        console.log("[BuyNow] Not in iframe, redirecting to:", invoiceUrl);
+        window.location.href = invoiceUrl;
+      }
+    } catch (error) {
+      console.error("[BuyNow] Error handling submit:", error);
+      alert("Checkout failed. Please refresh and try again.");
     }
   }
 
@@ -90,7 +122,11 @@ export function BuyNowButton({
         className={className}
         size={size}
       >
-        {pending ? <Loader2 className="mr-2 w-4 h-4 animate-spin" /> : <ShoppingBag className="mr-2 w-4 h-4" />}
+        {pending ? (
+          <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+        ) : (
+          <ShoppingBag className="mr-2 w-4 h-4" />
+        )}
         {pending ? "Processing..." : "Buy Now"}
       </Button>
     );
