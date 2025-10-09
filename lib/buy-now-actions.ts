@@ -233,7 +233,9 @@ export async function checkoutCartAction(
     const firstItem = cartItems[0];
     if (firstItem) {
       finalUrl.searchParams.set("product_title", firstItem.product.title);
-      const firstImage = firstItem.product.images?.[0]?.src;
+      const firstImage =
+        firstItem.product.variants?.[0]?.featured_image ||
+        firstItem.product.images?.[0]?.src;
       if (firstImage && /^https?:\/\//i.test(firstImage)) {
         finalUrl.searchParams.set("product_image", firstImage);
       }

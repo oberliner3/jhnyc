@@ -29,22 +29,23 @@ import {
 } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/cart-context";
 import { checkoutCartAction } from "@/lib/buy-now-actions";
+import { BuyNowButton } from "../product/buy-now-button";
 
 export default function CartDrawer() {
-	const {
-		items,
-		isOpen,
-		toggleCart,
-		removeItem,
-		updateQuantity,
-		clearCart,
-		getTotalPrice,
-	} = useCart();
+  const {
+    items,
+    isOpen,
+    toggleCart,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    getTotalPrice,
+  } = useCart();
 
-	const [isCheckingOut, setIsCheckingOut] = useState(false);
-	const totalPrice = getTotalPrice();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const totalPrice = getTotalPrice();
 
-	const handleCheckout = async () => {
+  const handleCheckout = async () => {
     if (items.length === 0) {
       toast.error("Your cart is empty");
       return;
@@ -73,7 +74,7 @@ export default function CartDrawer() {
     }
   };
 
-	return (
+  return (
     <Sheet open={isOpen} onOpenChange={toggleCart}>
       <SheetContent className="flex flex-col bg-white">
         <SheetHeader>
@@ -196,14 +197,12 @@ export default function CartDrawer() {
 
               {/* Actions */}
               <div className="space-y-2">
-                <Button
+                <BuyNowButton
                   className="w-full"
                   size="lg"
-                  onClick={handleCheckout}
-                  disabled={isCheckingOut}
-                >
-                  {isCheckingOut ? "Processing..." : "Checkout"}
-                </Button>
+                  product={items[0].product}
+                  variant={items[0].variant}
+                />
                 <Link href="/cart" className="block">
                   <Button
                     variant="outline"
