@@ -1,20 +1,12 @@
-// ===================================
-// BING MERCHANT FEED INDEX
-// Create as: app/api/feed/bing-merchant/index/route.ts
-// ===================================
-
 import { NextResponse } from "next/server";
 import { SITE_CONFIG } from "@/lib/constants";
 import { fetchAllProducts } from "@/lib/utils/product-server-utils";
 import { generateFeedIndexXml } from "@/lib/utils/xml-feeds";
 import {
-  calculatePaginationMetadata,
   generateIndexHeaders,
   FEED_PAGINATION_CONFIG,
 } from "@/lib/utils/xml-feeds/feed-pagination-utils";
 import { logger } from "@/lib/utils/logger";
-
-
 
 export async function GET() {
   const startTime = Date.now();
@@ -22,7 +14,9 @@ export async function GET() {
   try {
     logger.info("Generating Bing Merchant feed index");
 
-    const allProducts = await fetchAllProducts();
+    const allProducts = await fetchAllProducts(
+      FEED_PAGINATION_CONFIG.PRODUCTS_PER_PAGE
+    );
 
     if (!allProducts || allProducts.length === 0) {
       logger.warn("No products found for feed index");
@@ -77,7 +71,6 @@ export async function GET() {
   }
 }
 
-
-export const revalidate = 36000;
+export const revalidate = FEED_PAGINATION_CONFIG.DEFAULT_CACHE_S_MAX_AGE;
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

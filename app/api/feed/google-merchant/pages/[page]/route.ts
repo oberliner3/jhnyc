@@ -16,6 +16,7 @@ import {
   MerchantFeedItemData,
 } from "@/lib/utils/xml-feeds";
 import { logger } from "@/lib/utils/logger";
+import { FEED_PAGINATION_CONFIG } from "@/lib/utils/xml-feeds/feed-pagination-utils";
 
 // Products per page (adjust based on your needs)
 const PRODUCTS_PER_PAGE = 5000;
@@ -96,6 +97,6 @@ export async function GET(request: NextRequest, context: Context) {
     );
   }
 }
-export const revalidate = 36000;
+export const revalidate = FEED_PAGINATION_CONFIG.DEFAULT_CACHE_MAX_AGE;
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
