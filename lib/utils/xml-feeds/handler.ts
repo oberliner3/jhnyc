@@ -15,10 +15,11 @@ const PRODUCTS_PER_PAGE = 5000;
 
 export async function generatePaginatedFeed(
   req: NextRequest,
-  params: { page: string },
+  params: Promise<{ page: string }>,
   feedType: MerchantFeedType
 ) {
-  const page = parseInt(params.page, 10);
+  const { page: pageParam } = await params;
+  const page = parseInt(pageParam, 10);
 
   if (isNaN(page) || page < 1) {
     return new NextResponse("Invalid page number", { status: 400 });
