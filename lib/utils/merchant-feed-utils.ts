@@ -240,7 +240,7 @@ export function generateMerchantFeedXmlItem(
     service: "Standard",
     price: "9.99 USD",
   };
-
+ const proxiedImages =   data.imageLink.replace("https://cdn.shopify.com", "https://jhuangnyc.com/cdn") ;
   return `
     <item>
       <title><![CDATA[${data.title}]]></title>
@@ -250,7 +250,7 @@ export function generateMerchantFeedXmlItem(
       <${ns}:title><![CDATA[${data.title}]]></${ns}:title>
       <${ns}:description><![CDATA[${data.description}]]></${ns}:description>
       <${ns}:link>${escapeXml(data.link)}</${ns}:link>
-      <${ns}:image_link>${escapeXml(data.imageLink)}</${ns}:image_link>
+      <${ns}:image_link>${escapeXml(proxiedImages)}</${ns}:image_link>
       <${ns}:availability>${data.availability}</${ns}:availability>
       <${ns}:price>${escapeXml(data.price)}</${ns}:price>
       ${

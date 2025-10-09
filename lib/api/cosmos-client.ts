@@ -30,7 +30,7 @@ function getServerConfig() {
   const { env } = require("@/lib/env-validation");
 
   return {
-        baseUrl: env.NEXT_PUBLIC_COSMOS_API_BASE_URL,
+    baseUrl: env.NEXT_PUBLIC_COSMOS_API_BASE_URL,
     apiKey: env.COSMOS_API_KEY,
   };
 }
@@ -213,10 +213,7 @@ export async function getProduct(
   });
 
   const query = queryParams.toString() ? `?${queryParams}` : "";
-  return cosmosRequest<ApiProduct>(
-    `/products/${key}${query}`,
-    options
-  );
+  return cosmosRequest<ApiProduct>(`/products/${key}${query}`, options);
 }
 
 /**
@@ -265,26 +262,38 @@ export async function fetchAllProducts(
   while (hasMore) {
     const response = await getProducts(
       { page, limit: pageSize },
-      { cache: "no-store" } // Don't cache bulk operations
+      { cache: "no-store" }
     );
 
-    if (!response.products || response.products.length === 0) {
-      break;
-    }
+    if (!response.products?.length) break;
 
     allProducts.push(...response.products);
 
-    // Check if there are more pages
-    if (response.products.length < pageSize) {
-      hasMore = false;
-    } else {
-      page++;
-    }
+    // Use meta information if available, otherwise fall back to item count
+    const totalPages = response.meta?.total_pages;
+    const currentPage = response.meta?.page ?? page;
 
-    logger.debug(`Fetched page ${page - 1}`, {
-      count: response.products.length,
-      total: allProducts.length,
-    });
+    if (totalPages !== undefined) {
+      // Meta-based pagination
+      hasMore = currentPage < totalPages;
+      page = currentPage + 1;
+
+      logger.debug(`Fetched page ${currentPage}`, {
+        count: response.products.length,
+        total: allProducts.length,
+        totalPages,
+        limit: response.meta?.limit,
+      });
+    } else {
+      // Fallback pagination
+      hasMore = response.products.length >= pageSize;
+      page++;
+
+      logger.debug(`Fetched page ${page - 1}`, {
+        count: response.products.length,
+        total: allProducts.length,
+      });
+    }
   }
 
   return allProducts;
