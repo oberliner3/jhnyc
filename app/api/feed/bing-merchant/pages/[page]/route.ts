@@ -19,13 +19,10 @@ const PRODUCTS_PER_PAGE = 5000;
 type Context = {
   params: Promise<{ page: string }>;
 };
-export async function GET(
-  request: NextRequest,
-  context: Context
-) {
+export async function GET(request: NextRequest, context: Context) {
   const { page } = await context.params;
   const pageNumber = parseInt(page, 10);
-  const feedType = "bing";  
+  const feedType = "bing";
 
   if (isNaN(pageNumber) || pageNumber < 1) {
     return new Response("Invalid page number", { status: 400 });
@@ -97,6 +94,6 @@ export async function GET(
   }
 }
 
-export const revalidate = 3600; // optional ISR
-export const dynamic = "force-dynamic"; // ensure live data
-// export const runtime = "edge"; // uncomment for edge runtime
+export const revalidate = 3600;
+export const dynamic = "force-dynamic";
+export const runtime = "edge";

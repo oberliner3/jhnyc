@@ -17,9 +17,6 @@ import {
 } from "@/lib/utils/xml-feeds/feed-pagination-utils";
 import { logger } from "@/lib/utils/logger";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const revalidate = 3600; // Cache for 1 hour
 
 export async function GET() {
   const startTime = Date.now();
@@ -83,3 +80,8 @@ export async function GET() {
     );
   }
 }
+
+
+export const revalidate = 3600;
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
