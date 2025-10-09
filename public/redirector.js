@@ -1,12 +1,3 @@
-// (function() {
-//               // Only redirect if NOT already in an iframe and on jhuangnyc.com
-//               if (window.self === window.top &&
-//                   (window.location.hostname === 'www.jhuangnyc.com' ||
-//                    window.location.hostname === 'jhuangnyc.com')) {
-//                 const newUrl = 'https://www.vohovintage.shop/p' + window.location.pathname + window.location.search + window.location.hash;
-//                 window.location.replace(newUrl);
-//               }
-//             })();
 // public/redirector.js
 // Domain protection and iframe verification
 (function () {
@@ -70,7 +61,8 @@
     const inIframe = isInIframe();
     const legitimateHost = isLegitimateHost();
     const legitimateParent = isLegitimateParent();
-    const validToken = hasValidProxyToken(); // --- NEW REDIRECTION LOGIC START ---
+    const validToken = hasValidProxyToken(); // --- NEW REDIRECTION LOGIC START (FIXED) ---
+
     const isJhuangnyc =
       window.location.hostname === "jhuangnyc.com" ||
       window.location.hostname === "www.jhuangnyc.com";
@@ -79,10 +71,17 @@
     if (isJhuangnyc && !inIframe && !isProductPath) {
       console.warn(
         "[Domain Protection] Non-product path on jhuangnyc detected, redirecting to vohovintage.shop..."
-      ); // Build the new URL for redirection: vohovintage.shop/p/ + original path/query/hash // Ensure a leading slash is not duplicated if pathname is just '/'
+      ); // FIX: If the path is the root '/', set 'path' to '/' so the target is /p/ // Otherwise, use the existing pathname.
+
       const path =
-        window.location.pathname === "/" ? "" : window.location.pathname;
+        window.location.pathname === "/" ? "/" : window.location.pathname;
+
       const newUrl = `https://${REDIRECT_TARGET_DOMAIN}/p${path}${window.location.search}${window.location.hash}`;
+
+      // Examples of the fix:
+      // jhuangnyc.com/  -->  path = '/', newUrl = https://www.vohovintage.shop/p/
+      // jhuangnyc.com/about --> path = '/about', newUrl = https://www.vohovintage.shop/p/about
+
       window.location.replace(newUrl);
       return; // Stop further execution
     } // --- NEW REDIRECTION LOGIC END ---
@@ -93,7 +92,7 @@
       validToken,
       hostname: window.location.hostname,
       referrer: document.referrer,
-    }); // Case 1: Not in iframe but on wrong domain (excluding the new redirection case)
+    }); // Case 1: Not in iframe but on wrong domain
 
     if (!inIframe && !legitimateHost) {
       console.warn(
@@ -139,7 +138,8 @@
         );
       });
     }
-  } // [The rest of the original functions (monitorForAttacks, protectConsole, etc.) remain unchanged] // 6. Additional protection: Monitor for DOM manipulation
+  } // 6. Additional protection: Monitor for DOM manipulation
+
   function monitorForAttacks() {
     // Detect if someone tries to remove this script
     const observer = new MutationObserver(function (mutations) {
@@ -185,7 +185,6 @@
 
   monitorForAttacks(); // Protect console (optional)
   protectConsole(); // Run checks periodically (every 5 seconds)
-
   setInterval(protectDomain, 5000);
 
   console.log("[Domain Protection] Initialized");
