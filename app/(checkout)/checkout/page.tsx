@@ -486,8 +486,9 @@ export default function CheckoutPage() {
                       <div className="bg-gray-100 rounded-md w-full h-full overflow-hidden">
                         <Image
                           src={
-                            item.image ||
-                            getProductPlaceholder(item.name, 200, 200)
+                            item.image
+                              ? item.image.replace("https://cdn.shopify.com", "https://jhuangnyc.com/cdn")
+                              : getProductPlaceholder(item.name, 200, 200)
                           }
                           alt={item.name}
                           fill

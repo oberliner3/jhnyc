@@ -71,7 +71,11 @@ function CartContent() {
             className="flex items-center gap-4 p-4 border rounded-lg"
           >
             <Image
-              src={item.image || getProductPlaceholder(item.name, 200, 200)}
+              src={
+                item.image
+                  ? item.image.replace("https://cdn.shopify.com", "https://jhuangnyc.com/cdn")
+                  : getProductPlaceholder(item.name, 200, 200)
+              }
               alt={item.name}
               width={80}
               height={80}

@@ -74,7 +74,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
           {/* Main Image with Navigation */}
           <div className="group relative flex bg-muted bg-white rounded-lg aspect-square overflow-hidden">
             <Image
-              src={currentImage.src}
+              src={currentImage.src.replace("https://cdn.shopify.com", "https://jhuangnyc.com/cdn")}
               alt={currentImage.alt || product.title}
               fill
               unoptimized
@@ -135,7 +135,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                   aria-label={`View image ${index + 1}`}
                 >
                   <Image
-                    src={image.src}
+                    src={image.src.replace("https://cdn.shopify.com", "https://jhuangnyc.com/cdn")}
                     alt={`${product.title} ${index + 1}`}
                     fill
                     className="object-cover"

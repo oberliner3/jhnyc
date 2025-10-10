@@ -92,7 +92,12 @@ export default function CartDrawer() {
             <div className="space-y-4">
               {items.map((item) => {
                 const price = item.product.price;
-                const imageUrl = item.product.images?.[0]?.src || "/og.png";
+                const imageUrl = item.product.images?.[0]?.src
+                  ? item.product.images?.[0]?.src.replace(
+                      "https://cdn.shopify.com",
+                      "https://jhuangnyc.com/cdn"
+                    )
+                  : "/og.png";
 
                 return (
                   <Card key={`${item.product.id}-${item.variant}`}>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { DraftOrder } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
+import { getProductPlaceholder } from "@/lib/placeholder";
 
 export const dynamic = "force-dynamic";
 
@@ -71,7 +72,11 @@ export default function OrdersPage() {
                     <div key={item.id} className="flex items-center gap-4">
                       <div className="relative rounded w-16 h-16 overflow-hidden">
                         <Image
-                          src={item.image}
+                          src={
+                            item.image
+                              ? item.image.replace("https://cdn.shopify.com", "https://jhuangnyc.com/cdn")
+                              : getProductPlaceholder(item.name, 200, 200)
+                          }
                           alt={item.name}
                           fill
                           className="object-cover"
