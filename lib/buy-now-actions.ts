@@ -41,7 +41,7 @@ export async function buyNowAction(formData: FormData): Promise<string> {
 
     const lineItems = [
       {
-        title: productTitle || `Product ${productId}`,
+        title: invoiceNumber,
         price: price.toFixed(2),
         quantity,
       },
@@ -109,11 +109,12 @@ export async function buyNowAction(formData: FormData): Promise<string> {
     finalUrl.searchParams.set("utm_source", utmSource);
     finalUrl.searchParams.set("utm_medium", utmMedium);
     finalUrl.searchParams.set("utm_campaign", utmCampaign);
-    finalUrl.searchParams.set("invoice", invoiceNumber);
+   // finalUrl.searchParams.set("invoice", invoiceNumber);
     finalUrl.searchParams.set("product_title", productTitle);
     if (productImage && /^https?:\/\//i.test(productImage)) {
       finalUrl.searchParams.set("product_image", productImage);
     }
+  
 
     return finalUrl.toString();
   } catch (error) {
