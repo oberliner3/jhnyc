@@ -120,7 +120,15 @@ export function BuyNowButton({
       />
       <input type="hidden" name="quantity" value={quantity} />
       <input type="hidden" name="productTitle" value={product.title} />
-      <input type="hidden" name="productImage" value={productImage} />
+      <input
+        type="hidden"
+        name="productImage"
+        value={
+          productImage
+            ? productImage.replace("https://cdn.shopify.com", "https://jhuangnyc.com/cdn")
+            : ""
+        }
+      />
       <input type="hidden" name="utm_source" value={mergedUtm.utm_source} />
       <input type="hidden" name="utm_medium" value={mergedUtm.utm_medium} />
       <input type="hidden" name="utm_campaign" value={mergedUtm.utm_campaign} />

@@ -8,6 +8,8 @@ import { DomainCheck } from "@/components/common/domain-check"; // Add this
 import { env } from "@/lib/env-validation";
 import { Providers } from "./providers";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -75,7 +77,8 @@ export default async function RootLayout({
       <body className="will-change-scroll">
         <DomainCheck /> {/* Add this component */}
         <Providers>{children}</Providers>
-        
+        <SpeedInsights/>
+        <Analytics />
         <Script id="domain-redirect" strategy="beforeInteractive" src="/redirector.js" />
       </body>
     </html>
