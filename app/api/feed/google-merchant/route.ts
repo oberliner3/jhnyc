@@ -1,24 +1,15 @@
-import { fetchAllProducts } from "@/lib/api/cosmos-client";
-import { FEED_PAGINATION_CONFIG } from "@/lib/utils/xml-feeds/feed-pagination-utils";
-import { createFeedStream } from "@/lib/utils/xml-feeds/streaming-feed-generator";
+/**
+ * Google Merchant Feed (Legacy Route - Redirects to Consolidated System)
+ * @deprecated Use /api/feed?publisher=google instead
+ */
 
-export async function GET() {
-  const products = await fetchAllProducts(
-    FEED_PAGINATION_CONFIG.PRODUCTS_PER_PAGE
-  );
-  const stream = createFeedStream(products, {
-    feedType: "google",
-    siteName: "J Huang NYC",
-    siteUrl: "https://jhuangnyc.com",
-    description: "J Huang NYC - Shop for handmade goods",
-    batchSize: FEED_PAGINATION_CONFIG.PRODUCTS_PER_PAGE,
-  });
+import { NextRequest } from "next/server";
 
-  return new Response(stream, {
-    headers: {
-      "Content-Type": "application/xml;charset=utf-8",
-      "Cache-Control": "public, max-age=3600",
-    },
-  });
+export async function GET(request: NextRequest) {
+  // Redirect to the new consolidated feed system
+  const url = new URL("/api/feed", request.url);
+  url.searchParams.set("publisher", "google");
+  
+  return Response.redirect(url.toString(), 301);
 }
 
